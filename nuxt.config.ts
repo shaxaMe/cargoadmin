@@ -7,9 +7,13 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: true },
   css:['primeicons/primeicons.css','../assets/scss/main.scss'],
+  plugins:['~/plugins/vmask.js','~/plugins/peristit.js'],
   modules: [
     '@primevue/nuxt-module',
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    '@nuxt/icon',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
   ],
   tailwindcss: {
     cssPath: ['~/assets/css/tailwind.css', { injectPosition: "first" }],

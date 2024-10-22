@@ -5,7 +5,11 @@
     box-sizing: border-box;
     font-family: "Nunito Sans", sans-serif;
 }
-
+:root{
+  --p-inputtext-focus-border-color:#4964D8 !important;
+  --p-floatlabel-focus-color:#4964D8 !important;
+  --p-select-focus-border-color:#4964D8 !important;
+}
 body{
     overflow-x: hidden;
     background: #F5F6FA;
@@ -13,4 +17,23 @@ body{
 
 body::-webkit-scrollbar {
     display: none !important;
+  }
+
+
+  // .p-select{
+  //   border: none !important;
+  //   outline: none !important;
+  //   border-bottom: 1px solid rgb(209 213 219) !important;
+  //   border-radius: 0 !important;
+  // }
+
+  .p-password:has(.p-password-toggle-mask-icon) .p-password-input {
+    min-width: 100% !important;
+  //   border: none !important;
+  //   outline: none !important;
+  //   border-bottom: 1px solid rgb(209 213 219) !important;
+  //   border-radius: 0 !important;
+  }
+  .p-password:has(.p-password-toggle-mask-icon) .p-password-input.p-invalid{
+    border-bottom: 1px solid red !important;
   }
