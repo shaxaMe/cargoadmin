@@ -1,6 +1,7 @@
 <script setup>
 import { useAuth } from "~/store/auth";
 const auth = useAuth();
+const router = useRouter()
 const { setLogin } = auth;
 import AuthImg from "~/assets/images/auth-img.png";
 definePageMeta({
@@ -30,7 +31,8 @@ function _focus() {
 }
 
 function signIn() {
-  let phone = formatNum(this.formValues.phone, " ").substr(1);
+  if(type.value=='new'){
+    let phone = formatNum(this.formValues.phone, " ").substr(1);
   let data = { ...this.formValues }; // Copy the form values to avoid mutating the original object
   delete data.phone; // Remove the original phone
   delete data.role;
@@ -41,8 +43,18 @@ function signIn() {
     method: "POST",
     body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
   }).then((res) => {
-    console.log(res);
+    setLogin(true)
+    router.push('/')
   });
+  }else{
+    useApi("/v1/user/login", {
+    method: "POST",
+    body: { password: formValues.value.password, username:formValues.value.full_name }, // Use the modified 'data' object with the formatted phone
+  }).then((res) => {
+    setLogin(true)
+    router.push('/')
+  });
+  }
 }
 
 //watch
@@ -150,7 +162,7 @@ watch(
               />
             </div>
           </div>
-          <div class="mt-3" v-if="type == 'new'">
+          <div class="mt-3" v-if="!!type">
             <!-- <div class="relative flex items-center">
               <input
                 name="text"
@@ -166,8 +178,8 @@ watch(
               />
             </div> -->
             <FloatLabel variant="on" class="w-full">
-              <InputText class="w-full" v-mask="'+998 ## ### ## ##'" id="phone_num" v-model="formValues.full_name" />
-              <label for="phone_num">Ism familiya</label>
+              <InputText class="w-full"  id="full_name" v-model="formValues.full_name" />
+              <label for="full_name">Ism familiya</label>
             </FloatLabel>
           </div>
           <div class="mt-3" v-if="type == 'new'">

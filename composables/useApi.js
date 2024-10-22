@@ -28,9 +28,9 @@ export const useApi = (path, options = {}) => {
         set_user({});
 
         // Redirect if the request was for the profile
-        if (request.includes('profile')) {
-          router.push('/');  
-        }
+        // if (request.includes('profile')) {
+          router.push('/login');  
+        // }
       }
     }
   });
