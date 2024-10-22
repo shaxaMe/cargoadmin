@@ -1,39 +1,10 @@
-export default defineNuxtRouteMiddleware((to) => {
+import { useAuth } from '~/store/auth'; // Import the Pinia store
 
-//     const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
-  
-//     const token = useCookie('token'); // get token from cookies
-  
-  
-  
-//   if (token.value) {
-  
-//       // check if value exists
-  
-//       authenticated.value = true; // update the state to authenticated
-  
-//     }
-  
-  
-  
-//   // if token exists and url is /login redirect to homepage
-  
-//     if (token.value && to?.name === 'login') {
-  
-//       return navigateTo('/');
-  
-//     }
-  
-  
-  
-//   // if token doesn't exist redirect to log in
-  
-    // if (!token.value && to?.name !== 'login') {
-  
-    //   abortNavigation();
-  
-      return navigateTo('/login');
-  
-    // }
-  
-  });
+export default defineNuxtRouteMiddleware((to) => {
+  const auth = useAuth(); // Access the auth store
+  const { isLoggin } = auth;
+  // If the user is not logged in, redirect to the login page
+  if (!isLoggin) {
+    return navigateTo('/login');
+  }
+});

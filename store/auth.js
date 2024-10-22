@@ -1,5 +1,5 @@
 export const useAuth = defineStore('auth', () => {
-    const isLoggin = ref(false)
+    const isLoggin = ref(false);
     const user = ref({})
     const token = ref(null)
     function setUser(payload) {
@@ -11,18 +11,11 @@ export const useAuth = defineStore('auth', () => {
     function set_token(payload){
       token.value = payload
     }
-    return { isLoggin, setUser, user,setLogin,token }
+    return { isLoggin, setUser, user,setLogin,token,set_token }
 }, {
-    persist: [
-        {
-          pick: ['user'],
-          storage: process.client ? localStorage : false,
-        },
-        {
-          pick: ['isLoggin'],
-          storage: process.client ? localStorage : false,
-        },
-      ],
+  persist:{
+    storage:window.localStorage
+  },
 })
 
 // base url

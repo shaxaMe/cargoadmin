@@ -4,10 +4,10 @@ import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
-  ssr: true,
+  ssr: false,
   devtools: { enabled: true },
   css:['primeicons/primeicons.css','../assets/scss/main.scss'],
-  plugins:['~/plugins/vmask.js','~/plugins/peristit.js'],
+  plugins:['~/plugins/vmask.js','~/plugins/peristit.ts'],
   modules: [
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss',
