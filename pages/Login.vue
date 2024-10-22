@@ -1,7 +1,7 @@
 <script setup>
 import { useAuth } from "~/store/auth";
 const auth = useAuth();
-const router = useRouter()
+const router = useRouter();
 const { setLogin } = auth;
 import AuthImg from "~/assets/images/auth-img.png";
 definePageMeta({
@@ -31,29 +31,32 @@ function _focus() {
 }
 
 function signIn() {
-  if(type.value=='new'){
-    let phone = formatNum(this.formValues.phone, " ").substr(1);
-  let data = { ...this.formValues }; // Copy the form values to avoid mutating the original object
-  delete data.phone; // Remove the original phone
-  delete data.role;
-  data.role = this.formValues.role.code;
-  data.phone = phone; // Set the formatted phone number
+  if (type.value == "new") {
+    let phone = formValues.value.phone?formatNum(formValues.value.phone, " ").substr(1):'';
+    let data = { ...this.formValues }; // Copy the form values to avoid mutating the original object
+    delete data.phone; // Remove the original phone
+    delete data.role;
+    data.role = this.formValues.role.code;
+    data.phone = phone; // Set the formatted phone number
 
-  useApi("/v1/sms/phone/register/verify", {
-    method: "POST",
-    body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
-  }).then((res) => {
-    setLogin(true)
-    router.push('/')
-  });
-  }else{
+    useApi("/v1/sms/phone/register/verify", {
+      method: "POST",
+      body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
+    }).then((res) => {
+      setLogin(true);
+      router.push("/");
+    });
+  } else {
     useApi("/v1/user/login", {
-    method: "POST",
-    body: { password: formValues.value.password, username:formValues.value.full_name }, // Use the modified 'data' object with the formatted phone
-  }).then((res) => {
-    setLogin(true)
-    router.push('/')
-  });
+      method: "POST",
+      body: {
+        password: formValues.value.password,
+        username: formValues.value.full_name,
+      }, // Use the modified 'data' object with the formatted phone
+    }).then((res) => {
+      setLogin(true);
+      router.push("/");
+    });
   }
 }
 
@@ -136,7 +139,13 @@ watch(
               class="w-[18px] h-[18px] absolute right-2 text-[#bbb]"
             /> -->
             <FloatLabel variant="on" class="w-full">
-              <InputText class="w-full" @focus="_focus" v-mask="'+998 ## ### ## ##'" id="phone_num" v-model="formValues.phone" />
+              <InputText
+                class="w-full"
+                @focus="_focus"
+                v-mask="'+998 ## ### ## ##'"
+                id="phone_num"
+                v-model="formValues.phone"
+              />
               <label for="phone_num">Telefon raqam</label>
             </FloatLabel>
           </div>
@@ -178,7 +187,11 @@ watch(
               />
             </div> -->
             <FloatLabel variant="on" class="w-full">
-              <InputText class="w-full"  id="full_name" v-model="formValues.full_name" />
+              <InputText
+                class="w-full"
+                id="full_name"
+                v-model="formValues.full_name"
+              />
               <label for="full_name">Ism familiya</label>
             </FloatLabel>
           </div>
@@ -186,29 +199,27 @@ watch(
             <div class="relative flex items-center">
               <FloatLabel variant="on" class="w-full">
                 <Select
-                v-model="formValues.role"
-                :options="cities"
-                inputId="roleId"
-                optionLabel="name"
-                class="w-full text-sm"
-              />
-              <label for="roleId">Foydalanuvchi roli</label>
-
+                  v-model="formValues.role"
+                  :options="cities"
+                  inputId="roleId"
+                  optionLabel="name"
+                  class="w-full text-sm"
+                />
+                <label for="roleId">Foydalanuvchi roli</label>
               </FloatLabel>
-              
             </div>
           </div>
           <div class="mt-3" v-if="!!type">
             <div class="relative flex items-center">
               <FloatLabel variant="on" class="w-full">
                 <Password
-                v-model="formValues.password"
-                toggleMask
-                inputId="passwordId"
-                class="w-full relative text-sm"
-                :feedback="false"
-              />
-              <label for="passwordId">Parol</label>
+                  v-model="formValues.password"
+                  toggleMask
+                  inputId="passwordId"
+                  class="w-full relative text-sm"
+                  :feedback="false"
+                />
+                <label for="passwordId">Parol</label>
               </FloatLabel>
             </div>
           </div>
@@ -216,13 +227,13 @@ watch(
             <div class="relative flex items-center flex-col gap-1">
               <FloatLabel variant="on" class="w-full">
                 <Password
-                v-model="formValues.repeat_password"
-                toggleMask
-                inputId="rePassword"
-                class="w-full relative text-sm"
-                :feedback="false"
-              />
-              <label for="rePassword">Takror parol</label>
+                  v-model="formValues.repeat_password"
+                  toggleMask
+                  inputId="rePassword"
+                  class="w-full relative text-sm"
+                  :feedback="false"
+                />
+                <label for="rePassword">Takror parol</label>
               </FloatLabel>
               <!-- <div class="text-red-500 text-xs self-start">Parolda o'xshashlik mavjud emas</div> :invalid="!value" variant="filled" -->
             </div>
