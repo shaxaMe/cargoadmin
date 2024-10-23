@@ -2,7 +2,7 @@
 import { useAuth } from "~/store/auth";
 const auth = useAuth();
 const router = useRouter();
-const { setLogin } = auth;
+const { setLogin,set_token,setUser } = auth;
 import AuthImg from "~/assets/images/auth-img.png";
 definePageMeta({
   layout: "LoginLayout",
@@ -31,8 +31,8 @@ function _focus() {
 }
 
 function signIn() {
+  let phone = formValues.value.phone?formatNum(formValues.value.phone, " ").substr(1):'';
   if (type.value == "new") {
-    let phone = formValues.value.phone?formatNum(formValues.value.phone, " ").substr(1):'';
     let data = { ...formValues.value }; // Copy the form values to avoid mutating the original object
     delete data.phone; // Remove the original phone
     delete data.role;
@@ -44,18 +44,30 @@ function signIn() {
       body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
     }).then((res) => {
       setLogin(true);
+      set_token(res.access);
+      setUser(res.user);
       router.push("/");
-    });
+    }).catch((e) => {
+      setLogin(false);
+      set_token(null);
+      setUser(null);
+    });;
   } else {
     useApi("/v1/user/login", {
       method: "POST",
       body: {
         password: formValues.value.password,
-        username: formValues.value.full_name,
+        username: phone,
       }, // Use the modified 'data' object with the formatted phone
     }).then((res) => {
       setLogin(true);
+      set_token(res.access);
+      setUser(res.user);
       router.push("/");
+    }).catch((e) => {
+      setLogin(false);
+      set_token(null);
+      setUser(null);
     });
   }
 }
@@ -91,6 +103,8 @@ watch(
         .catch((e) => {
           console.log(e);
         });
+    }else{
+      type.value = null;
     }
   }
 );
@@ -171,7 +185,7 @@ watch(
               />
             </div>
           </div>
-          <div class="mt-3" v-if="!!type">
+          <div class="mt-3" v-if="type=='new'">
             <!-- <div class="relative flex items-center">
               <input
                 name="text"
