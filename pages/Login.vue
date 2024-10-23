@@ -33,10 +33,10 @@ function _focus() {
 function signIn() {
   if (type.value == "new") {
     let phone = formValues.value.phone?formatNum(formValues.value.phone, " ").substr(1):'';
-    let data = { ...this.formValues }; // Copy the form values to avoid mutating the original object
+    let data = { ...formValues.value }; // Copy the form values to avoid mutating the original object
     delete data.phone; // Remove the original phone
     delete data.role;
-    data.role = this.formValues.role.code;
+    data.role = formValues.value.role.code;
     data.phone = phone; // Set the formatted phone number
 
     useApi("/v1/sms/phone/register/verify", {
