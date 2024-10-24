@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   css:['primeicons/primeicons.css','../assets/scss/main.scss'],
-  plugins:['~/plugins/vmask.js','~/plugins/peristit.ts'],
+  plugins:['~/plugins/vmask.js','~/plugins/peristit.ts','~/plugins/validate.js'],
   modules: [
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss',
