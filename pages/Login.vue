@@ -1,5 +1,7 @@
 <script setup>
 import { useAuth } from "~/store/auth";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const auth = useAuth();
 const router = useRouter();
 const { setLogin,set_token,setUser } = auth;
@@ -10,9 +12,8 @@ definePageMeta({
 
 //data
 const type = ref("");
-const selectedCity = ref();
-const value = ref(null);
 const formValues = ref({});
+let loginPassError = ref(false);
 const cities = ref([
   { name: "DRIVER", code: "DRIVER" },
   { name: "USER", code: "USER" },
@@ -65,6 +66,12 @@ function signIn() {
       setUser(res.user);
       router.push("/");
     }).catch((e) => {
+      if(e.response.status==401){
+        loginPassError.value = true;
+      }else{
+        console.log('toe')
+        toast.add({ severity: 'error', summary: 'Xatolik', detail: 'Login qilishda xatolik', life: 3000 });
+      }
       setLogin(false);
       set_token(null);
       setUser(null);
@@ -112,6 +119,7 @@ watch(
 
 <template>
   <div class="flex justify-end" style="max-width: 1920px; margin: 0 auto">
+    <Toast />
     <div class="flex-1 bg-slate-50">
       <img class="w-full h-full" :src="AuthImg" alt="logo" />
     </div>
@@ -224,17 +232,19 @@ watch(
             </div>
           </div>
           <div class="mt-3" v-if="!!type">
-            <div class="relative flex items-center">
+            <div class="relative">
               <FloatLabel variant="on" class="w-full">
                 <Password
                   v-model="formValues.password"
                   toggleMask
                   inputId="passwordId"
                   class="w-full relative text-sm"
+                  :invalid="loginPassError"
                   :feedback="false"
                 />
                 <label for="passwordId">Parol</label>
               </FloatLabel>
+              <p v-if="loginPassError" class="text-red-500 text-sm mt-1">Parolni tekshiring</p>
             </div>
           </div>
           <div class="mt-3" v-if="type == 'new'">
@@ -256,11 +266,12 @@ watch(
           <div class="mt-12">
             <button
               type="button"
+              :disabled="formValues.phone.length < 11 ||!!type && formValues.password.length < 8"
               @click="
                 setLogin(true);
                 signIn();
               "
-              class="w-full py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
+              class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
             >
               Sign in
             </button>
