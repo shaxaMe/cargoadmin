@@ -2,7 +2,7 @@ import { useAuth } from "~/store/auth";
 
 export const useApi = (path, options = {}) => {  
   const authStore = useAuth();
-  const { set_token, set_user } = authStore;
+  const { set_token, setUser } = authStore;
   const { token } = storeToRefs(authStore);  
   const router = useRouter();
 
@@ -25,7 +25,7 @@ export const useApi = (path, options = {}) => {
       // Handle 401 Unauthorized responses
       if (response.status === 401) {  
         set_token(null);
-        set_user({});
+        setUser({});
 
         // Redirect if the request was for the profile
         // if (request.includes('profile')) {
