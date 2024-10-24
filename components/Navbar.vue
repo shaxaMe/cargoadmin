@@ -5,18 +5,19 @@
         class="max-w-[350px] relative w-full flex items-center justify-start"
       >
         <Icon
-          name="material-symbols:search left-3 text-black"
-          class="absolute"
+          name="ic:twotone-search"
+          class="absolute left-3 text-black"
         />
         <InputText
           class="w-full bg-[#D5D5D5] !pl-8 text-black"
           type="text"
           size="small"
           v-model="value"
+          placeholder="Search..."
         />
       </div>
       <div class="flex items-center gap-8">
-        <div class="relative">
+        <div class="relative cursor-pointer">
           <div
             class="bg-[#F93C65] p-1 text-white text-sm text-center flex justify-center items-center rounded-full w-4 h-4 absolute -right-1 -top-2"
           >
