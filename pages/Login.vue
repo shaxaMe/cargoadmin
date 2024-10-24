@@ -266,7 +266,7 @@ watch(
           <div class="mt-12">
             <button
               type="button"
-              :disabled="formValues.phone.length < 11 ||!!type && formValues.password.length < 8"
+              :disabled="formValues?.phone?.length < 11 ||!!type && formValues?.password?.length < 8"
               @click="
                 setLogin(true);
                 signIn();
