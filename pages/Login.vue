@@ -1,10 +1,12 @@
 <script setup>
 import { useAuth } from "~/store/auth";
 import { useToast } from "primevue/usetoast";
+import useVuelidate from "@vuelidate/core";
+import { required, sameAs } from "@vuelidate/validators";
 const toast = useToast();
 const auth = useAuth();
 const router = useRouter();
-const { setLogin,set_token,setUser } = auth;
+const { setLogin, set_token, setUser } = auth;
 import AuthImg from "~/assets/images/auth-img.png";
 definePageMeta({
   layout: "LoginLayout",
@@ -12,7 +14,14 @@ definePageMeta({
 
 //data
 const type = ref("");
-const formValues = ref({});
+const formValues = reactive({
+  secret_code:null,
+  full_name: null,
+  phone: null,
+  password: null,
+  repeat_password: null,
+  role: null,
+});
 let loginPassError = ref(false);
 const cities = ref([
   { name: "DRIVER", code: "DRIVER" },
@@ -20,69 +29,112 @@ const cities = ref([
   { name: "OPERATOR", code: "OPERATOR" },
 ]);
 
+const rules = computed(() => ({
+  full_name: {
+    required,
+  },
+  password: {
+    required,
+  },
+  repeat_password: {
+    required,
+    // sameAs: sameAs(formValues.password),
+  },
+  role:{
+    required
+  },
+}));
+
+const $v = useVuelidate(rules, formValues);
 // methods
 function format(payload) {
-  let str = formatNum(formValues.value.phone);
+  let str = formatNum(formValues.phone);
   return payload ? str.substr(1) : payload;
 }
 function _focus() {
-  if (!formValues.value.phone) {
-    formValues.value.phone = "+998 ";
+  if (!formValues.phone) {
+    formValues.phone = "+998 ";
   }
 }
 
 function signIn() {
-  let phone = formValues.value.phone?formatNum(formValues.value.phone, " ").substr(1):'';
-  if (type.value == "new") {
-    let data = { ...formValues.value }; // Copy the form values to avoid mutating the original object
-    delete data.phone; // Remove the original phone
-    delete data.role;
-    data.role = formValues.value.role.code;
-    data.phone = phone; // Set the formatted phone number
-
-    useApi("/v1/sms/phone/register/verify", {
-      method: "POST",
-      body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
-    }).then((res) => {
-      setLogin(true);
-      set_token(res.access);
-      setUser(res.user);
-      router.push("/");
-    }).catch((e) => {
-      setLogin(false);
-      set_token(null);
-      setUser(null);
-    });;
-  } else {
-    useApi("/v1/user/login", {
-      method: "POST",
-      body: {
-        password: formValues.value.password,
-        username: phone,
-      }, // Use the modified 'data' object with the formatted phone
-    }).then((res) => {
-      setLogin(true);
-      set_token(res.access);
-      setUser(res.user);
-      router.push("/");
-    }).catch((e) => {
-      if(e.response.status==401){
-        loginPassError.value = true;
-      }else{
-        console.log('toe')
-        toast.add({ severity: 'error', summary: 'Xatolik', detail: 'Login qilishda xatolik', life: 3000 });
-      }
-      setLogin(false);
-      set_token(null);
-      setUser(null);
-    });
+  let phone = formValues.phone
+    ? formatNum(formValues.phone, " ").substr(1)
+    : "";
+  $v.value.$touch();  
+  const result = $v.value.$validate();
+  result.then((res)=>{
+    if (res) {
+    if (type.value == "new") {
+      type.value = "sms";
+    } else {
+      useApi("/v1/user/login", {
+        method: "POST",
+        body: {
+          password: formValues.password,
+          username: phone,
+        }, // Use the modified 'data' object with the formatted phone
+      })
+        .then((res) => {
+          setLogin(true);
+          set_token(res.access);
+          setUser(res.user);
+          router.push("/");
+        })
+        .catch((e) => {
+          if (e.response.status == 401) {
+            loginPassError.value = true;
+          } else {
+            toast.add({
+              severity: "error",
+              summary: "Xatolik",
+              detail: "Login qilishda xatolik",
+              life: 3000,
+            });
+          }
+          setLogin(false);
+          set_token(null);
+          setUser(null);
+        });
+    }
   }
+  })
+  
+}
+
+function loggin(){
+  let phone = formValues.phone
+    ? formatNum(formValues.phone, " ").substr(1)
+    : "";
+  if (type.value == "sms" && formValues.secret_code && formValues.secret_code.length==6) {
+      let data = { ...formValues }; // Copy the form values to avoid mutating the original object
+      delete data.phone; // Remove the original phone
+      delete data.role;
+      data.role = formValues.role.code;
+      data.phone = phone; // Set the formatted phone number
+
+      useApi("/v1/sms/phone/register/verify", {
+        method: "POST",
+        body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
+      })
+        .then((res) => {
+          setLogin(true);
+          set_token(res.access);
+          setUser(res.user);
+          router.push("/");
+        })
+        .catch((e) => {
+          setLogin(false);
+          set_token(null);
+          setUser(null);
+        });
+    }
 }
 
 //watch
 
 watch(
-  () => formValues.value.phone,
+  () => formValues.phone,
   (newVal) => {
     let str = formatNum(newVal, " ").substr(1);
     if (str && str.length >= 12 && !type.value) {
@@ -103,18 +155,20 @@ watch(
                 phone: str,
               },
             }).then((res) => {
-              formValues.value.secret_key = res.secret_key;
+              formValues.secret_key = res.secret_key;
             });
           }
         })
         .catch((e) => {
           console.log(e);
         });
-    }else{
+    } else {
       type.value = null;
     }
   }
 );
+
+
 </script>
 
 <template>
@@ -171,7 +225,7 @@ watch(
               <label for="phone_num">Telefon raqam</label>
             </FloatLabel>
           </div>
-          <div class="mt-3" v-if="type == 'new'">
+          <div class="mt-3" v-if="type == 'sms'">
             <div class="relative flex items-start flex-col gap-1">
               <!-- <input
                 name="text"
@@ -188,12 +242,12 @@ watch(
               <div class="text-[#bbb] text-sm">Tasdiqlash kodi</div>
               <InputOtp
                 v-model="formValues.secret_code"
-                :invalid="false"
+                :invalid="!formValues.secret_code || formValues.secret_code && formValues.secret_code.length<6"
                 :length="6"
               />
             </div>
           </div>
-          <div class="mt-3" v-if="type=='new'">
+          <div class="mt-3" v-if="type == 'new'">
             <!-- <div class="relative flex items-center">
               <input
                 name="text"
@@ -212,26 +266,41 @@ watch(
               <InputText
                 class="w-full"
                 id="full_name"
+                :invalid="!!$v.full_name.$errors.length"
                 v-model="formValues.full_name"
+                @blur="$v.full_name.$touch()"
               />
               <label for="full_name">Ism familiya</label>
             </FloatLabel>
+            <div
+              v-if="!!$v.full_name.$errors.length"
+              class="text-red-500 text-sm mt-1"
+            >
+              Ism familiya kiritilmagan
+            </div>
           </div>
           <div class="mt-3" v-if="type == 'new'">
-            <div class="relative flex items-center">
+            <div class="relative">
               <FloatLabel variant="on" class="w-full">
                 <Select
                   v-model="formValues.role"
                   :options="cities"
                   inputId="roleId"
+                  :invalid="!!$v.role.$errors.length"
                   optionLabel="name"
                   class="w-full text-sm"
                 />
                 <label for="roleId">Foydalanuvchi roli</label>
               </FloatLabel>
+              <div
+              v-if="!!$v.role.$errors.length"
+              class="text-red-500 text-sm mt-1"
+            >
+              Foydalanuvchi roli tanlangan
+            </div>
             </div>
           </div>
-          <div class="mt-3" v-if="!!type">
+          <div class="mt-3" v-if="!!type && type != 'sms'">
             <div class="relative">
               <FloatLabel variant="on" class="w-full">
                 <Password
@@ -239,26 +308,50 @@ watch(
                   toggleMask
                   inputId="passwordId"
                   class="w-full relative text-sm"
-                  :invalid="loginPassError"
+                  :invalid="loginPassError || !!$v.password.$errors.length"
                   :feedback="false"
                 />
                 <label for="passwordId">Parol</label>
               </FloatLabel>
-              <p v-if="loginPassError" class="text-red-500 text-sm mt-1">Parolni tekshiring</p>
+              <p v-if="loginPassError" class="text-red-500 text-sm mt-1">
+                Parolni tekshiring
+              </p>
+              <div
+                v-if="!!$v.password.$errors.length"
+                class="text-red-500 text-sm mt-1"
+              >
+                Parol kiritilmagan
+              </div>
             </div>
           </div>
           <div class="mt-3" v-if="type == 'new'">
-            <div class="relative flex items-center flex-col gap-1">
+            <div class="relative">
               <FloatLabel variant="on" class="w-full">
                 <Password
                   v-model="formValues.repeat_password"
                   toggleMask
                   inputId="rePassword"
                   class="w-full relative text-sm"
+                  :invalid="
+                    !!$v.repeat_password.$errors.length ||
+                    formValues.password !== formValues.repeat_password
+                  "
                   :feedback="false"
                 />
                 <label for="rePassword">Takror parol</label>
               </FloatLabel>
+              <div
+                v-if="!!$v.password.$errors.length"
+                class="text-red-500 text-sm mt-1"
+              >
+                Takror parolni kiriting
+              </div>
+              <div
+                v-if="formValues.password !== formValues.repeat_password"
+                class="text-red-500 text-sm mt-1"
+              >
+                Takror parolni kiriting
+              </div>
               <!-- <div class="text-red-500 text-xs self-start">Parolda o'xshashlik mavjud emas</div> :invalid="!value" variant="filled" -->
             </div>
           </div>
@@ -266,15 +359,28 @@ watch(
           <div class="mt-12">
             <button
               type="button"
-              :disabled="formValues?.phone?.length < 11 ||!!type && formValues?.password?.length < 8"
-              @click="
-                setLogin(true);
-                signIn();
+              v-if="type != 'sms'"
+              :disabled="
+                formValues?.phone?.length < 11 ||
+                (!type && !formValues.password)
               "
+              @click="signIn"
               class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
             >
               Sign in
             </button>
+            <button v-else
+              type="button"
+              :disabled="
+                formValues?.phone?.length < 11 ||
+                (!type && !formValues.password)
+              "
+              @click="loggin"
+              class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
+            >
+              Sign in
+            </button>
+            
             <p class="text-sm text-center mt-3">
               Don't have an account
               <a
