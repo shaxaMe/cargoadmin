@@ -22,28 +22,28 @@
         <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl hidden group-hover:block group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF]">
-            <Icon size="16px" name="ic:outline-warehouse" />
+            <Icon size="18px" name="ic:outline-warehouse" />
             <span> Warehouse </span>
           </div>
         </div>
         <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl hidden group-hover:block group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF]">
-            <Icon size="16px" name="material-symbols:security" />
+            <Icon size="18px" name="material-symbols:security" />
             <span> Dashboard </span>
           </div>
         </div>
         <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl hidden group-hover:block group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF]">
-            <Icon size="16px" name="hugeicons:customer-service-01" />
+            <Icon size="18px" name="hugeicons:customer-service-01" />
             <span> Dashboard </span>
           </div>
         </div>
         <div class="cursor-pointer group relative w-full gap-3 flex justify-start" @click="logOut">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl hidden group-hover:block group-hover:bg-[#FF0000] w-1"></span>
-          <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#FF0000]">
-            <Icon size="16px" name="circum:logout" />
+          <div class="flex items-center gap-2 ml-3 trans-custom text-red-500 text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#FF0000]">
+            <Icon size="18px" name="circum:logout" />
             <span> Log out </span>
           </div>
         </div>
