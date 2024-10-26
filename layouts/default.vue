@@ -11,7 +11,14 @@
 </template>
 
 <script setup>
-
+import { useFlowbite } from '~/composables/useFlowbite';
+import { 
+    initDropdowns} from 'flowbite'
+    onMounted(() => {
+    useFlowbite(() => {
+        initDropdowns();
+    })
+})
 </script>
 
 <style lang="scss" scoped>

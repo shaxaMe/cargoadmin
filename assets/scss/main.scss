@@ -37,3 +37,32 @@ body::-webkit-scrollbar {
   .p-password:has(.p-password-toggle-mask-icon) .p-password-input.p-invalid{
     border-bottom: 1px solid red !important;
   }
+
+  .p-datatable-thead{
+     th{
+      background-color: #3b72f1;
+      color: #fff;
+        svg{
+          color: #fff;
+        }
+     }
+  }
+  .p-datatable-sortable-column:not(.p-datatable-column-sorted):hover {
+    opacity: 0.8;
+    background-color: #3b72f1 !important;
+    color: #fff !important;
+     svg{
+      color: #fff !important;
+     }
+  }
+
+.router-link-active {
+  &.router-link-exact-active{
+    span.absolute:nth-child(1)  {
+      @apply opacity-100 bg-[#4880FF]
+    }
+    div{
+      @apply text-white bg-[#4880FF]
+    }
+  }
+}

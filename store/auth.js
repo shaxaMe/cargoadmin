@@ -11,7 +11,12 @@ export const useAuth = defineStore('auth', () => {
     function set_token(payload){
       token.value = payload
     }
-    return { isLoggin, setUser, user,setLogin,token,set_token }
+    function logout() {
+      user.value = null;
+      token.value = null;
+      isLoggin.value = false;
+    }
+    return { isLoggin, setUser, user,setLogin,token,set_token,logout }
 }, {
   persist:{
     storage:window.localStorage

@@ -4,10 +4,7 @@
       <div
         class="max-w-[350px] relative w-full flex items-center justify-start"
       >
-        <Icon
-          name="ic:twotone-search"
-          class="absolute left-3 text-black"
-        />
+        <Icon name="ic:twotone-search" class="absolute left-3 text-black" />
         <InputText
           class="w-full bg-[#D5D5D5] !pl-8 text-black"
           type="text"
@@ -86,10 +83,72 @@
           </div>
         </div>
         <div class="flex items-center">
-          <Avatar :label="`${user?.full_name.substr(0,1)}`" class="mr-2" size="medium" shape="circle" />
+          <!-- <Avatar :label="`${user?.full_name?.substr(0,1)}`" class="mr-2" size="medium" shape="circle" />
           <div>
             <p class="text-sm">{{ user.full_name }}</p>
             <p class="text-xs">{{ user.role }}</p>
+          </div> -->
+
+          <div
+            id="dropdownDefaultButton"
+            class="flex items-center gap-2 cursor-pointer px-3 py-2"
+            data-dropdown-toggle="dropdown"
+          >
+            <div class="overflow-hidden rounded-full">
+              <!-- <img
+                class="w-full h-full object-cover"
+                src="https://wallpapercave.com/wp/wp6115931.jpg"
+                alt=""
+              /> -->
+              <Avatar :label="`${user?.full_name?.substr(0,1)}`" size="medium" shape="circle" />
+            </div>
+            <p>{{ user?.full_name }}</p>
+            <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
+          </div>
+
+          <!-- Dropdown menu -->
+          <div
+            id="dropdown"
+            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+          >
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              aria-labelledby="dropdownDefaultButton"
+            >
+              <li>
+                <a
+                  href="#"
+                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >Dashboard</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >Settings</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >Earnings</a
+                >
+              </li>
+              <li @click="signOut">
+                <a
+                  class="cursor-pointer group relative w-full gap-3 flex justify-start"
+                >
+                  <div
+                    class="flex items-center gap-2 trans-custom text-red-500 text-base rounded-xl px-4 py-2"
+                  >
+                    <Icon size="18px" name="circum:logout" />
+                    <span> Log out </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -98,9 +157,9 @@
 </template>
 
 <script setup>
-import { useAuth } from '~/store/auth';
-
-const { user } = useAuth();
+import { useAuth } from "~/store/auth";
+const router = useRouter();
+const { user,logout } = useAuth();
 const value = ref("");
 const selectedCountry = ref();
 const countries = ref([
@@ -115,6 +174,11 @@ const countries = ref([
   { name: "Spain", code: "ES" },
   { name: "United States", code: "US" },
 ]);
+
+function signOut() {
+  logout();
+  router.push("/login");
+}
 </script>
 
 <style lang="scss" scoped></style>
