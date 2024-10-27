@@ -1,5 +1,7 @@
 <script setup>
 const selectedCities = ref();
+const date = ref(null);
+const isOpen = ref(false);
 const cities = ref([
     { name: 'A', code: 'A' },
     { name: 'B', code: 'B' },
@@ -46,37 +48,70 @@ const cities = ref([
           <label for="full_name">Seria va raqami</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <InputText
-            class="w-full"
-            id="full_name"
-          />
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
           <label for="full_name">Berilgan muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <InputText
-            class="w-full"
-            id="full_name"
-          />
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
           <label for="full_name">Amal qilish muddati</label>
         </FloatLabel>
         <div>
-          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-xl h-full flex items-center justify-center gap-1">
+          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Passport rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
         </div>
         <div>
-          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-xl h-full flex items-center justify-center gap-1">
+          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Passport orqa rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
         </div>
         <div>
-          <button class="bg-white min-h-[40px] border-dashed relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-xl h-full flex items-center justify-center gap-1">
+          <button @click="isOpen=true" v-if="!isOpen" class="bg-white min-h-[40px] border-dashed relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
-            Xorij rasmini qo'shish
+            хорижий паспортни киритиш 
+            <!-- <input type="file"  class="opacity-0 absolute w-full h-full z-10" /> -->
+          </button>
+          <button @click="isOpen=false" v-if="!!isOpen" class="bg-white min-h-[40px] border-dashed relative w-full border border-red-400 px-6 text-red-400 rounded-md h-full flex items-center justify-center gap-1">
+            <Icon name="solar:minus-circle-outline" size="24px" />
+            horijiy passportni o'chirish 
+            <!-- <input type="file"  class="opacity-0 absolute w-full h-full z-10" /> -->
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="mt-5" v-if="!!isOpen">
+      <h1 class="text-xl">Horijiy pasportni malumotlari</h1>
+      <div class="form-container w-full grid grid-cols-5 mt-5  items-stretch gap-5">
+          <FloatLabel variant="on">
+          <InputText
+            class="w-full"
+            id="full_name"
+          />
+          <label for="full_name">Seria va raqami</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
+          <label for="full_name">Berilgan muddati</label>
+        </FloatLabel>
+        <FloatLabel variant="on">
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
+          <label for="full_name">Amal qilish muddati</label>
+        </FloatLabel>
+        <div>
+          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
+            <Icon name="uil:plus-circle" size="24px" />
+            Passport rasmi
+            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
+          </button>
+        </div>
+        <div>
+          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
+            <Icon name="uil:plus-circle" size="24px" />
+            Passport orqa rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
         </div>
@@ -93,17 +128,11 @@ const cities = ref([
           <label for="full_name">Seria va raqami</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <InputText
-            class="w-full"
-            id="full_name"
-          />
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
           <label for="full_name">Berilgan muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <InputText
-            class="w-full"
-            id="full_name"
-          />
+          <DatePicker class="w-full" v-model="date" dateFormat="dd.mm.yy" />
           <label for="full_name">Amal qilish muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
@@ -112,14 +141,14 @@ const cities = ref([
           <label for="full_name">Kategoriyalar</label>
         </FloatLabel>
         <div>
-          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-xl h-full flex items-center justify-center gap-1">
+          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Guvohnoma rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
         </div>
         <div>
-          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-xl h-full flex items-center justify-center gap-1">
+          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Guvohnoma orqa rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
