@@ -6,7 +6,7 @@
           <span>Haydovchi qo'shish</span>
          </button>
       </div>
-      <div class="card overflow-hidden rounded-lg">
+      <div class="card overflow-hidden rounded-lg" v-if="1==2">
         <DataTable :value="customers" stripedRows paginator :rows="5" :rowsPerPageOptions="false" tableStyle="min-width: 50rem">
             <Column field="first_name" header="Haydovchi ismi"  sortable style="width: 25%"></Column>
             <Column field="car_name" header="Moshina turi" sortable style="width: 25%"></Column>
@@ -14,7 +14,19 @@
             <Column field="expired_date" header="Representative" sortable style="width: 25%"></Column>
         </DataTable>
     </div>
-    <Modal v-model="isOpen" />
+    <AutoparkCard />
+    <Modal v-model="isOpen">
+      <div class="flex items-center gap-5">
+        <div class="flex-1 flex flex-col">
+        <label for="username" class="font-semibold mb-3">Transport turi</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-3">Kuzov turi</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      </div>
+    </Modal>
     </div>
 </template>
 
