@@ -167,9 +167,7 @@ watch(
 
 <template>
   <div>
-    <div class="grid justify-center max-w-md mx-auto">
-        <form
-          class="bg-white rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] min-w-[450px]"
+        <form class="w-full"
         >
           <div class="mb-12">
             <h3
@@ -378,7 +376,6 @@ watch(
           </div>
         </form>
       </div>
-  </div>
 </template>
 
 <style lang="scss" scoped></style>
