@@ -1,5 +1,5 @@
 <template>
-  <div class="border border-gray-400 px-5 py-4 bg-white rounded-xl flex">
+  <div class="border border-gray-400 px-5 py-4 max-md:pt-10 bg-white rounded-xl flex max-md:flex-col max-md:gap-4 relative">
     <div class="flex-1 flex items-center gap-3">
       <div
         class="w-14 h-14 bg-blue-400 rounded-md text-white flex items-center justify-center"
@@ -29,7 +29,7 @@
         <p class="text-gray-400">+998936554583</p>
       </div>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 max-md:absolute max-md:top-0 max-md:right-0">
       <Tag severity="success" value="Tasdiqlangan"></Tag>
       <div class="card flex justify-center">
         <Button

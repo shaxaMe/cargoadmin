@@ -70,7 +70,7 @@ provide('restart', restart)
             </button>
        </div>
     </div>
-    <div v-if="!!user_type && !!isNext" class="bg-white w-full min-w-[35dvw] max-lg:max-w-screen rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
+    <div v-if="!!user_type && !!isNext" class="bg-white w-full min-w-[35dvw] max-lg:min-w-[55dvw] rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
       <LoginUser v-if="!!isNext&& user_type=='user'" />
       <LoginAdmin v-if="!!isNext && user_type=='admin'"  />
     </div>

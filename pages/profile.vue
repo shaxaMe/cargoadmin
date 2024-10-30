@@ -39,7 +39,7 @@ const cities = ref([
     </div>
     <div class="mt-10">
       <h1 class="text-xl">Passport malumotlari</h1>
-      <div class="form-container w-full grid grid-cols-5 mt-5  items-stretch gap-5">
+      <div class="form-container w-full grid grid-cols-5 mt-5 max-lg:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
           <FloatLabel variant="on">
           <InputText
             class="w-full"
@@ -85,7 +85,7 @@ const cities = ref([
     </div>
     <div class="mt-5" v-if="!!isOpen">
       <h1 class="text-xl">Horijiy pasportni malumotlari</h1>
-      <div class="form-container w-full grid grid-cols-5 mt-5  items-stretch gap-5">
+      <div class="form-container w-full grid grid-cols-5 mt-5  max-lg:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
           <FloatLabel variant="on">
           <InputText
             class="w-full"
@@ -119,7 +119,7 @@ const cities = ref([
     </div>
     <div class="mt-10">
       <h1 class="text-xl">Haydovchilik guvohnomasi</h1>
-      <div class="form-container w-full grid grid-cols-4 mt-5  items-stretch gap-5">
+      <div class="form-container w-full grid grid-cols-4 mt-5 max-lg:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
           <FloatLabel variant="on">
           <InputText
             class="w-full"
