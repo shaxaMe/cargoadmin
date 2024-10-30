@@ -2,7 +2,7 @@
   <div>
     <nav class="w-full relative bg-white px-5 py-6 flex justify-between">
       <div
-        class="max-w-[350px] relative w-full flex items-center justify-start"
+        class="max-w-[300px] max-xl:max-w-[200px] relative w-full flex items-center justify-start"
       >
         <Icon name="ic:twotone-search" class="absolute left-3 text-black" />
         <InputText
@@ -13,8 +13,8 @@
           placeholder="Search..."
         />
       </div>
-      <div class="flex items-center gap-8">
-        <div class="relative cursor-pointer">
+      <div class="flex items-center gap-5 max-lg:gap-4">
+        <div class="relative cursor-pointer max-md:hidden">
           <div
             class="bg-[#F93C65] p-1 text-white text-sm text-center flex justify-center items-center rounded-full w-4 h-4 absolute -right-1 -top-2"
           >
@@ -45,7 +45,7 @@
           </svg>
         </div>
         <div>
-          <div class="card flex justify-content-center">
+          <div class="card flex justify-content-center max-lg:hidden">
             <Dropdown
               v-model="selectedCountry"
               :options="countries"
@@ -102,7 +102,7 @@
               /> -->
               <Avatar :label="`${user?.full_name?.substr(0,1)}`" size="medium" shape="circle" />
             </div>
-            <p>{{ user?.full_name }}</p>
+            <p class="max-md:hidden">{{ user?.full_name }}</p>
             <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
           </div>
 

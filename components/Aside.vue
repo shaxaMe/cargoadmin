@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[220px] px-3 py-5 bg-white w-full h-full min-h-screen">
+  <div class="max-w-[220px] px-3 py-5 bg-white w-full h-full min-h-screen max-lg:hidden">
     <aside class="w-full h-full">
       <div class="w-full text-center text-[#202224] font-extrabold text-lg">
         <span class="text-[#4880FF]">Dash</span>Stack
