@@ -18,12 +18,63 @@
     <Modal v-model="isOpen">
       <div class="flex items-center gap-5">
         <div class="flex-1 flex flex-col">
-        <label for="username" class="font-semibold mb-3">Transport turi</label>
+        <label for="username" class="font-semibold mb-2">Transport turi</label>
         <InputText id="username" class="flex-auto" autocomplete="off" />
       </div>
       <div class="flex-1 flex flex-col">
-        <label for="email" class="font-semibold mb-3">Kuzov turi</label>
+        <label for="email" class="font-semibold mb-2">Kuzov turi</label>
         <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      </div>
+      <div class="flex items-center gap-5 mt-5">
+        <div class="flex-1 flex flex-col">
+        <label for="username" class="font-semibold mb-2">Yuk ko’tarish vazni (t)</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Yuk olish hajmi (m3)</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Yuklash yo’nalishlari</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      </div>
+      <div class="mt-6">
+        <h1 class="p-dialog-title">Texnik xarakteristikalar</h1>
+        <div class="flex items-center gap-5 mt-5">
+        <div class="flex-1 flex flex-col">
+        <label for="username" class="font-semibold mb-2">Davlat raqami</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Modeli</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Yili</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      </div>
+      <div class="flex items-center gap-5 mt-5">
+        <div class="flex-1 flex flex-col">
+        <label for="username" class="font-semibold mb-2">Tex pasport seriya va raqami</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Old rasmi</label>
+        <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
+            <Icon name="ri:upload-cloud-2-fill" size="24px" />
+            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
+          </button>
+      </div>
+      <div class="flex-1 flex flex-col">
+        <label for="email" class="font-semibold mb-2">Orqa rasmi</label>
+        <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
+            <Icon name="ri:upload-cloud-2-fill" size="24px" />
+            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
+          </button>
+      </div>
       </div>
       </div>
     </Modal>

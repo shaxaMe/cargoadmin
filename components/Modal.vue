@@ -20,17 +20,17 @@ watch(() => visible.value, (visible) => {
       v-model:visible="visible"
       modal
       header="Transport qo’shish"
-      :style="{ width: '50dvw' }"
+      :style="{ width: '70dvw' }"
     >
      <slot></slot>
-      <div class="flex justify-end gap-2 mt-5">
+      <div class="flex justify-end gap-2 mt-10">
         <Button
           type="button"
-          label="Cancel"
+          label="Bekor qilish"
           severity="secondary"
           @click="visible=false"
         ></Button>
-        <Button type="button" label="Save" @click="visible=false"></Button>
+        <Button type="button" label="Saqlash" @click="visible=false"></Button>
       </div>
     </Dialog>
   </div>
