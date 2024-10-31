@@ -13,8 +13,8 @@ const isNext = ref(false);
 
 //methods
 function restart(){
-  isNext.value = false;
-  user_type.value = "";
+  isNext.value = true;
+  user_type.value = "user";
 }
 
 provide('restart', restart)
@@ -31,8 +31,8 @@ provide('restart', restart)
     <div
       class="bg-gray-100 font-[sans-serif] h-full max-lg:min-h-screen p-4 mx-auto max-md:w-full flex flex-col items-center justify-center"
     >
-    <h1 class="text-3xl my-6 font-bold " v-if="!isNext">Profilingizni tanlang</h1>
-    <div v-if="!isNext" class="bg-white w-full max-lg:max-w-screen rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
+    <!-- <h1 class="text-3xl my-6 font-bold " v-if="!isNext">Profilingizni tanlang</h1> -->
+    <!-- <div v-if="!isNext" class="bg-white w-full max-lg:max-w-screen rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
        <div @click="user_type='user'"  class="border cursor-pointer w-full border-gray-500 py-4 px-3 transition duration-300 ease-linear rounded-2xl hover:bg-[rgba(73,100,216,.1)] flex items-center justify-between gap-2 group hover:border-[#4964D8]">
            <div class="flex items-center gap-4">
             <div class="group-hover:text-[#4964D8] text-gray-500">
@@ -69,10 +69,10 @@ provide('restart', restart)
               Next
             </button>
        </div>
-    </div>
-    <div v-if="!!user_type && !!isNext" class="bg-white w-full min-w-[35dvw] max-lg:min-w-[55dvw] rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
-      <LoginUser v-if="!!isNext&& user_type=='user'" />
-      <LoginAdmin v-if="!!isNext && user_type=='admin'"  />
+    </div> -->
+    <div class="bg-white w-full min-w-[35dvw] max-lg:min-w-[55dvw] rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
+      <LoginUser />
+      <!-- <LoginAdmin v-if="!!isNext && user_type=='admin'"  /> -->
     </div>
     </div>
   </div>
