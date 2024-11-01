@@ -5,7 +5,6 @@ export const useApi = (path, options = {}) => {
   const { set_token, setUser } = authStore;
   const { token } = storeToRefs(authStore);  
   const router = useRouter();
-
   // Attach Authorization header if token is available
   if (token.value) { 
     options.headers = {

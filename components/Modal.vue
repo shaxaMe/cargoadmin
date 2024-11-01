@@ -1,11 +1,20 @@
 <script setup>
 import Dialog from "primevue/dialog";
 
-const props = defineProps(['modelValue']);
+const props = defineProps(['modelValue','maxWidth']);
 const emit = defineEmits(['update:modelValue']);
 
 const visible = ref(false);
 
+
+function _close() {
+  visible.value = false;
+  emit('_close');
+}
+function save() {
+  visible.value = false;
+  emit('_save');
+}
 watch(()=>props.modelValue, () => {
     visible.value = props.modelValue;
 })
@@ -20,7 +29,7 @@ watch(() => visible.value, (visible) => {
       v-model:visible="visible"
       modal
       header="Transport qo’shish"
-      :style="{ width: '70dvw' }"
+      :style="{ width: maxWidth?maxWidth:'70dvw' }"
     >
      <slot></slot>
       <div class="flex justify-end gap-2 mt-10">
@@ -28,9 +37,9 @@ watch(() => visible.value, (visible) => {
           type="button"
           label="Bekor qilish"
           severity="secondary"
-          @click="visible=false"
+          @click="_close"
         ></Button>
-        <Button type="button" label="Saqlash" @click="visible=false"></Button>
+        <Button type="button" label="Saqlash" @click="save"></Button>
       </div>
     </Dialog>
   </div>
