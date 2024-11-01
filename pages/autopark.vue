@@ -3,7 +3,7 @@
       <div class="flex justify-end mb-5">
          <button @click="isOpen=true" class="bg-[#3b72f1] gap-2 text-white flex justify-center items-center text-center px-6 py-4 rounded-lg">
           <Icon size="20px" name="material-symbols:person-add-rounded" />
-          <span>Haydovchi qo'shish</span>
+          <span>avtomobil qo'shish</span>
          </button>
       </div>
       <div class="card overflow-hidden rounded-lg" v-if="1==2">
