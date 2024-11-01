@@ -3,6 +3,11 @@
          <div class="opacity-0 absolute w-full h-full z-10 top-0 left-0">
           <input @change="_uploadImage" class="opacity-0 absolute w-full h-24 z-10" type="file">
         </div>
+        <Modal v-model="isOpen" maxWidth="500px" @_save="save">
+           <div class="w-full">
+                <img :src="img" alt="al">
+           </div>
+        </Modal>
     </div>
 </template>
 
@@ -18,15 +23,16 @@ const file = e.target.files[0];
 //   img.value = e.target.result;
 // }
 // reader.readAsDataURL(file);
- // Add the file directly to FormData
+const data = new FormData();
+data.append('photo', file); // Add the file directly to FormData
 
-// useApi('/v1/user/info', {
-//     method: 'PATCH',
-//     body: data // Send FormData directly as the request body
-// }).then((response) => {
-//     img.value = response.photo; // Update the image URL
-//     isOpen.value = true;
-// });
+useApi('/v1/user/info', {
+    method: 'PATCH',
+    body: data // Send FormData directly as the request body
+}).then((response) => {
+    img.value = response.photo; // Update the image URL
+    isOpen.value = true;
+});
 // open modal to view and save image
 
 }
