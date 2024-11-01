@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex justify-start items-start">
+        <div class="flex justify-start items-stretch">
             <Aside></Aside>
             <div class="flex-1">
                 <Navbar />

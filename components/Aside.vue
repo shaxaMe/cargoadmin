@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-[220px] px-3 py-5 bg-white w-full h-full min-h-screen max-lg:hidden">
+  <div class="max-w-[220px] px-3 py-5 bg-white w-full h-auto min-h-full max-lg:hidden">
     <aside class="w-full h-full">
       <div class="w-full text-center text-[#202224] font-extrabold text-lg">
-        <span class="text-[#4880FF]">Dash</span>Stack
+        <span class="text-[#4880FF]">Fura</span>Go
       </div>
       <div class="pb-5 pt-6 flex px-2 flex-col items-center gap-4">
         <nuxt-link to="/profile" class="cursor-pointer group relative w-full gap-3 flex justify-start">
