@@ -1,7 +1,7 @@
 <template>
   <div>
-    <nav class="w-full relative bg-white px-5 py-6 flex justify-between">
-      <div
+    <nav class="w-full relative bg-white px-5 py-6 flex justify-end">
+      <!-- <div
         class="max-w-[300px] max-xl:max-w-[200px] relative w-full flex items-center justify-start"
       >
         <Icon name="ic:twotone-search" class="absolute left-3 text-black" />
@@ -12,7 +12,7 @@
           v-model="value"
           placeholder="Search..."
         />
-      </div>
+      </div> -->
       <div class="flex items-center gap-5 max-lg:gap-4">
         <div class="relative cursor-pointer max-md:hidden">
           <div
@@ -44,7 +44,7 @@
             />
           </svg>
         </div>
-        <div>
+        <!-- <div>
           <div class="card flex justify-content-center max-lg:hidden">
             <Dropdown
               v-model="selectedCountry"
@@ -81,7 +81,7 @@
               </template>
             </Dropdown>
           </div>
-        </div>
+        </div> -->
         <div class="flex items-center">
           <!-- <Avatar :label="`${user?.full_name?.substr(0,1)}`" class="mr-2" size="medium" shape="circle" />
           <div>

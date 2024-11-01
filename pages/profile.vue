@@ -1,22 +1,43 @@
 <script setup>
 import { format } from 'date-fns';
+
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
+
 //data
 const selectedCities = ref();
 const date = ref(null);
 const isOpen = ref(false);
 const cities = ref([
-    { name: 'A', code: 'A' },
-    { name: 'B', code: 'B' },
-    { name: 'C', code: 'C' },
-    { name: 'D', code: 'D' },
-    { name: 'E', code: 'E' }
+    { name: 'A', code: 1 },
+    { name: 'B', code: 2 },
+    { name: 'C', code: 3 },
+    { name: 'D', code: 4 },
+    { name: 'E', code: 5 }
 ]);
-
+const imgUrls = reactive({
+  passport_main_file: null,
+  passport_back_file: null,
+  foreignpassport_main_file: null,
+  foreignpassport_back_file: null,
+  driver_license_front_file: null,
+  driver_license_back_file: null,
+});
+const imgObj = reactive({
+  passport_main_file: null,
+  passport_back_file: null,
+  foreignpassport_main_file: null,
+  foreignpassport_back_file: null,
+  driver_license_front_file: null,
+  driver_license_back_file: null,
+});
 const formValues = reactive({});
 const passport_main_file = ref(null);
 const passport_back_file = ref(null);
 const foreginpassport_main_file = ref(null);
 const foreginpassport_back_file = ref(null);
+const driver_license_front_file = ref(null);
+const driver_license_back_file = ref(null);
 const foreginpassportData = reactive({
   expired_date: '',
   given_date: '',
@@ -26,9 +47,12 @@ const passportData = reactive({
   expired_date: '',
   given_date: '',
   serial: '',
+  driving_license_category:[]
 })
 const driver_pass = reactive({
-   
+  expired_date: '',
+  given_date: '',
+  serial: '',
 })
 const img_url = ref(null);
 //methods
@@ -50,6 +74,20 @@ function getUserProfile() {
        console.log(response);
      })
 }
+function _deleteImg(key){
+  let el = document.querySelector(`#${key}`);
+  el.value = '';
+  imgUrls[key] = null;
+}
+function previewImage(e,key) {
+  const obj = e.target.files[0];
+  if (obj) {
+    imgUrls[key] = URL.createObjectURL(obj); // Set the preview URL for the selected file
+    imgObj[key] = e; // Set the selected file for further processing
+  }
+  // console.log(imgObj,'obj')
+
+}
 function _save(img){
   formValues.photo = img;
 }
@@ -63,6 +101,32 @@ function saveForeignPassport(){
   data.append('type','foreign_passport');
    useApi('/v1/user/document', {method:'POST',body:data}).then((response) => {
       console.log(response);
+      toast.add({ severity: 'success', summary: 'Muvaffaqiyatli', detail: 'Malumotlar saqlandi', life: 3000 });
+   }).catch((error) => {
+     toast.add({ severity: 'error', summary: 'Xatolik', detail: error.message, life: 3000 });
+   })
+}
+function saveDriverLicense(){
+  const data = new FormData();
+  // console.log(imgObj)
+  let front_file = imgObj[driver_license_front_file];
+
+  // let driver_license_back_file = imgObj[driver_license_back_file];
+  data.append('expired_date', timeFormatter(driver_pass.expired_date));
+  data.append('given_date', timeFormatter(driver_pass.given_date));
+  data.append('serial', driver_pass.serial.replaceAll(' ', ''));
+  data.append('main_file', driver_license_front_file.value.files[0]);
+  data.append('back_file', driver_license_back_file.value.files[0]);
+  driver_pass.driving_license_category.forEach((item, index) => {
+    data.append('driving_license_category', item);
+  })
+  data.append('type','driver_passport');
+   useApi('/v1/user/document', {method:'POST',body:data}).then((response) => {
+      console.log(response);
+      toast.add({ severity: 'success', summary: 'Muvaffaqiyatli', detail: 'Malumotlar saqlandi', life: 3000 });
+   }).catch((error) => {
+    console.log(error);
+     toast.add({ severity: 'error', summary: 'Xatolik', detail: error.back_file[0], life: 3000 });
    })
 }
 function savePassport(){
@@ -75,6 +139,9 @@ function savePassport(){
   data.append('type','passport');
    useApi('/v1/user/document', {method:'POST',body:data}).then((response) => {
       console.log(response);
+      toast.add({ severity: 'success', summary: 'Muvaffaqiyatli', detail: 'Malumotlar saqlandi', life: 3000 });
+   }).catch((error) => {
+     toast.add({ severity: 'error', summary: 'Xatolik', detail: error.message, life: 3000 });
    })
 }
 //actins
@@ -85,6 +152,7 @@ onMounted(()=>{
 </script>
 <template>
   <div class="px-5 py-6">
+    <Toast />
     <div>
       <h1 class="text-xl">Haydovchi profili</h1>
       <div class="form-container max-w-[500px] mt-5 flex items-center gap-10">
@@ -120,10 +188,10 @@ onMounted(()=>{
     </div>
     <div class="mt-10">
       <h1 class="text-xl">Passport malumotlari</h1>
-      <div class="form-container w-full grid grid-cols-5 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
+      <div class="form-container w-full grid grid-cols-3 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
           <FloatLabel variant="on">
           <InputText
-            class="w-full h-full"
+            class="w-full h-full min-h-[40px]"
             id="full_name"
             v-model="passportData.serial"
             v-mask="'AA #######'"
@@ -131,33 +199,59 @@ onMounted(()=>{
           <label for="full_name">Seria va raqami</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="passportData.given_date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="passportData.given_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Berilgan muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="passportData.expired_date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="passportData.expired_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Amal qilish muddati</label>
         </FloatLabel>
-        <div>
-          <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
-            <Icon name="uil:plus-circle" size="24px" />
+        <!-- <div>
+          <button class="bg-white  h-[200px]  w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center gap-1">
+            <div v-if="!imgUrls['passport_main_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
             Passport rasmi
-            <input type="file" ref="passport_main_file" class="opacity-0 absolute w-full h-full z-10" />
+            <input type="file"  ref="passport_main_file" @change="previewImage($event,'passport_main_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <img v-if="imgUrls['passport_main_file']" :src="imgUrls['passport_main_file']" alt="passport_main_file">
+          </button>
+        </div> -->
+        <div>
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['passport_main_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Passport old rasmi
+            <input id="passport_main_file" type="file" ref="passport_main_file" @change="previewImage($event,'passport_main_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['passport_main_file']">
+              <img  :src="imgUrls['passport_main_file']" class="w-full h-full object-cover" alt="passport_main_file">
+              <div @click="_deleteImg('passport_main_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
           </button>
         </div>
         <div>
-          <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
-            <Icon name="uil:plus-circle" size="24px" />
-            Passport orqa rasmi
-            <input type="file" ref="passport_back_file"  class="opacity-0 absolute w-full h-full z-10" />
-          </button>
-        </div>
-        <div>
-          <button @click="savePassport" class="bg-white  min-h-[40px] relative w-full border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
-            Saqlash
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['passport_back_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Passport orqa rasmi
+            <input type="file"  id="passport_back_file" ref="passport_back_file" @change="previewImage($event,'passport_back_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['passport_back_file']">
+              <img  :src="imgUrls['passport_back_file']" class="w-full h-full object-cover" alt="passport_back_file">
+              <div @click="_deleteImg('passport_back_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
           </button>
         </div>
       </div>
+      <div class="flex justify-end mt-2">
+          <button @click="savePassport" class="bg-white w-fit min-h-[40px] relative border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
+            Saqlash
+          </button>
+        </div>
     </div>
     <div class="mt-4 grid grid-cols-4">
           <button @click="isOpen=true" v-if="!isOpen" class="bg-white min-h-[40px] border-dashed relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
@@ -173,10 +267,10 @@ onMounted(()=>{
         </div>
     <div class="mt-5" v-if="!!isOpen">
       <h1 class="text-xl">Horijiy pasportni malumotlari</h1>
-      <div class="form-container w-full grid grid-cols-5 mt-5  max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
+      <div class="form-container w-full grid grid-cols-3 mt-5  max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5">
           <FloatLabel variant="on">
           <InputText
-            class="w-full h-full"
+            class="w-full h-full min-h-[40px]"
             id="full_name"
             v-model="foreginpassportData.serial"
             v-mask="'AA #######'"
@@ -184,75 +278,137 @@ onMounted(()=>{
           <label for="full_name">Seria va raqami</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="foreginpassportData.given_date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="foreginpassportData.given_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Berilgan muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="foreginpassportData.expired_date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="foreginpassportData.expired_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Amal qilish muddati</label>
         </FloatLabel>
-        <div>
+        <!-- <div>
           <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Passport rasmi
-            <input type="file" ref="foreginpassport_main_file" class="opacity-0 absolute w-full h-full z-10" />
+            <input type="file" ref="foreginpassport_main_file" @change="previewImage('foreginpassport_main_file')" class="opacity-0 absolute w-full h-full z-10" />
+          </button>
+        </div> -->
+        <div>
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['foreginpassport_main_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Passport old rasmi
+            <input type="file" id="foreginpassport_main_file" ref="foreginpassport_main_file" @change="previewImage($event,'foreginpassport_main_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['foreginpassport_main_file']">
+              <img  :src="imgUrls['foreginpassport_main_file']" class="w-full h-full object-cover" alt="foreginpassport_main_file">
+              <div @click="_deleteImg('foreginpassport_main_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
           </button>
         </div>
-        <div>
+        <!-- <div>
           <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Passport orqa rasmi
-            <input type="file" ref="foreginpassport_back_file"  class="opacity-0 absolute w-full h-full z-10" />
+            <input type="file" ref="foreginpassport_back_file"  @change="previewImage('foreginpassport_back_file')"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
-        </div>
+        </div> -->
         <div>
-          <button @click="saveForeignPassport" class="bg-white  min-h-[40px] relative w-full border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
-            Saqlash
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['foreginpassport_back_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Passport old rasmi
+            <input id="foreginpassport_back_file" type="file" ref="foreginpassport_back_file" @change="previewImage($event,'foreginpassport_back_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['foreginpassport_back_file']">
+              <img  :src="imgUrls['foreginpassport_back_file']" class="w-full h-full object-cover" alt="foreginpassport_back_file">
+              <div @click="_deleteImg('foreginpassport_back_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
           </button>
         </div>
       </div>
+      <div class="w-full flex justify-end">
+          <button @click="saveForeignPassport" class="bg-white  min-h-[40px] relative w-fit border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
+            Saqlash
+          </button>
+        </div>
     </div>
     <div class="mt-10">
       <h1 class="text-xl">Haydovchilik guvohnomasi</h1>
       <div class="form-container w-full grid grid-cols-4 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch justify-end gap-5">
           <FloatLabel variant="on">
           <InputText
-            class="w-full h-full"
+            class="w-full h-full min-h-[40px]"
             id="full_name"
+            v-mask="'AA #######'"
+            v-model="driver_pass.serial"
           />
           <label for="full_name">Seria va raqami</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="driver_pass.given_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Berilgan muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <DatePicker class="w-full h-full" v-model="date" dateFormat="dd.mm.yy" />
+          <DatePicker class="w-full h-full min-h-[40px]" v-model="driver_pass.expired_date" dateFormat="dd.mm.yy" />
           <label for="full_name">Amal qilish muddati</label>
         </FloatLabel>
         <FloatLabel variant="on">
-          <MultiSelect v-model="selectedCities" :options="cities" optionLabel="name"
-             class="w-full h-full" />
+          <MultiSelect v-model="driver_pass.driving_license_category" :options="cities" optionValue="code" optionLabel="name"
+             class="w-full h-full min-h-[40px]" />
           <label for="full_name">Kategoriyalar</label>
         </FloatLabel>
-        <div>
+        <!-- <div>
           <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Guvohnoma rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
-        </div>
+        </div> -->
         <div>
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['driver_license_front_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Guvohnoma rasmi
+            <input id="driver_license_front_file" type="file" ref="driver_license_front_file" @change="previewImage($event,'driver_license_front_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['driver_license_front_file']">
+              <img  :src="imgUrls['driver_license_front_file']" class="w-full h-full object-cover" alt="driver_license_front_file">
+              <div @click="_deleteImg('driver_license_front_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
+          </button>
+        </div>
+        <!-- <div>
           <button class="bg-white  min-h-[40px] relative w-full border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-center gap-1">
             <Icon name="uil:plus-circle" size="24px" />
             Guvohnoma orqa rasmi
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button>
+        </div> -->
+        <div>
+          <button class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center">
+            <div v-show="!imgUrls['driver_license_back_file']" class="flex flex-col items-center gap-6">
+              <Icon name="uil:plus-circle" size="34px" />
+              Guvohnoma orqa rasmi
+            <input id="driver_license_back_file" type="file" ref="driver_license_back_file" @change="previewImage($event,'driver_license_back_file')" class="opacity-0 cursor-pointer absolute w-full h-full z-10" />
+            </div>
+            <div class="relative flex items-center justify-center group w-full h-full" v-if="imgUrls['driver_license_back_file']">
+              <img  :src="imgUrls['driver_license_back_file']" class="w-full h-full object-cover" alt="driver_license_back_file">
+              <div @click="_deleteImg('driver_license_back_file')" class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0">
+                <Icon name="material-symbols:delete-outline" size="24px" class="text-red-400" />
+              </div>
+            </div>
+          </button>
         </div>
        
       </div>
       <div class="flex justify-end mt-3">
-          <button @click="saveForeignPassport" class="bg-white max-w-fit  min-h-[40px] relative w-full border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
+          <button @click="saveDriverLicense" class="bg-white max-w-fit  min-h-[40px] relative w-full border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1">
             Saqlash
           </button>
         </div>
