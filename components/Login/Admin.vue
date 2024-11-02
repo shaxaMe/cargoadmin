@@ -46,7 +46,7 @@ function signIn() {
       })
         .then((res) => {
           setLogin(true);
-          set_token(res.access);
+          set_token(res.access_token);
           setUser(res.user);
           router.push("/");
         })

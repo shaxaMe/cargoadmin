@@ -70,9 +70,10 @@ function signIn() {
         }, // Use the modified 'data' object with the formatted phone
       })
         .then((res) => {
-          setLogin(true);
-          set_token(res.access);
+          console.log(res,'log');
+          set_token(res.access_token);
           setUser(res.user);
+          setLogin(true);
           router.push("/");
         })
         .catch((e) => {
@@ -112,9 +113,9 @@ function loggin(){
         body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
       })
         .then((res) => {
-          setLogin(true);
-          set_token(res.access);
+          set_token(res.access_token);
           setUser(res.user);
+          setLogin(true);
           router.push("/");
         })
         .catch((e) => {
