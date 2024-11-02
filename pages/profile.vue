@@ -74,6 +74,32 @@ function getUserProfile() {
        console.log(response);
      })
 }
+function getUserDocuments() {
+  useApi('/v1/user/document').then((response) => {
+       response.results.forEach((item)=>{
+         if(item.type === 'passport'){
+           passportData.expired_date = item.expired_date;
+           passportData.given_date = item.given_date;
+           passportData.serial = item.serial;
+           imgUrls.passport_main_file = item.main_file;
+           imgUrls.passport_back_file = item.back_file;
+         }else if(item.type === 'driver_passport'){
+           driver_pass.expired_date = item.expired_date;
+           driver_pass.given_date = item.given_date;
+           driver_pass.serial = item.serial;
+           passportData.driving_license_category = item.driving_license_category;
+           imgUrls.driver_license_front_file = item.main_file;
+           imgUrls.driver_license_back_file = item.back_file;
+         }else{
+           foreginpassportData.expired_date = item.expired_date;
+           foreginpassportData.given_date = item.given_date;
+           foreginpassportData.serial = item.serial;
+           imgUrls.foreignpassport_main_file = item.main_file;
+           imgUrls.foreignpassport_back_file = item.back_file;
+         }
+       })
+     })
+}
 function _deleteImg(key){
   let el = document.querySelector(`#${key}`);
   el.value = '';
@@ -148,6 +174,7 @@ function savePassport(){
 
 onMounted(()=>{
   getUserProfile();
+  getUserDocuments()
 })
 </script>
 <template>
