@@ -53,6 +53,7 @@ const driver_pass = reactive({
   expired_date: "",
   given_date: "",
   serial: "",
+  driving_license_category: [],
 });
 const img_url = ref(null);
 //methods

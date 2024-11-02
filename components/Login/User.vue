@@ -71,7 +71,7 @@ function signIn() {
       })
         .then((res) => {
           console.log(res,'log');
-          set_token(res.access_token);
+          set_token(res.access);
           setUser(res.user);
           setLogin(true);
           router.push("/");
@@ -113,7 +113,7 @@ function loggin(){
         body: { phone: phone, ...data }, // Use the modified 'data' object with the formatted phone
       })
         .then((res) => {
-          set_token(res.access_token);
+          set_token(res.access);
           setUser(res.user);
           setLogin(true);
           router.push("/");
