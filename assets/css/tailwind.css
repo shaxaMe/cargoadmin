@@ -7,7 +7,7 @@
     @apply transition duration-300 ease-in-out;
 } 
 .trans-delete{
-    transition: all .5s ease-in-out;
+    transition: all .3s ease-in-out;
 }
 .wh-18{
     @apply w-[18px] h-[18px];

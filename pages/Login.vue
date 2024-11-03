@@ -2,6 +2,7 @@
 import { useAuth } from "~/store/auth";
 import { useToast } from "primevue/usetoast";
 import AuthImg from "~/assets/images/auth-img.png";
+import Logo from "../public/FG1.png"
 definePageMeta({
   layout: "LoginLayout",
 });
@@ -31,6 +32,9 @@ provide('restart', restart)
     <div
       class="bg-gray-100 font-[sans-serif] h-full max-lg:min-h-screen p-4 mx-auto max-md:w-full flex flex-col items-center justify-center"
     >
+   <div class="max-w-40 h-20">
+     <img :src="Logo" alt="logo">
+   </div>
     <!-- <h1 class="text-3xl my-6 font-bold " v-if="!isNext">Profilingizni tanlang</h1> -->
     <!-- <div v-if="!isNext" class="bg-white w-full max-lg:max-w-screen rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
        <div @click="user_type='user'"  class="border cursor-pointer w-full border-gray-500 py-4 px-3 transition duration-300 ease-linear rounded-2xl hover:bg-[rgba(73,100,216,.1)] flex items-center justify-between gap-2 group hover:border-[#4964D8]">

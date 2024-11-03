@@ -1,10 +1,11 @@
 <script setup>
 import { format } from "date-fns";
-
+import {useAuth} from "../store/auth"
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
 
 //data
+const auth = useAuth()
 const selectedCities = ref();
 const date = ref(null);
 const isOpen = ref(false);
@@ -15,21 +16,34 @@ const cities = ref([
   { name: "D", code: 4 },
   { name: "E", code: 5 },
 ]);
+const isPassportEdit = ref(false);
+const isForeginPassportEdit = ref(false);
+const isDriverLicenseEdit = ref(false);
 const imgUrls = reactive({
-  passport_main_file: null,
-  passport_back_file: null,
-  foreginpassport_main_file: null,
-  foreginpassport_back_file: null,
-  driver_license_front_file: null,
-  driver_license_back_file: null,
-});
-const imgObj = reactive({
-  passport_main_file: null,
-  passport_back_file: null,
-  foreginpassport_main_file: null,
-  foreginpassport_back_file: null,
-  driver_license_front_file: null,
-  driver_license_back_file: null,
+  passport_main_file: {
+    url:null,
+    base64: null,
+  },
+  passport_back_file: {
+    url: null,
+    base64: null,
+  },
+  foreginpassport_main_file: {
+    url: null,
+    base64: null,
+  },
+  foreginpassport_back_file: {
+    url: null,
+    base64: null,
+  },
+  driver_license_front_file: {
+    url: null,
+    base64: null,
+  },
+  driver_license_back_file: {
+    url: null,
+    base64: null,
+  },
 });
 const formValues = reactive({});
 const passport_main_file = ref(null);
@@ -78,25 +92,27 @@ function getUserDocuments() {
   useApi("/v1/user/document").then((response) => {
     response.results.forEach((item) => {
       if (item.type === "passport") {
+        isPassportEdit.value = true;
         passportData.expired_date = item.expired_date;
         passportData.given_date = item.given_date;
         passportData.serial = item.serial;
-        imgUrls.passport_main_file = item.main_file;
-        imgUrls.passport_back_file = item.back_file;
+        imgUrls.passport_main_file.url = item.main_file;
+        imgUrls.passport_back_file.url = item.back_file;
       } else if (item.type === "driver_passport") {
+        isDriverLicenseEdit.value = true;
         driver_pass.expired_date = item.expired_date;
         driver_pass.given_date = item.given_date;
         driver_pass.serial = item.serial;
-        passportData.driving_license_category = item.driving_license_category;
-        imgUrls.driver_license_front_file = item.main_file;
-        imgUrls.driver_license_back_file = item.back_file;
+        driver_pass.driving_license_category = item.driving_license_category;
+        imgUrls.driver_license_front_file.url = item.main_file;
+        imgUrls.driver_license_back_file.url = item.back_file;
       } else {
+        isForeginPassportEdit.value = true;
         foreginpassportData.expired_date = item.expired_date;
         foreginpassportData.given_date = item.given_date;
         foreginpassportData.serial = item.serial;
-        imgUrls.foreginpassport_main_file = item.main_file;
-        imgUrls.foreginpassport_back_file = item.back_file;
-        console.log(imgUrls, "foreginpassportData");
+        imgUrls.foreginpassport_main_file.url = item.main_file;
+        imgUrls.foreginpassport_back_file.url = item.back_file;
       }
     });
   });
@@ -104,42 +120,101 @@ function getUserDocuments() {
 function _deleteImg(key) {
   let el = document.querySelector(`#${key}`);
   el.value = "";
-  imgUrls[key] = null;
+  imgUrls[key]['url'] = null;
+  imgUrls[key]['base64'] = null;
 }
 function previewImage(e, key) {
   const obj = e.target.files[0];
-  if (obj) {
-    imgUrls[key] = URL.createObjectURL(obj); // Set the preview URL for the selected file
-    imgObj[key] = e; // Set the selected file for further processing
-  }
-  // console.log(imgObj,'obj')
+//   if (obj) {
+//     imgUrls[key]['url'] = URL.createObjectURL(obj);  // Set the URL for preview
+
+//     const reader = new FileReader();
+    
+//     reader.onload = function(event) {
+//         const base64String = event.target.result;
+//         imgUrls[key]['base64'] = base64String;  // Store the Base64 string in imgUrls
+
+//         const data = new FormData();
+//         data.append("back_file", base64String);
+        
+//         // Now you can send `data` with the Base64-encoded file
+//         console.log("FormData with Base64 back_file:", data.get("back_file"));
+//         console.log("Base64 stored in imgUrls:", imgUrls[key]['base64']);
+        
+//         // Make your API call here, passing `data` as the payload
+//     };
+    
+//     reader.onerror = function(error) {
+//         console.error("Error converting file to Base64:", error);
+//     };
+    
+//     reader.readAsDataURL(obj);  // Convert file to Base64
+// }
+if (obj) {
+    imgUrls[key]['url'] = URL.createObjectURL(obj);  // Set the URL for preview
+
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const base64String = event.target.result;
+
+        // Create an offscreen canvas to render the image in JPEG format
+        const image = new Image();
+        image.src = base64String;
+
+        image.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(image, 0, 0);
+
+            // Convert canvas to JPEG Base64 format
+            const jpegBase64String = canvas.toDataURL('image/jpeg', 0.9); // 0.9 for quality setting (1 is max)
+
+            // Store the JPEG Base64 string in imgUrls
+            imgUrls[key]['base64'] = jpegBase64String;
+
+            // Make your API call here, passing `data` as the payload
+        };
+    };
+
+    reader.onerror = function(error) {
+        console.error("Error converting file to Base64:", error);
+    };
+
+    reader.readAsDataURL(obj);  // Convert file to Base64
+}
+
 }
 function _save(img) {
   formValues.photo = img;
 }
 function saveForeignPassport() {
-  if (!foreginpassportData.serial) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Xorijiy passport seriasini kiriting",
-      life: 3000,
-    });
-  } else if (!foreginpassportData.expired_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Xorijiy passport amal qilish sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!foreginpassportData.given_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Xorijiy passport berilgan sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!foreginpassport_main_file.value) {
+  // if (!foreginpassportData.serial) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Xorijiy passport seriasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!foreginpassportData.expired_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Xorijiy passport amal qilish sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!foreginpassportData.given_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Xorijiy passport berilgan sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else 
+  if (!foreginpassport_main_file.value) {
     toast.add({
       severity: "error",
       summary: "Xatolik",
@@ -155,18 +230,18 @@ function saveForeignPassport() {
     });
   } else {
     const data = new FormData();
-    data.append(
+    foreginpassportData.expired_date?data.append(
       "expired_date",
       timeFormatter(foreginpassportData.expired_date)
-    );
-    data.append("given_date", timeFormatter(foreginpassportData.given_date));
-    data.append("serial", foreginpassportData.serial.replaceAll(" ", ""));
-    data.append("main_file", foreginpassport_main_file.value.files[0]);
-    data.append("back_file", foreginpassport_back_file.value.files[0]);
+    ):'';
+    foreginpassportData.given_date?data.append("given_date", timeFormatter(foreginpassportData.given_date)):'';
+    foreginpassportData.serial?data.append("serial", foreginpassportData.serial.replaceAll(" ", "")):'';
+    data.append("main_file", imgUrls.foreginpassport_main_file.base64);
+    data.append("back_file", imgUrls.foreginpassport_back_file.base64);
     data.append("type", "foreign_passport");
     useApi("/v1/user/document", { method: "POST", body: data })
       .then((response) => {
-        console.log(response);
+        getUserDocuments()
         toast.add({
           severity: "success",
           summary: "Muvaffaqiyatli",
@@ -185,28 +260,29 @@ function saveForeignPassport() {
   }
 }
 function saveDriverLicense() {
-  if (!driver_pass.serial) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Haydovchilik guvohnomasi seriasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_pass.expired_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Haydovchilik guvohnomasi amal qilish sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_pass.given_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Haydovchilik guvohnomasi sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_license_front_file.value) {
+  // if (!driver_pass.serial) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Haydovchilik guvohnomasi seriasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!driver_pass.expired_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Haydovchilik guvohnomasi amal qilish sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!driver_pass.given_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Haydovchilik guvohnomasi sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else 
+  if (!driver_license_front_file.value) {
     toast.add({
       severity: "error",
       summary: "Xatolik",
@@ -222,22 +298,18 @@ function saveDriverLicense() {
     });
   } else {
     const data = new FormData();
-    // console.log(imgObj)
-    let front_file = imgObj[driver_license_front_file];
-
-    // let driver_license_back_file = imgObj[driver_license_back_file];
-    data.append("expired_date", timeFormatter(driver_pass.expired_date));
-    data.append("given_date", timeFormatter(driver_pass.given_date));
+    driver_pass.expired_date?data.append("expired_date", timeFormatter(driver_pass.expired_date)):'';
+    driver_pass.given_date?data.append("given_date", timeFormatter(driver_pass.given_date)):'';
     data.append("serial", driver_pass.serial.replaceAll(" ", ""));
-    data.append("main_file", driver_license_front_file.value.files[0]);
-    data.append("back_file", driver_license_back_file.value.files[0]);
+    data.append("main_file", imgUrls.driver_license_front_file.base64);
+    data.append("back_file", imgUrls.driver_license_back_file.base64);
     driver_pass.driving_license_category.forEach((item, index) => {
       data.append("driving_license_category", item);
     });
     data.append("type", "driver_passport");
     useApi("/v1/user/document", { method: "POST", body: data })
       .then((response) => {
-        console.log(response);
+        getUserDocuments();
         toast.add({
           severity: "success",
           summary: "Muvaffaqiyatli",
@@ -257,28 +329,29 @@ function saveDriverLicense() {
   }
 }
 function savePassport() {
-  if (!driver_pass.serial) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Passport seriasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_pass.expired_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Passport amal qilish sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_pass.given_date) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Passport sanasini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_license_front_file.value) {
+  // if (!driver_pass.serial) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Passport seriasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!driver_pass.expired_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Passport amal qilish sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else if (!driver_pass.given_date) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: "Xatolik",
+  //     detail: "Passport sanasini kiriting",
+  //     life: 3000,
+  //   });
+  // } else 
+  if (!driver_license_front_file.value) {
     toast.add({
       severity: "error",
       summary: "Xatolik",
@@ -297,12 +370,13 @@ function savePassport() {
   data.append("expired_date", timeFormatter(passportData.expired_date));
   data.append("given_date", timeFormatter(passportData.given_date));
   data.append("serial", passportData.serial.replaceAll(" ", ""));
-  data.append("main_file", passport_main_file.value.files[0]);
-  data.append("back_file", passport_back_file.value.files[0]);
+  data.append("main_file", imgUrls.passport_main_file.base64);
+  data.append("back_file", imgUrls.passport_back_file.base64);
   data.append("type", "passport");
+  data.append('user',auth.user.id);
   useApi("/v1/user/document", { method: "POST", body: data })
     .then((response) => {
-      console.log(response);
+      getUserDocuments();
       toast.add({
         severity: "success",
         summary: "Muvaffaqiyatli",
@@ -319,6 +393,38 @@ function savePassport() {
       });
     });
   }
+}
+function isValidFuragoMediaUrl(url) {
+    const baseUrl = "http://api.furago.uz/media";
+    return url.includes(baseUrl);
+}
+function saveEditProfile(editedType) {
+   let data = new FormData();
+     if(editedType === 'passport'){
+       data.append('serial',passportData.serial.replaceAll(" ", ""));
+       !!isValidFuragoMediaUrl(imgUrls.passport_main_file.url)?"":data.append('main_file', imgUrls.passport_main_file.base64);
+       !!isValidFuragoMediaUrl(imgUrls.passport_back_file.url)?"":data.append('back_file', imgUrls.passport_back_file.base64);
+       data.append('type','passport');
+       data.append('given_date',passportData.given_date? timeFormatter(passportData.given_date) : '');
+       data.append('expired_date',passportData.expired_date? timeFormatter(passportData.expired_date) : '');
+     }
+     else if(editedType === 'driver_license'){
+       data.append('serial',driver_pass.serial.replaceAll(" ", ""));
+       !!isValidFuragoMediaUrl(imgUrls.driver_license_front_file.url)?"":data.append('main_file', imgUrls.driver_license_front_file.base64);
+       isValidFuragoMediaUrl(imgUrls.driver_license_back_file.url)?"":data.append('back_file', imgUrls.driver_license_back_file.base64);
+       data.append('type','driver_license');
+       data.append('given_date',driver_pass.given_date? timeFormatter(driver_pass.given_date) : '');
+       data.append('expired_date',driver_pass.expired_date? timeFormatter(driver_pass.expired_date) : '');
+     }
+     else if(editedType === 'foreign_passport'){
+       data.append('serial',foreginpassportData.serial.replaceAll(" ", ""));
+       isValidFuragoMediaUrl(imgUrls.foreginpassport_main_file.url)?"":data.append('main_file', imgUrls.foreginpassport_main_file.base64);
+       isValidFuragoMediaUrl(imgUrls.foreginpassport_back_file.url)?"":data.append('back_file', imgUrls.foreginpassport_back_file.base64);
+       data.append('type','foreign_passport');
+       data.append('given_date',foreginpassportData.given_date? timeFormatter(foreginpassportData.given_date) : '');
+       data.append('expired_date',foreginpassportData.expired_date? timeFormatter(foreginpassportData.expired_date) : '');
+     }
+     useApi(`v1/user/document/${auth.user.id}`, { method: "PUT", body: data })
 }
 //actins
 
@@ -348,6 +454,7 @@ onMounted(() => {
             <InputText
               class="w-full h-full"
               id="full_name"
+              disabled
               v-mask="'+998 ## ### ## ##'"
               v-model="formValues.phone"
               @focus="_focus"
@@ -417,7 +524,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['passport_main_file']"
+              v-show="!imgUrls['passport_main_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -432,10 +539,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['passport_main_file']"
+              v-if="imgUrls['passport_main_file']['url']"
             >
               <img
-                :src="imgUrls['passport_main_file']"
+                :src="imgUrls['passport_main_file']['url']"
                 class="w-full h-full object-cover"
                 alt="passport_main_file"
               />
@@ -457,7 +564,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['passport_back_file']"
+              v-show="!imgUrls['passport_back_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -472,10 +579,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['passport_back_file']"
+              v-if="imgUrls['passport_back_file']['url']"
             >
               <img
-                :src="imgUrls['passport_back_file']"
+                :src="imgUrls['passport_back_file']['url']"
                 class="w-full h-full object-cover"
                 alt="passport_back_file"
               />
@@ -495,14 +602,22 @@ onMounted(() => {
       </div>
       <div class="flex justify-end mt-2">
         <button
+          v-if="!isPassportEdit"
           @click="savePassport"
           class="bg-white w-fit min-h-[40px] relative border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1"
         >
           Saqlash
         </button>
+        <button
+        v-if="!!isPassportEdit"
+          @click="saveEditProfile('passport')"
+          class="bg-white min-h-[40px] relative hover:bg-blue-500 hover:text-white trans-custom w-fit border border-blue-400 px-6 text-blue-400 rounded-md h-full flex items-center justify-center gap-1"
+        >
+          O'zgartirishlarni saqlash
+        </button>
       </div>
     </div>
-    <div class="mt-4 grid grid-cols-4">
+    <div class="mt-4 grid grid-cols-4" v-if="!isForeginPassportEdit">
       <button
         @click="isOpen = true"
         v-if="!isOpen"
@@ -522,7 +637,7 @@ onMounted(() => {
         <!-- <input type="file"  class="opacity-0 absolute w-full h-full z-10" /> -->
       </button>
     </div>
-    <div class="mt-5" v-if="!!isOpen">
+    <div class="mt-5" v-if="!!isOpen || !!isForeginPassportEdit">
       <h1 class="text-xl">Horijiy pasportni malumotlari</h1>
       <div
         class="form-container w-full grid grid-cols-3 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5"
@@ -564,7 +679,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['foreginpassport_main_file']"
+              v-show="!imgUrls['foreginpassport_main_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -579,10 +694,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['foreginpassport_main_file']"
+              v-if="imgUrls['foreginpassport_main_file']['url']"
             >
               <img
-                :src="imgUrls['foreginpassport_main_file']"
+                :src="imgUrls['foreginpassport_main_file']['url']"
                 class="w-full h-full object-cover"
                 alt="foreginpassport_main_file"
               />
@@ -611,7 +726,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['foreginpassport_back_file']"
+              v-show="!imgUrls['foreginpassport_back_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -626,10 +741,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['foreginpassport_back_file']"
+              v-if="imgUrls['foreginpassport_back_file']['url']"
             >
               <img
-                :src="imgUrls['foreginpassport_back_file']"
+                :src="imgUrls['foreginpassport_back_file']['url']"
                 class="w-full h-full object-cover"
                 alt="foreginpassport_back_file"
               />
@@ -649,10 +764,18 @@ onMounted(() => {
       </div>
       <div class="w-full flex justify-end">
         <button
+        v-if="!isForeginPassportEdit"
           @click="saveForeignPassport"
           class="bg-white min-h-[40px] relative w-fit border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1"
         >
           Saqlash
+        </button>
+        <button
+        v-if="!!isForeginPassportEdit"
+          @click="saveEditProfile('foreign_passport')"
+          class="bg-white min-h-[40px] relative hover:bg-blue-500 hover:text-white trans-custom w-fit border border-blue-400 px-6 text-blue-400 rounded-md h-full flex items-center justify-center gap-1"
+        >
+          O'zgartirishlarni saqlash
         </button>
       </div>
     </div>
@@ -708,7 +831,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['driver_license_front_file']"
+              v-show="!imgUrls['driver_license_front_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -723,10 +846,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['driver_license_front_file']"
+              v-if="imgUrls['driver_license_front_file']['url']"
             >
               <img
-                :src="imgUrls['driver_license_front_file']"
+                :src="imgUrls['driver_license_front_file']['url']"
                 class="w-full h-full object-cover"
                 alt="driver_license_front_file"
               />
@@ -755,7 +878,7 @@ onMounted(() => {
             class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
-              v-show="!imgUrls['driver_license_back_file']"
+              v-show="!imgUrls['driver_license_back_file']['url']"
               class="flex flex-col items-center gap-6"
             >
               <Icon name="uil:plus-circle" size="34px" />
@@ -770,10 +893,10 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['driver_license_back_file']"
+              v-if="imgUrls['driver_license_back_file'['url']]"
             >
               <img
-                :src="imgUrls['driver_license_back_file']"
+                :src="imgUrls['driver_license_back_file']['url']"
                 class="w-full h-full object-cover"
                 alt="driver_license_back_file"
               />
@@ -793,10 +916,18 @@ onMounted(() => {
       </div>
       <div class="flex justify-end mt-3">
         <button
+          v-if="!isDriverLicenseEdit"
           @click="saveDriverLicense"
           class="bg-white max-w-fit min-h-[40px] relative w-full border border-green-400 px-6 text-green-400 rounded-md h-full flex items-center justify-center gap-1"
         >
           Saqlash
+        </button>
+        <button
+        v-if="!!isDriverLicenseEdit"
+          @click="saveEditProfile('driver_license')"
+          class="bg-white min-h-[40px] relative hover:bg-blue-500 hover:text-white trans-custom w-fit border border-blue-400 px-6 text-blue-400 rounded-md h-full flex items-center justify-center gap-1"
+        >
+          O'zgartirishlarni saqlash
         </button>
       </div>
     </div>

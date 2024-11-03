@@ -206,6 +206,7 @@ watch(
                 @focus="_focus"
                 v-mask="'+998 ## ### ## ##'"
                 id="phone_num"
+                pattern="[0-9]*"
                 v-model="formValues.phone"
               />
               <label for="phone_num">Telefon raqam</label>
