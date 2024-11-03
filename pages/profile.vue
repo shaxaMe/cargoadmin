@@ -5,6 +5,7 @@ import { useToast } from "primevue/usetoast";
 const toast = useToast();
 
 //data
+const loading = ref(true);
 const auth = useAuth()
 const selectedCities = ref();
 const date = ref(null);
@@ -90,10 +91,12 @@ function getUserProfile() {
 }
 function getUserDocuments() {
   useApi("/v1/user/document").then((response) => {
+    loading.value = false;
     response.results.forEach((item) => {
       if (item.type === "passport") {
         isPassportEdit.value = true;
         passportData.expired_date = item.expired_date;
+        passportData.id = item.id;
         passportData.given_date = item.given_date;
         passportData.serial = item.serial;
         imgUrls.passport_main_file.url = item.main_file;
@@ -106,6 +109,7 @@ function getUserDocuments() {
         driver_pass.driving_license_category = item.driving_license_category;
         imgUrls.driver_license_front_file.url = item.main_file;
         imgUrls.driver_license_back_file.url = item.back_file;
+        driver_pass.id = item.id;
       } else {
         isForeginPassportEdit.value = true;
         foreginpassportData.expired_date = item.expired_date;
@@ -113,9 +117,14 @@ function getUserDocuments() {
         foreginpassportData.serial = item.serial;
         imgUrls.foreginpassport_main_file.url = item.main_file;
         imgUrls.foreginpassport_back_file.url = item.back_file;
+        foreginpassportData.id = item.id;
       }
     });
-  });
+  }).catch((error) => {
+     loading.value = false;
+  }).finally(() => {
+     loading.value = false;
+  })
 }
 function _deleteImg(key) {
   let el = document.querySelector(`#${key}`);
@@ -335,32 +344,53 @@ function isValidFuragoMediaUrl(url) {
     return url.includes(baseUrl);
 }
 function saveEditProfile(editedType) {
-   let data = new FormData();
+  let id = null;
+   let data = {}
      if(editedType === 'passport'){
-       data.append('serial',passportData.serial.replaceAll(" ", ""));
-       !!isValidFuragoMediaUrl(imgUrls.passport_main_file.url)?"":data.append('main_file', imgUrls.passport_main_file.base64);
-       !!isValidFuragoMediaUrl(imgUrls.passport_back_file.url)?"":data.append('back_file', imgUrls.passport_back_file.base64);
-       data.append('type','passport');
-       data.append('given_date',passportData.given_date? timeFormatter(passportData.given_date) : '');
-       data.append('expired_date',passportData.expired_date? timeFormatter(passportData.expired_date) : '');
+       id=passportData.id;
+       data.serial=passportData.serial.replaceAll(" ", "");
+       !!isValidFuragoMediaUrl(imgUrls.passport_main_file.url)?"":data.main_file=imgUrls.passport_main_file.base64;
+       !!isValidFuragoMediaUrl(imgUrls.passport_back_file.url)?"":data.back_file=imgUrls.passport_back_file.base64;
+       data.type='passport';
+       data.given_date=passportData.given_date? timeFormatter(passportData.given_date) : '';
+       data.expired_date=passportData.expired_date? timeFormatter(passportData.expired_date) : '';
      }
      else if(editedType === 'driver_license'){
-       data.append('serial',driver_pass.serial.replaceAll(" ", ""));
-       !!isValidFuragoMediaUrl(imgUrls.driver_license_front_file.url)?"":data.append('main_file', imgUrls.driver_license_front_file.base64);
-       isValidFuragoMediaUrl(imgUrls.driver_license_back_file.url)?"":data.append('back_file', imgUrls.driver_license_back_file.base64);
-       data.append('type','driver_license');
-       data.append('given_date',driver_pass.given_date? timeFormatter(driver_pass.given_date) : '');
-       data.append('expired_date',driver_pass.expired_date? timeFormatter(driver_pass.expired_date) : '');
+      id  = driver_pass.id
+       data.serial=driver_pass.serial.replaceAll(" ", "");
+       !!isValidFuragoMediaUrl(imgUrls.driver_license_front_file.url)?"":data.main_file=imgUrls.driver_license_front_file.base64;
+       isValidFuragoMediaUrl(imgUrls.driver_license_back_file.url)?"":data.back_file=imgUrls.driver_license_back_file.base64;
+       data.type='driver_passport';
+       data.driving_license_category=driver_pass.driving_license_category;
+       data.given_date=driver_pass.given_date? timeFormatter(driver_pass.given_date) : '';
+       data.expired_date=driver_pass.expired_date? timeFormatter(driver_pass.expired_date) : '';
      }
      else if(editedType === 'foreign_passport'){
-       data.append('serial',foreginpassportData.serial.replaceAll(" ", ""));
-       isValidFuragoMediaUrl(imgUrls.foreginpassport_main_file.url)?"":data.append('main_file', imgUrls.foreginpassport_main_file.base64);
-       isValidFuragoMediaUrl(imgUrls.foreginpassport_back_file.url)?"":data.append('back_file', imgUrls.foreginpassport_back_file.base64);
-       data.append('type','foreign_passport');
-       data.append('given_date',foreginpassportData.given_date? timeFormatter(foreginpassportData.given_date) : '');
-       data.append('expired_date',foreginpassportData.expired_date? timeFormatter(foreginpassportData.expired_date) : '');
+       data.serial=foreginpassportData.serial.replaceAll(" ", "");
+       isValidFuragoMediaUrl(imgUrls.foreginpassport_main_file.url)?"":data.main_file=imgUrls.foreginpassport_main_file.base64;
+       isValidFuragoMediaUrl(imgUrls.foreginpassport_back_file.url)?"":data.back_file=imgUrls.foreginpassport_back_file.base64;
+       data.type='foreign_passport';
+       data.given_date=foreginpassportData.given_date? timeFormatter(foreginpassportData.given_date) : '';
+       data.expired_date=foreginpassportData.expired_date? timeFormatter(foreginpassportData.expired_date) : '';
+       id = foreginpassportData.id
      }
-     useApi(`v1/user/document/${auth.user.id}`, { method: "PUT", body: data })
+     data.user=auth.user.id;
+     useApi(`v1/user/document/${id}`, { method: "PUT", body: JSON.stringify(data) }).then((response) => {
+      getUserDocuments();
+      toast.add({
+        severity: "success",
+        summary: "Muvaffaqiyatli",
+        detail: "Malumotlar saqlandi",
+        life: 3000,
+      });
+     }).catch((error) => {
+      toast.add({
+        severity: "error",
+        summary: "Xatolik",
+        detail: 'Qayta urinib kuring',
+        life: 3000,
+      });
+     })
 }
 //actins
 
@@ -866,6 +896,10 @@ onMounted(() => {
           O'zgartirishlarni saqlash
         </button>
       </div>
+    </div>
+    <div v-if="loading" class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center">
+      <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+            animationDuration=".5s" aria-label="Custom ProgressSpinner" />
     </div>
   </div>
 </template>

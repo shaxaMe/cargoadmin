@@ -69,7 +69,7 @@
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button> -->
           <button
-            class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
+            class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
               class="flex flex-col items-center gap-6"
@@ -112,7 +112,7 @@
             <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
           </button> -->
           <button
-            class="bg-white overflow-hidden h-[200px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
+            class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
           >
             <div
               class="flex flex-col items-center gap-6"
@@ -153,7 +153,14 @@
       <div class="flex items-center gap-5 mt-5">
         <div class="flex-1 flex flex-col max-w-[380px]">
         <label for="username" class="font-semibold mb-2">Haydovchi biriktirish</label>
-        <InputText id="username" class="flex-auto" autocomplete="off" />
+        <!-- <InputText id="username" class="flex-auto" autocomplete="off" /> -->
+        <Select
+                  v-model="selectedCity"
+                  :options="cities"
+                  optionLabel="name"
+                  optionValue="code"
+                  class="w-full text-sm"
+                />
       </div>
       </div>
       <div class="my-4">
@@ -170,6 +177,14 @@
 
 <script setup>
 let isOpen = ref(false);
+const selectedCity = ref();
+const cities = ref([
+    { name: 'New York', code: 'NY' },
+    { name: 'Rome', code: 'RM' },
+    { name: 'London', code: 'LDN' },
+    { name: 'Istanbul', code: 'IST' },
+    { name: 'Paris', code: 'PRS' }
+]);
 const customers = ref(
   [{
   "id": 1,
