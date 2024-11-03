@@ -152,7 +152,7 @@ function previewImage(e, key) {
 // }
 if (obj) {
     imgUrls[key]['url'] = URL.createObjectURL(obj);  // Set the URL for preview
-
+    console.log("URL stored in imgUrls:", imgUrls[key]['url']);
     const reader = new FileReader();
     
     reader.onload = function(event) {
@@ -192,28 +192,6 @@ function _save(img) {
   formValues.photo = img;
 }
 function saveForeignPassport() {
-  // if (!foreginpassportData.serial) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Xorijiy passport seriasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!foreginpassportData.expired_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Xorijiy passport amal qilish sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!foreginpassportData.given_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Xorijiy passport berilgan sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else 
   if (!foreginpassport_main_file.value) {
     toast.add({
       severity: "error",
@@ -239,6 +217,7 @@ function saveForeignPassport() {
     data.append("main_file", imgUrls.foreginpassport_main_file.base64);
     data.append("back_file", imgUrls.foreginpassport_back_file.base64);
     data.append("type", "foreign_passport");
+    data.append('user',auth.user.id);
     useApi("/v1/user/document", { method: "POST", body: data })
       .then((response) => {
         getUserDocuments()
@@ -260,28 +239,6 @@ function saveForeignPassport() {
   }
 }
 function saveDriverLicense() {
-  // if (!driver_pass.serial) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Haydovchilik guvohnomasi seriasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!driver_pass.expired_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Haydovchilik guvohnomasi amal qilish sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!driver_pass.given_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Haydovchilik guvohnomasi sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else 
   if (!driver_license_front_file.value) {
     toast.add({
       severity: "error",
@@ -303,6 +260,7 @@ function saveDriverLicense() {
     data.append("serial", driver_pass.serial.replaceAll(" ", ""));
     data.append("main_file", imgUrls.driver_license_front_file.base64);
     data.append("back_file", imgUrls.driver_license_back_file.base64);
+    data.append('user',auth.user.id);
     driver_pass.driving_license_category.forEach((item, index) => {
       data.append("driving_license_category", item);
     });
@@ -329,36 +287,14 @@ function saveDriverLicense() {
   }
 }
 function savePassport() {
-  // if (!driver_pass.serial) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Passport seriasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!driver_pass.expired_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Passport amal qilish sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else if (!driver_pass.given_date) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: "Xatolik",
-  //     detail: "Passport sanasini kiriting",
-  //     life: 3000,
-  //   });
-  // } else 
-  if (!driver_license_front_file.value) {
+  if (!passport_main_file.value) {
     toast.add({
       severity: "error",
       summary: "Xatolik",
       detail: "Passport old rasmini kiriting",
       life: 3000,
     });
-  } else if (!driver_license_back_file.value) {
+  } else if (!passport_back_file.value) {
     toast.add({
       severity: "error",
       summary: "Xatolik",
@@ -893,7 +829,7 @@ onMounted(() => {
             </div>
             <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="imgUrls['driver_license_back_file'['url']]"
+              v-if="imgUrls['driver_license_back_file']['url']"
             >
               <img
                 :src="imgUrls['driver_license_back_file']['url']"
