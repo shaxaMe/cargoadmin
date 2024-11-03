@@ -202,6 +202,7 @@ watch(
             /> -->
             <FloatLabel variant="on" class="w-full">
               <InputText
+                type="tel"
                 class="w-full"
                 @focus="_focus"
                 v-mask="'+998 ## ### ## ##'"
