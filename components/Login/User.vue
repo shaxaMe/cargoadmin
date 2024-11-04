@@ -8,6 +8,7 @@ const auth = useAuth();
 const router = useRouter();
 const { setLogin, set_token, setUser } = auth;
 import AuthImg from "~/assets/images/auth-img.png";
+import { set } from "date-fns";
 definePageMeta({
   layout: "LoginLayout",
 });
@@ -61,6 +62,12 @@ function signIn() {
     if (res) {
     if (type.value == "new") {
       type.value = "sms";
+       setTimeout(()=>{
+        const inputs = document.querySelectorAll('.p-inputotp.p-component input')
+  inputs.forEach(input => {
+    input.setAttribute('type', 'tel')
+  },200)
+       })
     } else {
       useApi("/v1/user/login", {
         method: "POST",
@@ -229,7 +236,6 @@ watch(
               /> -->
               <div class="text-[#bbb] text-sm">Tasdiqlash kodi</div>
               <InputOtp
-              type="tel"
                 v-model="formValues.secret_code"
                 :invalid="!formValues.secret_code || formValues.secret_code && formValues.secret_code.length<6"
                 :length="6"
