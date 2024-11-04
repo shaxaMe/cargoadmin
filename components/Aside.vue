@@ -10,7 +10,7 @@
         <img src="../assets/images/FG1.png" class="w-full h-full object-cover" alt="">
         <!-- <span class="text-[#4880FF]">Fura</span>Go -->
       </div>
-      <div class="pb-5 pt-6 flex px-2 flex-col items-center gap-4">
+      <div class="pb-5 pt-6 flex px-2 flex-col items-center gap-4 navbar-mobile-item">
         <nuxt-link to="/profile" class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
@@ -124,6 +124,14 @@ function logOut(){
   router.push('/login')
 }
 
+onMounted(()=>{
+    let items = document.querySelectorAll('.navbar-mobile-item a');
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        toggleNav.value = false;
+      });
+    });
+})
 </script>
 
 <style lang="scss" scoped></style>
