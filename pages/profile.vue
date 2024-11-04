@@ -7,6 +7,7 @@ const toast = useToast();
 //data
 const loading = ref(true);
 const auth = useAuth()
+const {setUser} = auth
 const selectedCities = ref();
 const date = ref(null);
 const isOpen = ref(false);
@@ -78,11 +79,12 @@ function _focus() {
   }
 }
 function timeFormatter(date) {
-  return format(new Date(date), "yyyy-MM-dd");
+  return format(new Date(date), "dd-MM-yyyy");
 }
 function getUserProfile() {
   useApi("/v1/user/info").then((response) => {
     if (response) {
+      setUser(response);
       for (let i in response) {
         formValues[i] = response[i];
       }
@@ -583,7 +585,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="mt-4 grid grid-cols-4" v-if="!isForeginPassportEdit">
+    <div class="mt-4 grid grid-cols-4 max-xl:grid-cols-3 max-md:grid-cols-1" v-if="!isForeginPassportEdit">
       <button
         @click="isOpen = true"
         v-if="!isOpen"

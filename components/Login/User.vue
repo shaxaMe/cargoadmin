@@ -229,6 +229,7 @@ watch(
               /> -->
               <div class="text-[#bbb] text-sm">Tasdiqlash kodi</div>
               <InputOtp
+              type="tel"
                 v-model="formValues.secret_code"
                 :invalid="!formValues.secret_code || formValues.secret_code && formValues.secret_code.length<6"
                 :length="6"

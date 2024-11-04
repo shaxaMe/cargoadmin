@@ -1,6 +1,7 @@
 <template>
   <div>
-    <nav class="w-full relative bg-white px-5 py-3 flex justify-end">
+    <nav class="w-full relative bg-white px-5 py-3 flex justify-end max-md:items-center max-md:justify-between">
+      <Icon @click="toggleNav=true" name="iconamoon:menu-burger-horizontal-bold" size="25px" />
       <!-- <div
         class="max-w-[300px] max-xl:max-w-[200px] relative w-full flex items-center justify-start"
       >
@@ -99,8 +100,9 @@
                 class="w-full h-full object-cover"
                 src="https://wallpapercave.com/wp/wp6115931.jpg"
                 alt=""
+                :label="`${user?.full_name?.substr(0,1)}`"
               /> -->
-              <Avatar :label="`${user?.full_name?.substr(0,1)}`" size="medium" shape="circle" />
+              <Avatar :image="user.photo?user.photo:emptyProfile"  size="medium" shape="circle" />
             </div>
             <p class="max-md:hidden">{{ user?.full_name }}</p>
             <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
@@ -157,7 +159,9 @@
 </template>
 
 <script setup>
+import emptyProfile from "../assets/images/profile.svg"
 import { useAuth } from "~/store/auth";
+const toggleNav = useState('toggleNav',()=>false);
 const router = useRouter();
 const { user,logout } = useAuth();
 const value = ref("");
