@@ -201,6 +201,8 @@ if (obj) {
 }
 function _save(img) {
   formValues.photo = img;
+  setUser(formValues)
+
 }
 function saveForeignPassport() {
   if (!foreginpassport_main_file.value) {
