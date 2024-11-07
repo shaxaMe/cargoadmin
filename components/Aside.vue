@@ -57,7 +57,7 @@
     </aside>
   </div>
     </div>
-    <div class="max-w-[220px] px-3 py-5 bg-white w-full h-auto min-h-screen max-lg:hidden">
+    <div class="max-w-[220px] px-3 py-5 bg-white w-full h-full min-h-screen max-lg:hidden">
     <aside class="w-full h-full">
       <div class="w-full h-10 text-center text-[#202224] font-extrabold text-lg">
         <img src="../assets/images/FG1.png" class="w-full h-full object-cover" alt="">

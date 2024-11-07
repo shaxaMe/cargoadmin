@@ -2,6 +2,10 @@
 import { format } from "date-fns";
 import {useAuth} from "../store/auth"
 import { useToast } from "primevue/usetoast";
+import {useOption} from "../store/option";
+
+const {getDatas} = useOption()
+
 const toast = useToast();
 
 //data
@@ -400,6 +404,7 @@ function saveEditProfile(editedType) {
 
 onMounted(() => {
   setTimeout(() => {
+    getDatas();
     getUserProfile();
     getUserDocuments();
   }, 200);
