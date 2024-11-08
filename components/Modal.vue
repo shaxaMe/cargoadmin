@@ -1,11 +1,14 @@
 <script setup>
 import Dialog from "primevue/dialog";
 
-const props = defineProps(['modelValue','maxWidth']);
+const props = defineProps(['modelValue','maxWidth','loading']);
 const emit = defineEmits(['update:modelValue']);
 
 const visible = ref(false);
 
+const btnLoad = computed(()=>{
+  return props.loading;
+})
 
 function _close() {
   // visible.value = false;
@@ -39,7 +42,7 @@ watch(() => visible.value, (visible) => {
           severity="secondary"
           @click="_close"
         ></Button>
-        <Button type="button" label="Saqlash" @click="save"></Button>
+        <Button type="button" @click="save"><Icon v-if="!!btnLoad" name="line-md:loading-twotone-loop" /> Saqlash</Button>
       </div>
     </Dialog>
   </div>
