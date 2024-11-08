@@ -46,7 +46,9 @@
         ></Column>
       </DataTable>
     </div>
-    <AutoparkCard />
+    <div v-if="!loading">
+      <AutoparkCard @UpdateData="_update" class="my-2" v-for="(item,i) in results" :cardData="item" :key="`cadr${i}`"  />
+    </div>
     <Modal v-model="isOpen" @_save="_save">
       <div class="flex items-center gap-5">
         <div class="flex-1 flex flex-col">
@@ -83,7 +85,7 @@
           <label for="email" class="font-semibold mb-2"
             >Yuk olish hajmi (m3)</label
           >
-          <InputNumber v-model="formData.size" id="email" class="flex-auto" autocomplete="off" />
+          <InputNumber v-model="formData.volume" id="email" class="flex-auto" autocomplete="off" />
         </div>
         <div class="flex-1 flex flex-col">
           <label for="email" class="font-semibold mb-2"
@@ -105,18 +107,18 @@
             <label for="username" class="font-semibold mb-2"
               >Davlat raqami</label
             >
-            <InputText id="username" v-model="formData.documents.license_plate" class="flex-auto" autocomplete="off" />
+            <InputText id="username" v-model="formData.document.license_plate" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex flex-col">
             <label for="email" class="font-semibold mb-2">Modeli</label>
-            <InputText v-model="formData.documents.model" id="email" class="flex-auto" autocomplete="off" />
+            <InputText v-model="formData.document.model" id="email" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex flex-col">
           <label for="email" class="font-semibold mb-2"
             >Yoqilg'i turi</label
           >
           <MultiSelect
-            v-model="formData.documents.fuel_type"
+            v-model="formData.document.fuel_type"
             :options="options.fuel_type"
             optionLabel="name"
             optionValue="id"
@@ -128,8 +130,9 @@
             <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
             <DatePicker
             class="w-full h-full min-h-[40px]"
-            v-model="formData.documents.ayear"
-            view="year" dateFormat="yy"
+            v-model="formData.document.ayear"
+            view="year" 
+            dateFormat="yy"
           />
           </div>
         </div>
@@ -138,7 +141,7 @@
             <label for="username" class="font-semibold mb-2"
               >Tex pasport seriya va raqami</label
             >
-            <InputText v-model="formData.documents.serial" id="username" class="flex-auto" autocomplete="off" />
+            <InputText v-model="formData.document.serial" id="username" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex items-stretch gap-5 w-full">
             <div class="flex-1 flex flex-col max-w-[300px]">
@@ -150,7 +153,7 @@
               <button
                 class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
               >
-              <div class="flex flex-col items-center gap-6" v-show="!formData.documents.main_file">
+              <div class="flex flex-col items-center gap-6" v-show="!formData.document.main_file">
                   <Icon name="uil:plus-circle" size="34px" />
                   <!--  -->
                   <input
@@ -163,10 +166,10 @@
                 </div>
                 <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="formData.documents.main_file"
+              v-if="formData.document.main_file"
             >
               <img
-                :src="formData.documents.main_file"
+                :src="formData.document.main_file"
                 class="w-full h-full object-cover"
                 alt="main file"
               />
@@ -192,7 +195,7 @@
               <button
                 class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
               >
-                <div class="flex flex-col items-center gap-6" v-show="!formData.documents.back_file">
+                <div class="flex flex-col items-center gap-6" v-show="!formData.document.back_file">
                   <Icon name="uil:plus-circle" size="34px" />
                   <input
                     id="back_file"
@@ -204,10 +207,10 @@
                 </div>
                 <div
               class="relative flex items-center justify-center group w-full h-full"
-              v-if="formData.documents.back_file"
+              v-if="formData.document.back_file"
             >
               <img
-                :src="formData.documents.back_file"
+                :src="formData.document.back_file"
                 class="w-full h-full object-cover"
                 alt="back file"
               />
@@ -282,18 +285,24 @@
         </div>
       </div>
     </Modal>
+    <div v-if="loading" class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center">
+      <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+            animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useOption } from '../store/option';
 import { useToast } from "primevue/usetoast";
-
+import { format } from "date-fns";
 const toast = useToast();
 let isOpen = ref(false);
 const selectedCity = ref();
+let loading = ref(true);
 const imagesInput = ref(null);
 const {options} = useOption();
+const results = ref([])
 const cities = ref([
   { name: "New York", code: "NY" },
   { name: "Rome", code: "RM" },
@@ -377,13 +386,13 @@ const formData = reactive({
   type: '1',
   truck_body: 2,
   weight: null,
-  size: null,
+  volume: null,
   loading_type: null,
-  truck_body_parameter: [1],
+  truck_body_parameter: [5],
   note: "This is a test vehicle",
   main_driver: 1,
   images: [],
-  documents: {
+  document: {
     color: 1,
     license_plate: null,
     model: null,
@@ -401,7 +410,7 @@ function _deleteImg(key,ind) {
   if(key != 'multiple'){
     let el = document.querySelector(`#${key}`);
     el.value = "";
-    formData.documents[key] = null;
+    formData.document[key] = null;
   }else{
     formData.images.splice(ind,1);
   }
@@ -431,7 +440,7 @@ if (obj) {
 
             // Store the JPEG Base64 string in imgUrls
             if(key!='multiple') {
-              formData.documents[key] = jpegBase64String;
+              formData.document[key] = jpegBase64String;
             }else{
               formData.images.push({image:jpegBase64String});
             }
@@ -445,13 +454,37 @@ if (obj) {
     reader.readAsDataURL(obj);  // Convert file to Base64
 }
 }
+function timeFormatter(date) {
+  return format(new Date(date), "yyyy");
+}
+
+function getVihicle(){
+  useApi('/v1/driver/vehicles',{
+    method: 'GET',
+  }).then((res)=>{
+    results.value = res.results;
+    loading.value = false;
+  }).catch((error)=>{
+    toast.add({
+      severity: "error",
+      summary: "Xəta",
+      detail: "Serverda xatolik",
+      life: 3000,
+    });
+    loading.value = false;
+  }).finally(()=>{
+    loading.value = false;
+  })
+}
 
 function _save(){
+      formData.document.ayear = timeFormatter(formData.document.ayear);
       useApi('/v1/driver/vehicle',{
         method: 'POST',
         body: formData,
       }).then((res)=>{
         isOpen.value = false;
+        getVihicle()
         toast.add({
           severity: "success",
           summary: "Muvaffaqiyatli",
@@ -467,6 +500,12 @@ function _save(){
         });
       })
 }
+function _update(){
+  getVihicle()
+}
+onMounted(()=>{
+  getVihicle()
+})
 </script>
 
 <style lang="scss" scoped></style>
