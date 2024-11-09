@@ -58,6 +58,7 @@
           <Select
             v-model="formData.type"
             :options="options.vehicle_type"
+            :invalid="$v.type.$error"
             optionLabel="name"
             optionValue="id"
             class="w-full text-sm"
@@ -68,6 +69,7 @@
           <Select
             v-model="formData.truck_body"
             :options="options.truck_type_parametr"
+            :invalid="$v.truck_body.$error"
             optionLabel="name"
             optionValue="id"
             class="w-full text-sm"
@@ -79,13 +81,13 @@
           <label for="username" class="font-semibold mb-2"
             >Yuk ko’tarish vazni (t)</label
           >
-          <InputNumber v-model="formData.weight" id="username" class="flex-auto" autocomplete="off" />
+          <InputNumber v-model="formData.weight" :invalid="$v.weight.$error" id="username" class="flex-auto" autocomplete="off" />
         </div>
         <div class="flex-1 flex flex-col">
           <label for="email" class="font-semibold mb-2"
             >Yuk olish hajmi (m3)</label
           >
-          <InputNumber v-model="formData.volume" id="email" class="flex-auto" autocomplete="off" />
+          <InputNumber v-model="formData.volume" :invalid="$v.volume.$error" id="email" class="flex-auto" autocomplete="off" />
         </div>
         <div class="flex-1 flex flex-col">
           <label for="email" class="font-semibold mb-2"
@@ -96,6 +98,7 @@
             :options="options.truck_load_type"
             optionLabel="name"
             optionValue="id"
+            :invalid="$v.loading_type.$error" 
             class="w-full text-sm"
           />
         </div>
@@ -107,11 +110,11 @@
             <label for="username" class="font-semibold mb-2"
               >Davlat raqami</label
             >
-            <InputText id="username" v-model="formData.document.license_plate" class="flex-auto" autocomplete="off" />
+            <InputText id="username" :invalid="$v.document.license_plate.$error" v-model="formData.document.license_plate" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex flex-col">
             <label for="email" class="font-semibold mb-2">Modeli</label>
-            <InputText v-model="formData.document.model" id="email" class="flex-auto" autocomplete="off" />
+            <InputText v-model="formData.document.model" :invalid="$v.document.model.$error" id="email" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex flex-col">
           <label for="email" class="font-semibold mb-2"
@@ -120,6 +123,7 @@
           <MultiSelect
             v-model="formData.document.fuel_type"
             :options="options.fuel_type"
+            :invalid="$v.document.fuel_type.$error"
             optionLabel="name"
             optionValue="id"
             class="w-full text-sm"
@@ -131,6 +135,7 @@
             <DatePicker
             class="w-full h-full min-h-[40px]"
             v-model="formData.document.ayear"
+            :invalid="$v.document.ayear.$error"
             view="year" 
             dateFormat="yy"
           />
@@ -141,7 +146,7 @@
             <label for="username" class="font-semibold mb-2"
               >Tex pasport seriya va raqami</label
             >
-            <InputText v-model="formData.document.serial" id="username" class="flex-auto" autocomplete="off" />
+            <InputText v-model="formData.document.serial" :invalid="$v.document.serial.$error" id="username" class="flex-auto" autocomplete="off" />
           </div>
           <div class="flex-1 flex items-stretch gap-5 w-full">
             <div class="flex-1 flex flex-col max-w-[300px]">
@@ -296,6 +301,8 @@
 import { useOption } from '../store/option';
 import { useToast } from "primevue/usetoast";
 import { format } from "date-fns";
+import useVuelidate from "@vuelidate/core";
+import { required, sameAs } from "@vuelidate/validators";
 const toast = useToast();
 let isOpen = ref(false);
 const selectedCity = ref();
@@ -405,6 +412,24 @@ const formData = reactive({
   },
 });
 
+const rules = {
+      type: { required },
+      truck_body: { required },
+      weight: { required, },
+      volume: { required, },
+      loading_type: { required },
+      truck_type_parametr: { required },
+      main_driver: { required },
+      document: {
+        license_plate: { required },
+        model: { required },
+        ayear: { required },
+        fuel_type: { required },
+        serial: { required },
+      },
+}
+
+const $v = useVuelidate(rules, formData);
 //methods
 function _deleteImg(key,ind) {
   if(key != 'multiple'){
@@ -476,30 +501,70 @@ function getVihicle(){
     loading.value = false;
   })
 }
+function checkInvalidFields() {
+  const invalidFields = [];
+  
+  // Check main fields
+  if ($v.value.type.$invalid) invalidFields.push('Transport turi');
+  if ($v.value.truck_body.$invalid) invalidFields.push('Kuzov turi');
+  if ($v.value.weight.$invalid) invalidFields.push("Yuk ko'tarish vazni");
+  if ($v.value.volume.$invalid) invalidFields.push('Yuk olish hajmi');
+  if ($v.value.loading_type.$invalid) invalidFields.push("Yuklash yo'nalishlari");
+  
+  // Check document fields
+  if ($v.value.document.license_plate.$invalid) invalidFields.push('Davlat raqami');
+  if ($v.value.document.model.$invalid) invalidFields.push('Modeli');
+  if ($v.value.document.ayear.$invalid) invalidFields.push('Yili');
+  if ($v.value.document.fuel_type.$invalid) invalidFields.push("Yoqilg'i turi");
+  if ($v.value.document.serial.$invalid) invalidFields.push('Tex pasport seriya va raqami');
 
-function _save(){
-      formData.document.ayear = timeFormatter(formData.document.ayear);
-      useApi('/v1/driver/vehicle',{
-        method: 'POST',
-        body: formData,
-      }).then((res)=>{
-        isOpen.value = false;
-        getVihicle()
-        toast.add({
-          severity: "success",
-          summary: "Muvaffaqiyatli",
-          detail: "Malumotlar saqlandi",
-          life: 3000,
-        });
-      }).catch((e)=>{
-        toast.add({
-          severity: "error",
-          summary: "Xəta",
-          detail: "Serverda xatolik",
-          life: 3000,
-        });
-      })
+  return invalidFields;
 }
+const _save = async () => {
+  const invalidFields = checkInvalidFields();
+  $v.value.$touch();
+  if (invalidFields.length>0) {
+    toast.add({
+      severity: "error",
+      summary: "Xatolik",
+      detail: "Barcha maydonlarni to'ldiring",
+      life: 3000,
+    });
+    return;
+  }
+
+  try {
+    const formDataToSend = {
+      ...formData,
+      document: {
+        ...formData.document,
+        ayear: formData.document.ayear ? timeFormatter(formData.document.ayear) : null
+      }
+    };
+
+    await useApi('/v1/driver/vehicle', {
+      method: 'POST',
+      body: formDataToSend,
+    });
+
+    isOpen.value = false;
+    await getVehicle();
+    
+    toast.add({
+      severity: "success",
+      summary: "Muvaffaqiyatli",
+      detail: "Malumotlar saqlandi",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Xəta",
+      detail: "Serverda xatolik",
+      life: 3000,
+    });
+  }
+};
 function _update(){
   getVihicle()
 }

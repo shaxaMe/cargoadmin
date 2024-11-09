@@ -2,7 +2,7 @@
 import Dialog from "primevue/dialog";
 
 const props = defineProps(['modelValue','maxWidth','loading']);
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue','_save']);
 
 const visible = ref(false);
 
