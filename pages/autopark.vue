@@ -69,7 +69,7 @@
           <Select
             v-model="formData.truck_body"
             :options="options.truck_type_parametr"
-            :invalid="$v.truck_type_parametr.$error"
+            :invalid="$v.truck_body.$error"
             optionLabel="name"
             optionValue="id"
             class="w-full text-sm"
@@ -419,7 +419,6 @@ const rules = {
       volume: { required, },
       loading_type: { required },
       truck_type_parametr: { required },
-      note: { required },
       main_driver: { required },
       document: {
         license_plate: { required },
@@ -502,36 +501,70 @@ function getVihicle(){
     loading.value = false;
   })
 }
+function checkInvalidFields() {
+  const invalidFields = [];
+  
+  // Check main fields
+  if ($v.value.type.$invalid) invalidFields.push('Transport turi');
+  if ($v.value.truck_body.$invalid) invalidFields.push('Kuzov turi');
+  if ($v.value.weight.$invalid) invalidFields.push("Yuk ko'tarish vazni");
+  if ($v.value.volume.$invalid) invalidFields.push('Yuk olish hajmi');
+  if ($v.value.loading_type.$invalid) invalidFields.push("Yuklash yo'nalishlari");
+  
+  // Check document fields
+  if ($v.value.document.license_plate.$invalid) invalidFields.push('Davlat raqami');
+  if ($v.value.document.model.$invalid) invalidFields.push('Modeli');
+  if ($v.value.document.ayear.$invalid) invalidFields.push('Yili');
+  if ($v.value.document.fuel_type.$invalid) invalidFields.push("Yoqilg'i turi");
+  if ($v.value.document.serial.$invalid) invalidFields.push('Tex pasport seriya va raqami');
 
-function _save(){
-  $v.value.$touch();
-  const result = $v.value.$validate();
-  result.then((res)=>{
-    if(!!res){
-      formData.document.ayear = timeFormatter(formData.document.ayear);
-      useApi('/v1/driver/vehicle',{
-        method: 'POST',
-        body: formData,
-      }).then((res)=>{
-        isOpen.value = false;
-        getVihicle()
-        toast.add({
-          severity: "success",
-          summary: "Muvaffaqiyatli",
-          detail: "Malumotlar saqlandi",
-          life: 3000,
-        });
-      }).catch((e)=>{
-        toast.add({
-          severity: "error",
-          summary: "Xəta",
-          detail: "Serverda xatolik",
-          life: 3000,
-        });
-      })
-    }
-  })
+  return invalidFields;
 }
+const _save = async () => {
+  const invalidFields = checkInvalidFields();
+  $v.value.$touch();
+  if (invalidFields.length>0) {
+    toast.add({
+      severity: "error",
+      summary: "Xatolik",
+      detail: "Barcha maydonlarni to'ldiring",
+      life: 3000,
+    });
+    return;
+  }
+
+  try {
+    const formDataToSend = {
+      ...formData,
+      document: {
+        ...formData.document,
+        ayear: formData.document.ayear ? timeFormatter(formData.document.ayear) : null
+      }
+    };
+
+    await useApi('/v1/driver/vehicle', {
+      method: 'POST',
+      body: formDataToSend,
+    });
+
+    isOpen.value = false;
+    await getVehicle();
+    
+    toast.add({
+      severity: "success",
+      summary: "Muvaffaqiyatli",
+      detail: "Malumotlar saqlandi",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Xəta",
+      detail: "Serverda xatolik",
+      life: 3000,
+    });
+  }
+};
 function _update(){
   getVihicle()
 }
