@@ -30,7 +30,7 @@
             v-for="(item, i) in application"
             v-if="application && application.length > 0"
           >
-            <AwayCard :item="item" @_save="getApplications" />
+            <AwayCard :item="item" @_update="getApplications" class="my-1" />
           </div>
         </div>
       </div>
@@ -202,33 +202,127 @@ const formData = reactive({
 });
 
 const application = ref([]);
+// async function filterOptions(key) {
+//   if (key.value) {
+//     useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
+//       (res) => {
+//         fromOptions.value = res.results.map((item, i) => ({
+//           name: item.title.text,
+//           code: item.code,
+//           ...item,
+//         }));
+//       }
+//     );
+//   }
+// }
+// async function filterOptions(key) {
+//   if (key.value) {
+//     // Create a copy of the current options to keep the old ones
+//     let data = [];
+
+//     try {
+//       // Fetch new data from the API
+//       const res = await useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`);
+      
+//       // Process the new results
+//       data = res.results.map((item) => ({
+//         name: item.title.text,
+//         code: item.code,
+//         ...item,
+//       }));
+
+//       // Update `fromOptions` by combining old and new data without overwriting
+//       fromOptions.value = [...fromOptions.value, ...data];
+//     } catch (error) {
+//       console.error('Error fetching data:', error);
+//     }
+//   }
+// }
 async function filterOptions(key) {
   if (key.value) {
-    useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
-      (res) => {
-        fromOptions.value = res.results.map((item, i) => ({
-          name: item.title.text,
-          code: item.code,
-          ...item,
-        }));
-      }
-    );
+    try {
+      // API dan yangi ma'lumotlarni olish
+      const res = await useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`);
+      
+      // Yangi natijalarni qayta ishlash
+      const newData = res.results.map((item) => ({
+        name: item.title.text,
+        code: item.uri, // Manzillarni `uri` bo'yicha tekshiramiz
+        ...item,
+      }));
+
+      // Eski va yangi ma'lumotlarni birlashtirish
+      const allData = [...fromOptions.value, ...newData];
+
+      // Unikal `uri` bo‘yicha birinchi kelgan manzilni saqlash
+      const uniqueData = [];
+      allData.forEach((item) => {
+        // Agar item `uri` avvalgi manzillarda mavjud bo'lmasa, qo‘shamiz
+        if (!uniqueData.some(existingItem => existingItem.uri === item.uri)) {
+          uniqueData.push(item);
+        }
+      });
+
+      // `fromOptions.value` ni faqat unikal manzillar bilan yangilash
+      fromOptions.value = uniqueData;
+
+      // Yangi ma'lumotlar qo‘shilganini tekshirish uchun konsolga chiqarish
+      console.log(fromOptions.value);
+
+    } catch (error) {
+      console.error('API dan ma\'lumot olishda xato:', error);
+    }
   }
 }
 
+
+
+// async function toOptions(params) {
+//   if (params.value) {
+//     useApi(`/v1/service/yandex-suggest?text=${params.value}&results=20`).then(
+//       (res) => {
+//         toOptionsData.value = res.results.map((item, i) => ({
+//           name: item.title.text,
+//           code: i,
+//           ...item,
+//         }));
+//       }
+//     );
+//   }
+// }
 async function toOptions(params) {
   if (params.value) {
-    useApi(`/v1/service/yandex-suggest?text=${params.value}&results=20`).then(
-      (res) => {
-        toOptionsData.value = res.results.map((item, i) => ({
-          name: item.title.text,
-          code: i,
-          ...item,
-        }));
-      }
-    );
+    try {
+      // API dan yangi ma'lumotlarni olish
+      const res = await useApi(`/v1/service/yandex-suggest?text=${params.value}&results=20`);
+      
+      // Yangi natijalarni qayta ishlash
+      const newData = res.results.map((item, i) => ({
+        name: item.title.text,
+        code: item.uri, // Manzillarni `uri` bo'yicha tekshiramiz
+        ...item,
+      }));
+
+      // Eski ma'lumotlar bilan birlashtirish
+      const allData = [...toOptionsData.value, ...newData];
+      // Unikal `uri` bo‘yicha birinchi kelgan manzilni saqlash
+      const uniqueData = [];
+      allData.forEach((item) => {
+        // Agar item `uri` avvalgi manzillarda mavjud bo'lmasa, qo‘shamiz
+        if (!uniqueData.some(existingItem => existingItem.uri === item.uri)) {
+          uniqueData.push(item);
+        }
+      });
+
+      // `toOptionsData.value` ni faqat unikal manzillar bilan yangilash
+      toOptionsData.value = uniqueData;
+
+    } catch (error) {
+      console.error('API dan ma\'lumot olishda xato:', error);
+    }
   }
 }
+
 async function getLocations(keyname) {
   let items = keyname == "from" ? fromValue.value : toValue.value;
   let coords = [];
@@ -264,7 +358,8 @@ function _save() {
     method: "POST",
     body: { ...formData, departure_date: formatDate(formData.departure_date) },
   }).then(()=>{
-    getApplications()
+    getApplications();
+    isOpen.value = false;
   });
 }
 function getApplications() {
