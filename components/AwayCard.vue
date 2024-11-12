@@ -61,8 +61,8 @@
         </Menu>
       </div>
     </div>
-    <Modal v-model="isOpen" @_save="_save"> 
-        <div class="flex justify-between gap-4 py-3 items-stretch w-full">
+    <Modal v-model="isOpen" @_save="_save">
+      <div class="flex justify-between gap-4 py-3 items-stretch w-full">
         <div class="flex-1 relative">
           <InputGroup>
             <FloatLabel variant="on">
@@ -210,7 +210,7 @@
 const props = defineProps({
   item: { type: Object, required: true },
 });
-const emit = defineEmits(['_save'])
+const emit = defineEmits(["_update"]);
 const fromValue = ref(null);
 const toValue = ref(null);
 const toOptionsData = ref([]);
@@ -219,7 +219,7 @@ const fromCoord = ref([]);
 const toCoord = ref([]);
 const isOpen = ref(false);
 const menuitem = ref(null);
-const optionsCar=ref([])
+const optionsCar = ref([]);
 const formData = ref({
   weight: null,
   volume: null,
@@ -244,7 +244,7 @@ const items = ref([
       //   detail: "File created",
       //   life: 3000,
       // });
-        getEditData();
+      getEditData();
     },
   },
 ]);
@@ -253,106 +253,183 @@ const toggle = (event) => {
   menuitem.value.toggle(event);
 };
 
+// async function filterOptions(key) {
+//   if (key.value) {
+//     useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
+//       (res) => {
+//         fromOptions.value = res.results.map((item, i) => ({
+//           name: item.title.text,
+//           code: item.code,
+//           ...item,
+//         }));
+//       }
+//     );
+//   }
+// }
 async function filterOptions(key) {
   if (key.value) {
-    useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
-      (res) => {
-        fromOptions.value = res.results.map((item, i) => ({
-          name: item.title.text,
-          code: item.code,
-          ...item,
-        }));
-      }
-    );
+    try {
+      // API dan yangi ma'lumotlarni olish
+      const res = await useApi(
+        `/v1/service/yandex-suggest?text=${key.value}&results=20`
+      );
+      // Yangi natijalarni qayta ishlash
+      const newData = res.results.map((item) => ({
+        name: item.title.text,
+        code: item.uri, // Manzillarni `uri` bo'yicha tekshiramiz
+        ...item,
+      }));
+
+      // Eski va yangi ma'lumotlarni birlashtirish
+      const allData = [...fromOptions.value, ...newData];
+
+      // Unikal `uri` bo‘yicha birinchi kelgan manzilni saqlash
+      const uniqueData = [];
+      allData.forEach((item) => {
+        // Agar item `uri` avvalgi manzillarda mavjud bo'lmasa, qo‘shamiz
+        if (
+          !item.uri ||
+          !uniqueData.some((existingItem) => existingItem.uri === item.uri)
+        ) {
+          uniqueData.push(item);
+        }
+      });
+
+      // `fromOptions.value` ni faqat unikal manzillar bilan yangilash
+      fromOptions.value = uniqueData;
+
+      // Yangi ma'lumotlar qo‘shilganini tekshirish uchun konsolga chiqarish
+    } catch (error) {
+      console.error("API dan ma'lumot olishda xato:", error);
+    }
   }
 }
 
+// async function toOptions(params) {
+//   if (params.value) {
+//     useApi(`/v1/service/yandex-suggest?text=${params.value}&results=20`).then(
+//       (res) => {
+//         toOptionsData.value = res.results.map((item, i) => ({
+//           name: item.title.text,
+//           code: i,
+//           ...item,
+//         }));
+//       }
+//     );
+//   }
+// }
 async function toOptions(params) {
   if (params.value) {
-    useApi(`/v1/service/yandex-suggest?text=${params.value}&results=20`).then(
-      (res) => {
-        toOptionsData.value = res.results.map((item, i) => ({
-          name: item.title.text,
-          code: i,
-          ...item,
-        }));
-      }
-    );
+    try {
+      // API dan yangi ma'lumotlarni olish
+      const res = await useApi(
+        `/v1/service/yandex-suggest?text=${params.value}&results=20`
+      );
+
+      // Yangi natijalarni qayta ishlash
+      const newData = res.results.map((item, i) => ({
+        name: item.title.text,
+        code: item.uri, // Manzillarni `uri` bo'yicha tekshiramiz
+        ...item,
+      }));
+
+      // Eski ma'lumotlar bilan birlashtirish
+      const allData = [...toOptionsData.value, ...newData];
+
+      // Unikal `uri` bo‘yicha birinchi kelgan manzilni saqlash
+      const uniqueData = [];
+      allData.forEach((item) => {
+        // Agar item `uri` avvalgi manzillarda mavjud bo'lmasa, qo‘shamiz
+        if (!item.uri ||!uniqueData.some((existingItem) => existingItem.uri === item.uri)) {
+          uniqueData.push(item);
+        }
+      });
+
+      // `toOptionsData.value` ni faqat unikal manzillar bilan yangilash
+      toOptionsData.value = uniqueData;
+    } catch (error) {
+      console.error("API dan ma'lumot olishda xato:", error);
+    }
   }
 }
+
 async function getLocations(keyname) {
   let items = keyname == "from" ? fromValue.value : toValue.value;
   let coords = [];
+  let existingCoords = keyname == "from" ? fromCoord.value : toCoord.value;
+  console.log("Getting locations",existingCoords)
   items.forEach((element) => {
-    useApi(`/v1/service/yandex-geocode?uri=${element.uri}`).then((res) => {
-      let obj = {
-        name: element.name,
-        latitude: parseFloat(
-          res.response.GeoObjectCollection.featureMember[0]["GeoObject"][
-            "Point"
-          ]["pos"].split(" ")[1]
-        ).toFixed(2),
-        longitude: parseFloat(
-          res.response.GeoObjectCollection.featureMember[0]["GeoObject"][
-            "Point"
-          ]["pos"].split(" ")[0]
-        ).toFixed(2),
-        direction: keyname,
-      };
-      coords.push(obj);
-    });
+    if (element.uri) {
+      useApi(`/v1/service/yandex-geocode?uri=${element.uri}`).then((res) => {
+        let obj = {
+          name: element.name,
+          latitude: parseFloat(
+            res.response.GeoObjectCollection.featureMember[0]["GeoObject"][
+              "Point"
+            ]["pos"].split(" ")[1]
+          ).toFixed(2),
+          longitude: parseFloat(
+            res.response.GeoObjectCollection.featureMember[0]["GeoObject"][
+              "Point"
+            ]["pos"].split(" ")[0]
+          ).toFixed(2),
+          direction: keyname,
+        };
+        coords.push(obj);
+        if (keyname == "from") {
+            fromCoord.value = [...existingCoords, ...coords]; // Eski manzillarni qo'shish
+          // console.log(fromCoord.value);
+        } else {
+            toCoord.value = [...existingCoords, ...coords]; // Eski manzillarni qo'shish
+          // console.log(toCoord.value);
+        }
+      });
+    }
   });
-  if (keyname == "from") {
-    fromCoord.value = coords;
-  } else {
-    toCoord.value = coords;
-  }
 }
 function setKeys(locations, keyname) {
   if (locations) {
     let str = locations
-  .map((d) => {
-    if (d.direction === keyname) {
-      return d.name;
-    }
-  })
-  .filter((name) => name != null);
+      .map((d) => {
+        if (d.direction === keyname) {
+          return d.name;
+        }
+      })
+      .filter((name) => name != null);
     return str.join(",");
   }
 }
 
 function getEditData() {
-    useApi(`/v1/driver/vehicle-application/${props.item.id}`).then((res)=>{
-        // formData.value = res
-        if(res){
-            toOptionsData.value = res.locations.filter((d)=>d.direction == 'to');
-            fromOptions.value = res.locations.filter((d)=>d.direction == 'from');
-            for(let i in res){
-                formData.value[i] = res[i];
-            }
-            toValue.value = res.locations.filter(d=>d.direction == 'to');
-            fromValue.value = res.locations.filter(d=>d.direction == 'from');
-        }
-        isOpen.value = true;
-    })
+  useApi(`/v1/driver/vehicle-application/${props.item.id}`).then((res) => {
+    // formData.value = res
+    if (res) {
+      toOptionsData.value = res.locations.filter((d) => d.direction == "to");
+      fromOptions.value = res.locations.filter((d) => d.direction == "from");
+      for (let i in res) {
+        formData.value[i] = res[i];
+      }
+      fromCoord.value = res.locations.filter((d) => d.direction == "from");
+      toCoord.value = res.locations.filter((d) => d.direction == "to");
+      toValue.value = res.locations.filter((d) => d.direction == "to");
+      fromValue.value = res.locations.filter((d) => d.direction == "from");
+    }
+    isOpen.value = true;
+  });
 }
-function _save(){
-    formData.value.locations = [...toOptionsData.value, ...fromOptions.value];
-    
-    useApi(`/v1/driver/vehicle-application/${props.item.id}`,{
-        method: "PUT",
-        body: { ...formData.value, departure_date: formatDate(formData.value.departure_date) },
-  
-    }).then((res) => {
-        toast.add({
-          severity: "success",
-          summary: "Success",
-          detail: "File created",
-          life: 3000,
-        });
-        emit('_save')
-        isOpen.value = false;
-    });
+function _save() {
+  formData.value.locations = [...fromCoord.value, ...toCoord.value];
+
+  useApi(`/v1/driver/vehicle-application/${props.item.id}`, {
+    method: "PUT",
+    body: {
+      ...formData.value,
+      departure_date: formatDate(formData.value.departure_date),
+    },
+  }).then((res) => {
+    isOpen.value = false;
+    emit("_update");
+  });
 }
 watch(
   () => isOpen.value,
