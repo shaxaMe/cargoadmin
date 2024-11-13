@@ -4,28 +4,28 @@
   >
     <div class="flex flex-col gap-1 flex-1 w-fit">
       <div class="flex gap-2 items-center">
-        <p
+        <!-- <p
           class="p-1 rounded-md bg-gray-200 text-gray-500 flex items-center gap-1"
         >
           <Icon name="twemoji:flag-russia" size="1.2em" /><span
             class="text-[.9em]"
             >Ru</span
           >
-        </p>
+        </p> -->
         <p class="line-clamp-1">{{ setKeys(item.locations, "from") }}</p>
       </div>
       <p class="text-gray-500 text-xs mt-1">{{ item.departure_date }}</p>
     </div>
     <div class="flex flex-col gap-1 flex-1 w-fit">
       <div class="flex gap-2 items-center">
-        <p
+        <!-- <p
           class="p-1 rounded-md bg-gray-200 text-gray-500 flex items-center gap-1"
         >
           <Icon name="twemoji:flag-russia" size="1.2em" /><span
             class="text-[.9em]"
             >Ru</span
           >
-        </p>
+        </p> -->
         <p class="line-clamp-1">{{ setKeys(item.locations, "to") }}</p>
       </div>
     </div>
@@ -38,7 +38,7 @@
     <div class="flex gap-1 flex-1 justify-between">
       <div class="flex gap-2 items-center">
         <p class="line-clamp-1">
-          $ {{ item.price }} <span class="text-gray-500">(0.48km)</span>
+          {{ item.price }}
         </p>
       </div>
       <div class="card flex justify-center">
@@ -61,7 +61,7 @@
         </Menu>
       </div>
     </div>
-    <Modal v-model="isOpen" @_save="_save">
+    <Modal v-model="isOpen" @_save="_save" title="Йўналишни ўзгартириш">
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
         <div class="flex-1 relative">
           <InputGroup>
@@ -71,6 +71,7 @@
                 v-model="fromValue"
                 :options="fromOptions"
                 optionLabel="name"
+                :selectionLimit="1"
                 filter
                 @change="getLocations('from')"
                 @filter="filterOptions"
@@ -105,6 +106,7 @@
                 optionLabel="name"
                 class="toselect"
                 filter
+                :selectionLimit="1"
                 v-model="toValue"
                 @change="getLocations('to')"
                 :options="toOptionsData"

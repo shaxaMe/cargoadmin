@@ -11,7 +11,7 @@ const toast = useToast();
 //data
 const loading = ref(true);
 const auth = useAuth()
-const {setUser} = auth
+const {setUser,user} = auth
 const selectedCities = ref();
 const date = ref(null);
 const isOpen = ref(false);
@@ -592,7 +592,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="mt-4 grid grid-cols-4 max-xl:grid-cols-3 max-md:grid-cols-1" v-if="!isForeginPassportEdit">
+    <div class="mt-4 grid grid-cols-4 max-xl:grid-cols-3 max-md:grid-cols-1" v-if="!isForeginPassportEdit && user?.role!='USER'">
       <button
         @click="isOpen = true"
         v-if="!isOpen"
@@ -612,7 +612,7 @@ onMounted(() => {
         <!-- <input type="file"  class="opacity-0 absolute w-full h-full z-10" /> -->
       </button>
     </div>
-    <div class="mt-5" v-if="!!isOpen || !!isForeginPassportEdit">
+    <div class="mt-5" v-if="!!isOpen || !!isForeginPassportEdit && user?.role!='USER'">
       <h1 class="text-xl">Horijiy pasportni malumotlari</h1>
       <div
         class="form-container w-full grid grid-cols-3 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch gap-5"
@@ -754,7 +754,7 @@ onMounted(() => {
         </button>
       </div>
     </div>
-    <div class="mt-10">
+    <div class="mt-10" v-if="user?.role!='USER'">
       <h1 class="text-xl">Haydovchilik guvohnomasi</h1>
       <div
         class="form-container w-full grid grid-cols-4 mt-5 max-xl:grid-cols-3 max-md:grid-cols-1 items-stretch justify-end gap-5"
