@@ -1,7 +1,7 @@
 <script setup>
 import Dialog from "primevue/dialog";
 
-const props = defineProps(['modelValue','maxWidth','loading']);
+const props = defineProps(['modelValue','maxWidth','loading','title']);
 const emit = defineEmits(['update:modelValue','_save']);
 
 const visible = ref(false);
@@ -31,7 +31,7 @@ watch(() => visible.value, (visible) => {
     <Dialog
       v-model:visible="visible"
       modal
-      header="Transport qo’shish"
+      :header="props.title??`Transport qo’shish`"
       class="max-lg:!w-[90dvw]"
       :style="{ width: maxWidth?maxWidth:'70dvw' }"
     >

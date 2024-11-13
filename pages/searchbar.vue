@@ -1,6 +1,6 @@
 <template>
   <div class="px-5 py-6">
-    <div>
+    <div v-if="!loading">
       <div class="flex justify-end mb-5">
         <button
           @click="isOpen = true"
@@ -14,7 +14,7 @@
         </button>
       </div>
 
-      <div class="mt-5">
+      <div class="mt-5" v-if="application && application.length > 0">
         <h1 class="text-2xl font-semibold">
           найти подхонашиые и выгодны грузы
         </h1>
@@ -28,12 +28,13 @@
           </div>
           <div
             v-for="(item, i) in application"
-            v-if="application && application.length > 0"
+            
           >
             <AwayCard :item="item" @_update="getApplications" class="my-1" />
           </div>
         </div>
       </div>
+      <Empty v-else title="Hech qanday malumot topilmadi" subtitle="Yo'nalishlarni qo'shing" />
     </div>
     <Modal v-model="isOpen" @_save="_save">
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
@@ -48,6 +49,7 @@
                 filter
                 @change="getLocations('from')"
                 @filter="filterOptions"
+                :selectionLimit="1"
                 placeholder=""
                 :maxSelectedLabels="3"
                 class="w-full md:w-80 fromselect"
@@ -79,6 +81,7 @@
                 optionLabel="name"
                 class="toselect"
                 filter
+                :selectionLimit="1"
                 v-model="toValue"
                 @change="getLocations('to')"
                 :options="toOptionsData"
@@ -177,10 +180,16 @@
         </div> -->
       </div>
     </Modal>
+    <div v-if="loading" class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center">
+      <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+            animationDuration=".5s" aria-label="Custom ProgressSpinner" />
+    </div>
   </div>
 </template>
 
 <script setup>
+import Empty from '~/components/Empty.vue';
+
 const isOpen = ref(false);
 
 const fromValue = ref(null);
@@ -190,7 +199,7 @@ const fromOptions = ref([]);
 const fromCoord = ref([]);
 const toCoord = ref([]);
 const optionsCar = ref([]);
-
+let loading = ref(true);
 const formData = reactive({
   weight: null,
   volume: null,
@@ -365,6 +374,12 @@ function _save() {
 function getApplications() {
   useApi("/v1/driver/vehicle-application").then((res) => {
     application.value = res.results;
+    loading.value = false;
+  }).catch(()=>{
+    loading.value = false;
+    console.error("Error fetching applications");
+  }).finally(()=>{
+    loading.value = false;
   });
 }
 

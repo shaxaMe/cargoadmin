@@ -104,40 +104,43 @@
               /> -->
               <Avatar :image="user.photo?user.photo:emptyProfile"  size="medium" shape="circle" />
             </div>
-            <p class="max-md:text-sm">{{ user?.full_name }}</p>
+            <div class="flex justify-center items-center flex-col">
+              <p class="max-md:text-sm">{{ user?.full_name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ user?.role }}
+              </p>
+            </div>
             <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
           </div>
 
           <!-- Dropdown menu -->
           <div
             id="dropdown"
-            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 custom-dropdown"
           >
             <ul
               class="py-2 text-sm text-gray-700 dark:text-gray-200"
               aria-labelledby="dropdownDefaultButton"
             >
-              <li>
-                <a
-                  href="#"
+              <li @click="_hide">
+                <nuxt-link to="/profile"
                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >Dashboard</a
-                >
+                  >Profil</nuxt-link>
               </li>
-              <li>
+              <!-- <li>
                 <a
                   href="#"
                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >Settings</a
                 >
-              </li>
-              <li>
+              </li> -->
+              <!-- <li>
                 <a
                   href="#"
                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >Earnings</a
                 >
-              </li>
+              </li> -->
               <li @click="signOut">
                 <a
                   class="cursor-pointer group relative w-full gap-3 flex justify-start"
@@ -146,7 +149,7 @@
                     class="flex items-center gap-2 trans-custom text-red-500 text-base rounded-xl px-4 py-2"
                   >
                     <Icon size="18px" name="circum:logout" />
-                    <span> Log out </span>
+                    <span> Chiqish </span>
                   </div>
                 </a>
               </li>
@@ -161,6 +164,7 @@
 <script setup>
 import emptyProfile from "../assets/images/profile.svg"
 import { useAuth } from "~/store/auth";
+import { Dropdown } from 'flowbite';
 const toggleNav = useState('toggleNav',()=>false);
 const router = useRouter();
 const auth = useAuth();
@@ -181,6 +185,13 @@ const countries = ref([
   { name: "United States", code: "US" },
 ]);
 
+
+
+function _hide(){
+    const targetEl = document.querySelector('.custom-dropdown');
+    targetEl.classList.remove('block');
+    targetEl.classList.add('hidden');
+}
 function signOut() {
   logout();
   router.push("/login");

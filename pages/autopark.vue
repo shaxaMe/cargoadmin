@@ -47,9 +47,11 @@
       </DataTable>
     </div>
     <div v-if="!loading">
-      <AutoparkCard @UpdateData="_update" class="my-2 max-lg:my-4" v-for="(item,i) in results" :cardData="item" :key="`cadr${i}`"  />
+      <AutoparkCard @UpdateData="_update" class="my-2 max-lg:my-4" v-for="(item,i) in results" v-if="results && results.length>0" :cardData="item" :key="`cadr${i}`"  />
+      <Empty v-else title="Hech avtomobil topilmadi" subtitle="Avtomobil qo'shing" />
+
     </div>
-    <Modal v-model="isOpen" @_save="_save">
+    <Modal v-model="isOpen" @_save="_save" title="Йўналиш қўшиш">
       <div class="flex items-center max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1">
         <div class="flex-1 flex flex-col">
           <label for="username" class="font-semibold mb-2"
