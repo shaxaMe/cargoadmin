@@ -350,6 +350,7 @@ async function getLocations(keyname) {
           ]["pos"].split(" ")[0]
         ).toFixed(2),
         direction: keyname,
+        country:res.response.GeoObjectCollection.featureMember[0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['country_code']
       };
       coords.push(obj);
     });
@@ -372,7 +373,7 @@ function _save() {
   });
 }
 function getApplications() {
-  useApi("/v1/driver/vehicle-application").then((res) => {
+  useApi("/v1/driver/vehicle-applications").then((res) => {
     application.value = res.results;
     loading.value = false;
   }).catch(()=>{
