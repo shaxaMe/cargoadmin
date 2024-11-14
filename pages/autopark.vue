@@ -142,6 +142,11 @@
             dateFormat="yy"
           />
           </div>
+          <div class="flex-1 flex flex-col">
+            <label for="email" class="font-semibold mb-2">Turi</label>
+            <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
+            <InputText v-model="formData.document.type" class="flex-auto" autocomplete="off" />
+          </div>
         </div>
         <div class="flex items-start flex-col gap-5 mt-5">
           <div class="flex flex-col max-md:w-full">
@@ -237,12 +242,12 @@
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-5 mt-5">
+      <!-- <div class="flex items-center gap-5 mt-5">
         <div class="flex-1 flex flex-col max-w-[380px]">
           <label for="username" class="font-semibold mb-2"
             >Haydovchi biriktirish</label
           >
-          <!-- <InputText id="username" class="flex-auto" autocomplete="off" /> -->
+           <InputText id="username" class="flex-auto" autocomplete="off" /> 
           <Select
             v-model="selectedCity"
             :options="cities"
@@ -251,7 +256,7 @@
             class="w-full text-sm"
           />
         </div>
-      </div>
+      </div> -->
       <div class="my-4">
         <label class="font-semibold my-2">Transport rasmlari</label>
         <div
@@ -305,6 +310,10 @@ import { useToast } from "primevue/usetoast";
 import { format } from "date-fns";
 import useVuelidate from "@vuelidate/core";
 import { required, sameAs } from "@vuelidate/validators";
+import { useAuth } from '~/store/auth';
+
+const {getDatas} = useOption();
+const user = useAuth()
 const toast = useToast();
 let isOpen = ref(false);
 const selectedCity = ref();
@@ -399,7 +408,7 @@ const formData = reactive({
   loading_type: null,
   truck_body_parameter: [5],
   note: "This is a test vehicle",
-  main_driver: 1,
+  main_driver:user.user.id,
   images: [],
   document: {
     color: 1,
@@ -407,6 +416,7 @@ const formData = reactive({
     model: null,
     ayear: null,
     fuel_type: null,
+    type: null,
     serial: null,
     main_file: null,
     back_file: null,
@@ -576,7 +586,7 @@ const _save = async () => {
     });
 
     isOpen.value = false;
-    await getVehicle();
+      getVihicle();
     
     toast.add({
       severity: "success",
@@ -585,19 +595,20 @@ const _save = async () => {
       life: 3000,
     });
   } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Xəta",
-      detail: "Serverda xatolik",
-      life: 3000,
-    });
+    // toast.add({
+    //   severity: "error",
+    //   summary: "Xəta",
+    //   detail: "Serverda xatolik",
+    //   life: 3000,
+    // });
   }
 };
 function _update(){
   getVihicle()
 }
 onMounted(()=>{
-  getVihicle()
+  getDatas();
+  getVihicle();
 })
 </script>
 

@@ -2,9 +2,7 @@
 import { format } from "date-fns";
 import {useAuth} from "../store/auth"
 import { useToast } from "primevue/usetoast";
-import {useOption} from "../store/option";
 
-const {getDatas} = useOption()
 
 const toast = useToast();
 
@@ -83,7 +81,7 @@ function _focus() {
   }
 }
 function timeFormatter(date) {
-  return format(new Date(date), "dd-MM-yyyy");
+  return format(new Date(date), "yyyy-MM-dd");
 }
 function getUserProfile() {
   useApi("/v1/user/info").then((response) => {
@@ -96,7 +94,7 @@ function getUserProfile() {
   });
 }
 function getUserDocuments() {
-  useApi("/v1/user/document").then((response) => {
+  useApi("/v1/user/documents").then((response) => {
     loading.value = false;
     response.results.forEach((item) => {
       if (item.type === "passport") {
@@ -235,6 +233,7 @@ function saveForeignPassport() {
     data.append("back_file", imgUrls.foreginpassport_back_file.base64);
     data.append("type", "foreign_passport");
     data.append('user',auth.user.id);
+    data.append('driving_license_category',[1])
     useApi("/v1/user/document", { method: "POST", body: data })
       .then((response) => {
         getUserDocuments()
@@ -327,6 +326,7 @@ function savePassport() {
   data.append("back_file", imgUrls.passport_back_file.base64);
   data.append("type", "passport");
   data.append('user',auth.user.id);
+  data.append('driving_license_category',[1]);
   useApi("/v1/user/document", { method: "POST", body: data })
     .then((response) => {
       getUserDocuments();
@@ -337,14 +337,14 @@ function savePassport() {
         life: 3000,
       });
     })
-    .catch((error) => {
-      toast.add({
-        severity: "error",
-        summary: "Xatolik",
-        detail: error.message,
-        life: 3000,
-      });
-    });
+    // .catch((error) => {
+    //   toast.add({
+    //     severity: "error",
+    //     summary: "Xatolik",
+    //     detail: error.message,
+    //     life: 3000,
+    //   });
+    // });
   }
 }
 function isValidFuragoMediaUrl(url) {
@@ -404,7 +404,6 @@ function saveEditProfile(editedType) {
 
 onMounted(() => {
   setTimeout(() => {
-    getDatas();
     getUserProfile();
     getUserDocuments();
   }, 200);

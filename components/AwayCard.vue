@@ -376,6 +376,7 @@ async function getLocations(keyname) {
             ]["pos"].split(" ")[0]
           ).toFixed(2),
           direction: keyname,
+        country:res.response.GeoObjectCollection.featureMember[0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['country_code']
         };
         coords.push(obj);
         if (keyname == "from") {
