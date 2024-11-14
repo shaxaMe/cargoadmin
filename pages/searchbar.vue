@@ -4,10 +4,10 @@
       <div class="flex justify-end mb-5">
         <button
           @click="isOpen = true"
-          class="bg-[#3b72f1] gap-2 text-white flex justify-center items-center text-center px-6 py-4 rounded-lg"
+          class="bg-[#3b72f1] gap-2 text-white text-sm flex justify-center items-center text-center px-3 py-2 rounded-lg"
         >
           <Icon
-            size="20px"
+            size="15px"
             name="streamline:travel-places-street-sign-crossroad-street-sign-metaphor-directions"
           />
           <span>yo'nalish qo'shish </span>
@@ -15,9 +15,9 @@
       </div>
 
       <div class="mt-5" v-if="application && application.length > 0">
-        <h1 class="text-2xl font-semibold">
+        <!-- <h1 class="text-2xl font-semibold">
           найти подхонашиые и выгодны грузы
-        </h1>
+        </h1> -->
         <div class="flex justify-between flex-col gap-1 px-3 py-4">
           <div class="flex justify-between">
             <p class="text-sm text-gray-400 flex-1">Қаердан</p>

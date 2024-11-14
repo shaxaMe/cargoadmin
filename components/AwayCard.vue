@@ -233,10 +233,6 @@ const formData = ref({
 });
 const items = ref([
   {
-    label: "O'chirish",
-    icon: "material-symbols:delete-outline",
-  },
-  {
     label: "O'zgartirish",
     icon: "material-symbols:edit-rounded",
     command: () => {
@@ -248,6 +244,10 @@ const items = ref([
       // });
       getEditData();
     },
+  },
+  {
+    label: "O'chirish",
+    icon: "material-symbols:delete-outline",
   },
 ]);
 const toggle = (event) => {
