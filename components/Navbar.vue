@@ -45,44 +45,6 @@
             />
           </svg>
         </div>
-        <!-- <div>
-          <div class="card flex justify-content-center max-lg:hidden">
-            <Dropdown
-              v-model="selectedCountry"
-              :options="countries"
-              optionLabel="name"
-              placeholder="Select a Country"
-              class="w-full md:w-14rem h-[35px] text-sm"
-              size="small"
-            >
-              <template #value="slotProps">
-                <div v-if="slotProps.value" class="flex align-items-center">
-                  <img
-                    :alt="slotProps.value.label"
-                    src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png"
-                    :class="`mr-2 flag flag-${slotProps.value.code.toLowerCase()}`"
-                    style="width: 18px"
-                  />
-                  <div>{{ slotProps.value.name }}</div>
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-              <template #option="slotProps">
-                <div class="flex align-items-center">
-                  <img
-                    :alt="slotProps.option.label"
-                    src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png"
-                    :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`"
-                    style="width: 18px"
-                  />
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown>
-          </div>
-        </div> -->
         <div class="flex items-center">
           <!-- <Avatar :label="`${user?.full_name?.substr(0,1)}`" class="mr-2" size="medium" shape="circle" />
           <div>
@@ -106,9 +68,9 @@
             </div>
             <div class="flex justify-center items-center flex-col">
               <p class="max-md:text-sm">{{ user?.full_name }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <!-- <p class="text-xs text-gray-500 dark:text-gray-400">
                 {{ user?.role }}
-              </p>
+              </p> -->
             </div>
             <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
           </div>
