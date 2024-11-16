@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-
 import Aura from '@primevue/themes/aura';
+import locales from './locales'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -14,7 +14,20 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
+    '@nuxtjs/i18n'
   ],
+  // i18n: {
+  //   vueI18n: './i18n.config.ts',
+  //    // if you are using custom path, default
+  // },
+  i18n: {
+    lazy: true,
+    langDir: 'locales',
+    locales,
+    defaultLocale: 'en',
+    detectBrowserLanguage: false,
+    strategy: 'prefix_except_default',
+  },
   tailwindcss: {
     cssPath: ['~/assets/css/tailwind.css', { injectPosition: "first" }],
     configPath: 'tailwind.config',
