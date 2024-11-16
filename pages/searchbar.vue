@@ -38,8 +38,8 @@
     </div>
     <Modal v-model="isOpen" @_save="_save">
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
-        <div class="flex-1 relative">
-          <InputGroup>
+        <div class="flex-1 relative flex gap-1 items-center">
+          <InputGroup class="flex-1">
             <FloatLabel variant="on">
               <!-- <InputText id="username" v-model="value" /> -->
               <MultiSelect
@@ -63,7 +63,14 @@
               </MultiSelect>
               <label for="username">Qayerdan</label>
             </FloatLabel>
+            
             <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
           </InputGroup>
         </div>
         <div class="flex h-auto items-center justify-center cursor-pointer">
@@ -73,8 +80,8 @@
             size="25px"
           />
         </div>
-        <div class="flex-1 relative">
-          <InputGroup>
+        <div class="flex-1 relative flex items-center gap-1">
+          <InputGroup class="flex-1">
             <FloatLabel variant="on">
               <!-- <InputText id="username" v-model="value" /> -->
               <MultiSelect
@@ -97,6 +104,12 @@
               <label for="username">Qayerga</label>
             </FloatLabel>
             <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
           </InputGroup>
         </div>
       </div>
