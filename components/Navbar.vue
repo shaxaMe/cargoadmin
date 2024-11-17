@@ -319,29 +319,38 @@
         <div class="flex items-center">
           <button
             id="dropdownLocaleButton"
+            data-dropdown-auto-close="true"
             data-dropdown-toggle="dropdownLocale"
             class="relative inline-flex items-center text-sm font-medium text-center focus:outline-none dark:hover:text-white dark:text-gray-400"
             type="button"
           >
-           <img class="w-6 h-6"src="../assets/images/flags/en.png" alt="">
+          <div class="w-8 h-6 rounded-md overflow-hidden">
+            <img  :src="currentLocale" class="w-full h-full object-cover" alt="locale">
+          </div>
           </button>
 
           <!-- Dropdown menu -->
           <div
             id="dropdownLocale"
-            class="z-20 hidden w-fit py-2 bg-white rounded-lg"
+            class="z-20 hidden w-fit py-2 bg-white rounded-lg dropdown-locale"
             aria-labelledby="dropdownLocaleButton"
           >
-          <div class="flex items-center justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
-            <img  class="w-6 h-6" src="../assets/images/flags/ru.png" alt="">
+          <div @click="setLocal('ru')" class="flex items-center justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
+           <div  class="w-8 h-6 rounded-md overflow-hidden">
+            <img class="w-full h-full object-cover" src="../assets/images/flags/ru.png" alt="">
+           </div>
             <span>Russian</span>
           </div>
-          <div class="flex items-center my-3 justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
-            <img  class="w-6 h-6" src="../assets/images/flags/uz.png" alt="">
+          <div @click="setLocal('uz')" class="flex items-center my-3 justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
+            <div class="w-8 h-6 rounded-md overflow-hidden">
+              <img  class="w-full h-full object-cover" src="../assets/images/flags/uz.png" alt="">
+            </div>
             <span>Uzbek</span>
           </div>
-          <div class="flex items-center justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
-            <img class="w-6 h-6" src="../assets/images/flags/en.png" alt="">
+          <div @click="setLocal('en')" class="flex items-center justify-start gap-2 cursor-pointer hover:bg-gray-200 trans-custom py-1 px-2 "> 
+            <div class="w-8 h-6 rounded-md overflow-hidden">
+              <img  class="w-full h-full object-cover" src="../assets/images/flags/en.png" alt="">
+            </div>
             <span>English</span>
           </div>
           </div>
@@ -432,12 +441,16 @@
 
 <script setup>
 import emptyProfile from "../assets/images/profile.svg";
+import Uz from "../assets/images/flags/uz.png"
+import Ru from "../assets/images/flags/ru.png"
+import En from "../assets/images/flags/en.png"
 import { useAuth } from "~/store/auth";
 import { Dropdown } from "flowbite";
 const toggleNav = useState("toggleNav", () => false);
+const {locale,setLocale} = useI18n()
 const router = useRouter();
 const auth = useAuth();
-const { logout } = useAuth();
+const { logout,setLocaleStore } = useAuth();
 const { user } = storeToRefs(auth);
 const value = ref("");
 const selectedCountry = ref();
@@ -453,15 +466,28 @@ const countries = ref([
   { name: "Spain", code: "ES" },
   { name: "United States", code: "US" },
 ]);
-
+const currentLocale = computed(()=>{
+  return locale.value == "uz" ? Uz : locale.value == "ru"? Ru : En;
+})
 function _hide() {
   const targetEl = document.querySelector(".custom-dropdown");
+  targetEl.classList.remove("block");
+  targetEl.classList.add("hidden");
+}
+function _hidLocale() {
+  const targetEl = document.querySelector(".dropdown-locale");
   targetEl.classList.remove("block");
   targetEl.classList.add("hidden");
 }
 function signOut() {
   logout();
   router.push("/login");
+}
+
+function setLocal(lang){
+  setLocale(lang);
+  setLocaleStore(lang);
+  _hidLocale();
 }
 </script>
 

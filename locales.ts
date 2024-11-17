@@ -7,4 +7,8 @@ export default [
       code: 'ru',
       name: 'Русский',
     },
+    {
+      code: 'uz',
+      name: 'Uzbek',
+    },
   ].map(lang => ({ file: lang.code + '.json', ...lang }))

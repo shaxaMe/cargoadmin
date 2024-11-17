@@ -63,18 +63,18 @@
     </div>
     <Modal v-model="isOpen" @_save="_save" title="Йўналишни ўзгартириш">
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
-        <div class="flex-1 relative">
-          <InputGroup>
+        <div class="flex-1 relative flex gap-1 items-center">
+          <InputGroup class="flex-1">
             <FloatLabel variant="on">
               <!-- <InputText id="username" v-model="value" /> -->
               <MultiSelect
                 v-model="fromValue"
                 :options="fromOptions"
                 optionLabel="name"
-                :selectionLimit="1"
                 filter
                 @change="getLocations('from')"
                 @filter="filterOptions"
+                :selectionLimit="1"
                 placeholder=""
                 :maxSelectedLabels="3"
                 class="w-full md:w-80 fromselect"
@@ -88,7 +88,14 @@
               </MultiSelect>
               <label for="username">Qayerdan</label>
             </FloatLabel>
+            
             <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.from_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
           </InputGroup>
         </div>
         <div class="flex h-auto items-center justify-center cursor-pointer">
@@ -98,8 +105,8 @@
             size="25px"
           />
         </div>
-        <div class="flex-1 relative">
-          <InputGroup>
+        <div class="flex-1 relative flex items-center gap-1">
+          <InputGroup class="flex-1">
             <FloatLabel variant="on">
               <!-- <InputText id="username" v-model="value" /> -->
               <MultiSelect
@@ -122,6 +129,12 @@
               <label for="username">Qayerga</label>
             </FloatLabel>
             <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.to_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
           </InputGroup>
         </div>
       </div>
@@ -209,11 +222,13 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/store/auth';
 const props = defineProps({
   item: { type: Object, required: true },
 });
 const emit = defineEmits(["_update"]);
 const fromValue = ref(null);
+const {user} = useAuth();
 const toValue = ref(null);
 const toOptionsData = ref([]);
 const fromOptions = ref([]);
@@ -222,15 +237,24 @@ const toCoord = ref([]);
 const isOpen = ref(false);
 const menuitem = ref(null);
 const optionsCar = ref([]);
-const formData = ref({
+const formData = reactive({
   weight: null,
   volume: null,
   price: null,
-  radius: null,
+  to_radius:null,
+  from_radius:null,
   vehicle: null,
   departure_date: null,
   locations: [],
 });
+
+const urlLists = computed(()=>{
+  let obj = {
+    getUrl:user.role=="USER"?`/v1/cargo/application/${props.item.id}`:`/v1/driver/vehicle-application/${props.item.id}`,
+    putUrl:user.role=="USER"?`/v1/cargo/application/${props.item.id}`:`/v1/driver/vehicle/${props.item.id}`,
+  }
+  return obj;
+})
 const items = ref([
   {
     label: "O'zgartirish",
@@ -404,7 +428,7 @@ function setKeys(locations, keyname) {
 }
 
 function getEditData() {
-  useApi(`/v1/driver/vehicle-application/${props.item.id}`).then((res) => {
+  useApi(urlLists.value.getUrl).then((res) => {
     // formData.value = res
     if (res) {
       toOptionsData.value = res.locations.filter((d) => d.direction == "to");
@@ -423,7 +447,7 @@ function getEditData() {
 function _save() {
   formData.value.locations = [...fromCoord.value, ...toCoord.value];
 
-  useApi(`/v1/driver/vehicle-application/${props.item.id}`, {
+  useApi(urlLists.value.putUrl, {
     method: "PUT",
     body: {
       ...formData.value,
