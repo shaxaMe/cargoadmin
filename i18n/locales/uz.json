@@ -1,0 +1,10 @@
+{
+    "aside": {
+        "direction": "Yo'nalishlar",
+        "loads": "Yuklar",
+        "car_park": "Autopark"
+    },
+    "notifications": {
+        "empty": "Hech qanday malumot topilmadi"
+    }
+}

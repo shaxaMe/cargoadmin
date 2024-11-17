@@ -22,14 +22,14 @@
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
             <Icon size="16px" name="fa6-solid:truck-front" />
-            <span> Автопарк </span>
+            <span> {{ $t('aside.car_park') }} </span>
           </div>
         </nuxt-link>
         <nuxt-link to="/searchbar" class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
             <Icon size="18px" name="hugeicons:maps" />
-            <span> Yo'nalishlar </span>
+            <span> {{ user.role=="USER"?$t('aside.loads'):$t('aside.direction') }} </span>
           </div>
         </nuxt-link>
         <!-- <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
@@ -71,18 +71,18 @@
             <span> Profil </span>
           </div>
         </nuxt-link> -->
-        <nuxt-link v-if="user?.role!='USER'" to="/autopark" class="cursor-pointer group relative w-full gap-3 flex justify-start">
+        <nuxt-link v-if="user?.role!='USER'" :to="localePath('/autopark')" class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
             <Icon size="16px" name="fa6-solid:truck-front" />
-            <span> Автопарк </span>
+            <span> {{ $t('aside.car_park') }} </span>
           </div>
         </nuxt-link>
-        <nuxt-link to="/searchbar" class="cursor-pointer group relative w-full gap-3 flex justify-start">
+        <nuxt-link :to="localePath('/searchbar')" class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-[#202224] text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
             <Icon size="18px" name="hugeicons:maps" />
-            <span> Yo'nalishlar </span>
+            <span> {{ user.role=="USER"?$t('aside.loads'):$t('aside.direction') }} </span>
           </div>
         </nuxt-link>
         <!-- <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
@@ -115,6 +115,7 @@
 <script setup>
 import { useAuth } from '~/store/auth';
 const {set_token,setUser,setLogin,user} = useAuth();
+const localePath = useLocalePath()
 const router = useRouter();
 const toggleNav = useState('toggleNav');
 function logOut(){

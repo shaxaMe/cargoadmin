@@ -24,9 +24,9 @@ export default defineNuxtConfig({
     lazy: true,
     langDir: 'locales',
     locales,
-    defaultLocale: 'en',
+    defaultLocale: 'uz',
     detectBrowserLanguage: false,
-    strategy: 'prefix_except_default',
+    strategy: 'prefix_and_default',
   },
   tailwindcss: {
     cssPath: ['~/assets/css/tailwind.css', { injectPosition: "first" }],

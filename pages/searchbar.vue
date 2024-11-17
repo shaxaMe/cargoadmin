@@ -10,7 +10,7 @@
             size="15px"
             name="streamline:travel-places-street-sign-crossroad-street-sign-metaphor-directions"
           />
-          <span>yo'nalish qo'shish </span>
+          <span>{{ user.role=='USER'?"yuk qo'shish":"yo'nalish qo'shish" }} </span>
         </button>
       </div>
 
@@ -68,7 +68,7 @@
           </InputGroup>
           <InputGroup class="flex-1 max-w-28">
             <FloatLabel variant="on">
-              <InputNumber id="username" v-model="formData.radius" />
+              <InputNumber id="username" v-model="formData.from_radius" />
               <label for="username">Radius</label>
             </FloatLabel>
           </InputGroup>
@@ -107,7 +107,7 @@
           </InputGroup>
           <InputGroup class="flex-1 max-w-28">
             <FloatLabel variant="on">
-              <InputNumber id="username" v-model="formData.radius" />
+              <InputNumber id="username" v-model="formData.to_radius" />
               <label for="username">Radius</label>
             </FloatLabel>
           </InputGroup>
@@ -115,12 +115,12 @@
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
         <div class="flex-1 relative grid gap-3 grid-cols-5">
-          <InputGroup>
+          <!-- <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.radius" />
               <label for="username">Radius</label>
             </FloatLabel>
-          </InputGroup>
+          </InputGroup> -->
           <InputGroup>
             <FloatLabel variant="on">
               <DatePicker
@@ -202,9 +202,9 @@
 
 <script setup>
 import Empty from '~/components/Empty.vue';
-
+import { useAuth } from '~/store/auth';
 const isOpen = ref(false);
-
+const {user} = useAuth();
 const fromValue = ref(null);
 const toValue = ref(null);
 const toOptionsData = ref([]);
@@ -217,12 +217,20 @@ const formData = reactive({
   weight: null,
   volume: null,
   price: null,
-  radius: null,
+  to_radius:null,
+  from_radius:null,
   vehicle: null,
   departure_date: null,
   locations: [],
 });
 
+const urlLists = computed(()=>{
+  let obj = {
+    getUrl:user.role=="USER"?'/v1/cargo/applications':"/v1/driver/vehicle-applications",
+    postUrl:user.role=="USER"?'/v1/cargo/application':'/v1/driver/vehicle-application',
+  }
+  return obj;
+})
 const application = ref([]);
 // async function filterOptions(key) {
 //   if (key.value) {
@@ -263,6 +271,7 @@ const application = ref([]);
 async function filterOptions(key) {
   if (key.value) {
     try {
+      
       // API dan yangi ma'lumotlarni olish
       const res = await useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`);
       
@@ -377,7 +386,7 @@ async function getLocations(keyname) {
 
 function _save() {
   formData.locations = [...fromCoord.value, ...toCoord.value];
-  useApi("/v1/driver/vehicle-application", {
+  useApi(urlLists.value.postUrl, {
     method: "POST",
     body: { ...formData, departure_date: formatDate(formData.departure_date) },
   }).then(()=>{
@@ -386,7 +395,7 @@ function _save() {
   });
 }
 function getApplications() {
-  useApi("/v1/driver/vehicle-applications").then((res) => {
+  useApi(urlLists.value.getUrl).then((res) => {
     application.value = res.results;
     loading.value = false;
   }).catch(()=>{

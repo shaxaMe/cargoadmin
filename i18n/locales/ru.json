@@ -1,3 +1,10 @@
 {
-    "welcome": "dobriy"
+    "aside": {
+        "direction": "Направления",
+        "loads": "Грузы",
+        "car_park": "Автопарк"
+    },
+    "notifications": {
+        "empty": "Информация не найдена"
+    }
 }
