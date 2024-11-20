@@ -12,7 +12,7 @@ import { set } from "date-fns";
 definePageMeta({
   layout: "LoginLayout",
 });
-const restart = inject("restart");
+
 //data
 const type = ref("");
 const formValues = reactive({
@@ -50,6 +50,10 @@ function _focus() {
   if (!formValues.phone) {
     formValues.phone = "+998 ";
   }
+}
+const restart = ()=>{
+  type.value = "";
+  formValues.phone = "+998 ";
 }
 
 function signIn() {
@@ -378,7 +382,7 @@ watch(
           @click="signIn"
           class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
         >
-          Sign in
+          {{ $t('login.sign') }}
         </button>
         <button
           v-else
@@ -389,14 +393,14 @@ watch(
           @click="loggin"
           class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
         >
-          Sign in
+        {{ $t('login.sign') }}
         </button>
 
-        <p class="text-sm text-center mt-3" @click="restart">
+        <p class="text-sm text-center mt-3" @click="restart" v-if="!!type">
           <a
             href="javascript:void(0);"
             class="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap"
-            >go back</a
+            >{{ $t('login.back') }}</a
           >
         </p>
       </div>

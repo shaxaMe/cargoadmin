@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-    <Modal v-model="isOpen" @_save="_save" :loading="updateLoading">
+    <Modal v-model="isOpen" @_save="_save" :loading="updateLoading" title="Avtobilni o'gartirish">
       <div class="flex items-center max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1">
         <div class="flex-1 flex flex-col">
           <label for="username" class="font-semibold mb-2"

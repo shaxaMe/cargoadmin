@@ -6,5 +6,9 @@
     },
     "notifications": {
         "empty": "No information found"
+    },
+    "login":{
+        "sign":"Kirish",
+        "back":"Orqaga"
     }
 }

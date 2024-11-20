@@ -13,6 +13,7 @@ const btnLoad = computed(()=>{
 function _close() {
   // visible.value = false;
   emit('_close');
+  visible.value = false;
 }
 function save() {
   // visible.value = false;

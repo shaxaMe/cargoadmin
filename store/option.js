@@ -8,10 +8,16 @@ export const useOption = defineStore('option', () => {
         truck_type_parametr: null,
         colors: null,
         fuel_type: null,
+        currency:null,
+        cargoType: null,
     });
     const upiUrls = [{
         url: '/v1/reference/driving-license-categories',
         key: 'driver_types'
+    },
+    {
+        url:'/v1/reference/currencies',
+        key: 'currency'
     },
     {
         url: '/v1/reference/category-types',
@@ -40,11 +46,22 @@ export const useOption = defineStore('option', () => {
     {
         url: "/v1/reference/fuel-types",
         key: "fuel_type"
-    }];
+    },
+    {
+        url: "/v1/reference/cargo-types",
+        key: "cargoType"
+    }
+    ];
     function getDatas() {
         this.upiUrls.forEach(element => {
                useApi(`${element.url}`).then((res)=>{
-                this.options[element.key] = res.results.map((d)=>({id:d.id,name:d.names['uz'],sort_order:d.sort_order}))
+                if(element.key == 'currency'){
+                    this.options[element.key] = res.results.map((d)=>({id:d.id,name:d.code,sort_order:d.sort_order}))
+                }
+                if(res.results && res.results.length>0){
+                    this.options[element.key] = res.results.map((d)=>({id:d.id,name:d.names['uz'],sort_order:d.sort_order}))
+                }
+                
                })
         });
     }

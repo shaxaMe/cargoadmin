@@ -13,12 +13,7 @@ const isNext = ref(false);
 
 
 //methods
-function restart(){
-  isNext.value = true;
-  user_type.value = "user";
-}
 
-provide('restart', restart)
 
 
 </script>

@@ -6,5 +6,20 @@
     },
     "notifications": {
         "empty": "Hech qanday malumot topilmadi"
+    },
+    "login":{
+        "sign":"Kirish",
+        "back":"Orqaga"
+    },
+    "add_car":{
+        "title":"Avtomobil qo'shish",
+        "brand":"Transport turi",
+        "vehicle_type":"Kuzov turi",
+        "model":"Model",
+        "color":"Rang",
+        "year":"Yil",
+        "add":"Qo'shish",
+        "weight":"Yuk ko’tarish vazni (t)",
+        "volume":"Yuk olish hajmi (m3)"
     }
 }
