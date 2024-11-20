@@ -6,5 +6,9 @@
     },
     "notifications": {
         "empty": "Информация не найдена"
+    },
+    "login":{
+        "sign":"Kirish",
+        "back":"Orqaga"
     }
 }

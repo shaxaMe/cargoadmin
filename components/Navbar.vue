@@ -21,7 +21,7 @@
           placeholder="Search..."
         />
       </div> -->
-      <div class="flex items-center gap-5 max-lg:gap-4">
+      <div class="flex items-center gap-5 max-lg:gap-4 max-sm:hidden">
         <!-- <div class="relative cursor-pointer max-md:hidden">
           <div
             class="bg-[#F93C65] p-1 text-white text-sm text-center flex justify-center items-center rounded-full w-4 h-4 absolute -right-1 -top-2"
@@ -52,6 +52,9 @@
             />
           </svg>
         </div> -->
+        <!-- <div class="flex items-center">
+          <Icon name="line-md:chat-bubble-filled" class="w-6 h-6 text-gray-500 hover:text-[#4880FF]" />
+        </div> -->
         <div class="flex items-center">
           <button
             id="dropdownNotificationButton"
@@ -60,7 +63,7 @@
             type="button"
           >
             <svg
-              class="w-5 h-5"
+              class="w-6 h-6"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"

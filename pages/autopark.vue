@@ -7,7 +7,7 @@
         class="bg-[#3b72f1] gap-2 text-white text-sm flex justify-center items-center text-center px-3 py-2 rounded-lg"
       >
         <Icon size="15px" name="material-symbols:person-add-rounded" />
-        <span>avtomobil qo'shish
+        <span>Avtomobil qo'shish
         </span>
       </button>
     </div>
@@ -16,16 +16,20 @@
         :value="customers"
         stripedRows
         paginator
-        :rows="5"
-        :rowsPerPageOptions="false"
-        tableStyle="min-width: 50rem"
+        scrollable scrollHeight="400px"
+        :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]"
       >
-        <Column
+        <!-- <Column
           field="first_name"
           header="Haydovchi ismi"
           sortable
           style="width: 25%"
-        ></Column>
+        ></Column> -->
+        <Column header="Haydovchi ismi">
+                <template #body="slotProps">
+                    <span>{{ slotProps.row.first_name }}</span>
+                </template>
+            </Column>
         <Column
           field="car_name"
           header="Moshina turi"
@@ -51,7 +55,7 @@
       <Empty v-else title="Hech avtomobil topilmadi" subtitle="Avtomobil qo'shing" />
 
     </div>
-    <Modal v-model="isOpen" @_save="_save" title="Йўналиш қўшиш">
+    <Modal v-model="isOpen" @_save="_save" :title="modalTitle">
       <div class="flex items-center max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1">
         <div class="flex-1 flex flex-col">
           <label for="username" class="font-semibold mb-2"
@@ -313,7 +317,7 @@ import { required, sameAs } from "@vuelidate/validators";
 import { useAuth } from '~/store/auth';
 
 const {getDatas} = useOption();
-const user = useAuth()
+const {user }= useAuth()
 const toast = useToast();
 let isOpen = ref(false);
 const selectedCity = ref();
@@ -408,7 +412,7 @@ const formData = reactive({
   loading_type: null,
   truck_body_parameter: [5],
   note: "This is a test vehicle",
-  main_driver:user.user.id,
+  main_driver:user.id,
   images: [],
   document: {
     color: 1,
@@ -442,6 +446,11 @@ const rules = {
 }
 
 const $v = useVuelidate(rules, formData);
+
+const modalTitle = computed(()=>{
+
+  return user.role == 'USER'?'Yo\'nalish qo\'shish':'Avtomobil qo\'shish'
+})
 //methods
 function _deleteImg(key,ind) {
   if(key != 'multiple'){
