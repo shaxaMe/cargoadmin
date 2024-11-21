@@ -357,7 +357,7 @@ import { useToast } from "primevue/usetoast";
 import { format } from "date-fns";
 const toast = useToast();
 import { useOption } from "../store/option";
-const emit = defineEmits(["UpdateData"]);
+const emit = defineEmits(["UpdateData","_delete"]);
 const { options } = useOption();
 const delete_img = ref(null);
 const menu = ref();
@@ -426,6 +426,9 @@ const items = ref([
   {
     label: "O'chirish",
     icon: "material-symbols:delete-outline",
+    command:()=>{
+      emit("_delete",props.cardData.id);
+    }
   },
 ]);
 const $v = useVuelidate(rules, formData);

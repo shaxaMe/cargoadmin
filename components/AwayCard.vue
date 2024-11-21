@@ -147,12 +147,12 @@
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
         <div class="flex-1 relative grid gap-3 grid-cols-5">
-          <InputGroup>
+          <!-- <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.radius" />
               <label for="username">Radius</label>
             </FloatLabel>
-          </InputGroup>
+          </InputGroup> -->
           <InputGroup>
             <FloatLabel variant="on">
               <DatePicker
@@ -434,8 +434,9 @@ import { useOption } from "../store/option";
 const props = defineProps({
   item: { type: Object, required: true },
 });
+
 const { options } = useOption();
-const emit = defineEmits(["_update"]);
+const emit = defineEmits(["_update",'_dalete']);
 const fromValue = ref(null);
 const { user } = useAuth();
 const toValue = ref(null);
@@ -511,6 +512,9 @@ const items = ref([
   {
     label: "O'chirish",
     icon: "material-symbols:delete-outline",
+    command: () => {
+      emit("_dalete", props.item.id);
+    }
   },
 ]);
 const toggle = (event) => {
@@ -531,6 +535,7 @@ const toggle = (event) => {
 //     );
 //   }
 // }
+
 async function filterOptions(key) {
   if (key.value) {
     try {
@@ -700,7 +705,7 @@ function getEditData() {
         toOptionsData.value = res.locations.filter((d) => d.direction == "to");
         fromOptions.value = res.locations.filter((d) => d.direction == "from");
         for (let i in res) {
-          formData.value[i] = res[i];
+          formData[i] = res[i];
         }
         fromCoord.value = res.locations.filter((d) => d.direction == "from");
         toCoord.value = res.locations.filter((d) => d.direction == "to");
@@ -746,13 +751,13 @@ function getEditData() {
   });
 }
 function _save() {
-  formData.value.locations = [...fromCoord.value, ...toCoord.value];
+  formData.locations = [...fromCoord.value, ...toCoord.value];
 
   useApi(urlLists.value.putUrl, {
     method: "PUT",
     body: {
-      ...formData.value,
-      departure_date: formatDate(formData.value.departure_date),
+      ...formData,
+      departure_date: formatDate(formData.departure_date),
     },
   }).then((res) => {
     isOpen.value = false;

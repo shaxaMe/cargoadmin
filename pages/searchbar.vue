@@ -29,7 +29,7 @@
             <!-- <p class="text-sm text-gray-400">ОТВЕТСТВЕННЫЙ</p> -->
           </div>
           <div v-for="(item, i) in application">
-            <AwayCard :item="item" @_update="getApplications" class="my-1" />
+            <AwayCard :item="item" @_update="getApplications" @_dalete="requireConfirmation" class="my-1" />
           </div>
         </div>
       </div>
@@ -438,6 +438,7 @@
         aria-label="Custom ProgressSpinner"
       />
     </div>
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -445,6 +446,7 @@
 import InputGroup from "primevue/inputgroup";
 import { useOption } from "../store/option";
 import Empty from "~/components/Empty.vue";
+import { useConfirm } from "primevue/useconfirm";
 import { useAuth } from "~/store/auth";
 const isOpen = ref(false);
 const { getDatas, options } = useOption();
@@ -456,6 +458,7 @@ const fromOptions = ref([]);
 const fromCoord = ref([]);
 const toCoord = ref([]);
 const optionsCar = ref([]);
+const confirm = useConfirm();
 let loading = ref(true);
 const formData = reactive({
   weight: null,
@@ -507,42 +510,6 @@ const modalTitle = computed(() => {
   return user.role == "USER" ? "Yuk qo'shish" : "Yo'nalish qo'shish";
 });
 const application = ref([]);
-// async function filterOptions(key) {
-//   if (key.value) {
-//     useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
-//       (res) => {
-//         fromOptions.value = res.results.map((item, i) => ({
-//           name: item.title.text,
-//           code: item.code,
-//           ...item,
-//         }));
-//       }
-//     );
-//   }
-// }
-// async function filterOptions(key) {
-//   if (key.value) {
-//     // Create a copy of the current options to keep the old ones
-//     let data = [];
-
-//     try {
-//       // Fetch new data from the API
-//       const res = await useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`);
-
-//       // Process the new results
-//       data = res.results.map((item) => ({
-//         name: item.title.text,
-//         code: item.code,
-//         ...item,
-//       }));
-
-//       // Update `fromOptions` by combining old and new data without overwriting
-//       fromOptions.value = [...fromOptions.value, ...data];
-//     } catch (error) {
-//       console.error('Error fetching data:', error);
-//     }
-//   }
-// }
 const focusSearchInput = () => {
   // Use setTimeout to ensure the input is available after rendering
   setTimeout(() => {
@@ -602,6 +569,38 @@ async function filterOptions(key) {
 //     );
 //   }
 // }
+const requireConfirmation = (id) => {
+  confirm.require({
+        message: 'Siz rostan ham tasdiqlaysizmi ?',
+        header: 'Ogohlantirish',
+        // icon: 'pi pi-info-circle',
+        rejectLabel: 'Bekor qilish',
+        rejectProps: {
+            label: 'Bekor qilish',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'O\'chirish',
+            severity: 'danger'
+        },
+        accept: () => {
+            let putUrl=user.role == "USER"? `/v1/cargo/application/${id}`: `/v1/driver/vehicle/${id}`;
+            useApi(putUrl,{
+              method: 'PUT',
+              body: {
+                status: "archived ",
+                user:user.id
+              }
+            }).then(()=>{
+              getApplications();
+            })
+        },
+        reject: () => {
+            console.log('r')
+        }
+    });
+};
 async function toOptions(params) {
   if (params.value) {
     try {

@@ -51,7 +51,7 @@
       </DataTable>
     </div>
     <div v-if="!loading">
-      <AutoparkCard @UpdateData="_update" class="my-2 max-lg:my-4" v-for="(item,i) in results" v-if="results && results.length>0" :cardData="item" :key="`cadr${i}`"  />
+      <AutoparkCard @UpdateData="_update" @_delete="requireConfirmation" class="my-2 max-lg:my-4" v-for="(item,i) in results" v-if="results && results.length>0" :cardData="item" :key="`cadr${i}`"  />
       <Empty v-else title="Hech avtomobil topilmadi" subtitle="Avtomobil qo'shing" />
 
     </div>
@@ -305,6 +305,7 @@
       <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
             animationDuration=".5s" aria-label="Custom ProgressSpinner" />
     </div>
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -315,7 +316,7 @@ import { format } from "date-fns";
 import useVuelidate from "@vuelidate/core";
 import { required, sameAs } from "@vuelidate/validators";
 import { useAuth } from '~/store/auth';
-
+import { useConfirm } from "primevue/useconfirm";
 const {getDatas} = useOption();
 const {user }= useAuth()
 const toast = useToast();
@@ -324,6 +325,7 @@ const selectedCity = ref();
 let loading = ref(true);
 const imagesInput = ref(null);
 const {options} = useOption();
+const confirm = useConfirm();
 const results = ref([])
 const cities = ref([
   { name: "New York", code: "NY" },
@@ -522,6 +524,38 @@ function getVihicle(){
     loading.value = false;
   })
 }
+const requireConfirmation = (id) => {
+  confirm.require({
+        message: 'Siz rostan ham tasdiqlaysizmi ?',
+        header: 'Ogohlantirish',
+        // icon: 'pi pi-info-circle',
+        rejectLabel: 'Bekor qilish',
+        rejectProps: {
+            label: 'Bekor qilish',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'O\'chirish',
+            severity: 'danger'
+        },
+        accept: () => {
+            let putUrl=`/v1/driver/vehicle/${id}`;
+            useApi(putUrl,{
+              method: 'PATCH',
+              body: {
+                status: "archived ",
+                user:user.id
+              }
+            }).then(()=>{
+              getApplications();
+            })
+        },
+        reject: () => {
+            console.log('r')
+        }
+    });
+};
 function checkInvalidFields() {
   const invalidFields = [];
   
