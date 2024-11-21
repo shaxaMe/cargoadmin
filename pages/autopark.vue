@@ -548,7 +548,7 @@ const requireConfirmation = (id) => {
                 user:user.id
               }
             }).then(()=>{
-              getApplications();
+              getDatas();
             })
         },
         reject: () => {
