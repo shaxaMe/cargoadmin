@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav
-      class="w-full relative bg-white px-5 py-3 flex justify-end max-md:items-center max-md:justify-between"
+      class="w-full relative bg-white px-7 py-3 flex justify-end max-md:items-center max-md:justify-between"
     >
       <Icon
         @click="toggleNav = true"
@@ -365,18 +365,12 @@
             <p class="text-xs">{{ user.role }}</p>
           </div> -->
 
-          <div
+          <!-- <div
             id="dropdownDefaultButton"
             class="flex items-center gap-2 cursor-pointer px-3 py-2"
             data-dropdown-toggle="dropdown"
           >
             <div class="overflow-hidden rounded-full h-[32px]">
-              <!-- <img
-                class="w-full h-full object-cover"
-                src="https://wallpapercave.com/wp/wp6115931.jpg"
-                alt=""
-                :label="`${user?.full_name?.substr(0,1)}`"
-              /> -->
               <Avatar
                 :image="user.photo ? user.photo : emptyProfile"
                 size="medium"
@@ -385,12 +379,9 @@
             </div>
             <div class="flex justify-center items-center flex-col">
               <p class="max-md:text-sm">{{ user?.full_name }}</p>
-              <!-- <p class="text-xs text-gray-500 dark:text-gray-400">
-                {{ user?.role }}
-              </p> -->
             </div>
             <Icon name="ic:baseline-keyboard-arrow-down" size="18px" />
-          </div>
+          </div> -->
 
           <!-- Dropdown menu -->
           <div

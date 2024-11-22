@@ -410,13 +410,29 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="px-5 py-6">
+  <div class="px-5 py-6 max-w-4xl bg-white mx-auto rounded-xl my-5">
     <Toast />
     <div>
       <h1 class="text-xl">Haydovchi profili</h1>
-      <div class="form-container max-w-[500px] mt-5 flex items-center gap-10">
+      <div class="flex justify-between w-full items-start pb-10 border-b">
+        <div class="form-container max-w-[500px] mt-5 flex items-center gap-10">
+        <div
+          class="w-32 h-32 bg-gray-400 rounded-full flex justify-center items-center relative cursor-pointer overflow-hidden shadow-md"
+        >
+          <div v-if="!formValues.photo">
+            <Icon name="uil:image-plus" class="text-white" size="40px" />
+          </div>
+          <ProfileImage @save="_save" />
+          <!-- <input @change="_uploadImage" class="opacity-0 absolute w-full h-24 z-10" type="file"> -->
+          <img
+            :src="formValues.photo"
+            v-if="formValues.photo"
+            alt="Passport"
+            class="w-full h-full object-cover cursor-pointer"
+          />
+        </div>
         <div class="flex-1">
-          <FloatLabel variant="on">
+          <!-- <FloatLabel variant="on">
             <InputText
               class="w-full h-full"
               id="full_name"
@@ -434,25 +450,67 @@ onMounted(() => {
               @focus="_focus"
             />
             <label for="full_name">Telefon raqam</label>
-          </FloatLabel>
+          </FloatLabel> -->
+          <p class="text-2xl font-bold text-gray-900">{{ formValues.full_name }}</p>
+          <div class="text-gray-600 flex items-center gap-1 mt-1"><Icon name="line-md:phone" class="w-6 h-6" /> <p>+998{{ formValues.phone }}</p></div>
         </div>
-        <div
-          class="w-24 h-24 bg-gray-400 rounded-full flex justify-center items-center relative cursor-pointer overflow-hidden shadow-md"
-        >
-          <div v-if="!formValues.photo">
-            <Icon name="uil:image-plus" class="text-white" size="40px" />
-          </div>
-          <ProfileImage @save="_save" />
-          <!-- <input @change="_uploadImage" class="opacity-0 absolute w-full h-24 z-10" type="file"> -->
-          <img
-            :src="formValues.photo"
-            v-if="formValues.photo"
-            alt="Passport"
-            class="w-full h-full object-cover cursor-pointer"
-          />
-        </div>
+        
+      </div>
+      <div class="flex justify-start gap-1 items-center text-blue-600 cursor-pointer">
+        <Icon name="line-md:edit" class="w-5 h-5" />
+        <p class="underline text-blue-600 hover:text-blue-800">O'zgartirish</p>
+      </div>
       </div>
     </div>
+    <div class="border-t border-gray-200">
+        <div class="p-6 sm:p-8">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold text-gray-900">Документы</h2>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between hover:bg-gray-100 transition-colors duration-200">
+              <!-- Основная информация -->
+              <div class="flex-grow mb-4 md:mb-0">
+                <div class="flex items-center mb-2">
+                  <Icon name="hugeicons:passport" class="w-6 h-6" />
+                  <h3 class="font-semibold text-lg ml-2">Passport</h3>
+                </div>
+                <div class="ml-8 space-y-1 text-gray-600" v-if="foreginpassportData">
+                  <p>
+                    <span class="font-medium">Серийный номер:</span> 
+                    {{ foreginpassportData.serial }}
+                  </p>
+                  <p>
+                    <span class="font-medium">Срок действия:</span> 
+                    {{ foreginpassportData.given_date }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex space-x-4 mb-4 md:mb-0">
+                <div v-if="imgUrls['foreginpassport_main_file']['url']" class="w-20 h-20">
+                  <img :src="imgUrls['foreginpassport_main_file']['url']" alt="Front" class="w-full h-full object-cover rounded"/>
+                </div>
+                <div v-if="imgUrls['foreginpassport_main_file']['url']" class="w-20 h-20">
+                  <img :src="imgUrls['foreginpassport_main_file']['url']" alt="Back" class="w-full h-full object-cover rounded"/>
+                </div>
+              </div>
+              
+
+              <!-- Кнопки действий -->
+              <div class="flex items-center space-x-3 ml-3">
+                <button 
+                  
+                  class="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-50"
+                  title="Редактировать"
+                >
+                  <Icon name="line-md:edit" class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     <div class="mt-10">
       <h1 class="text-xl">Passport malumotlari</h1>
       <div
