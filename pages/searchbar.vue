@@ -1,5 +1,6 @@
 <template>
   <div class="px-5 py-6">
+    <Toast />
     <div v-if="!loading">
       <div class="flex justify-end mb-5">
         <button
@@ -15,7 +16,71 @@
           </span>
         </button>
       </div>
-
+      <div class="card rounded-lg scroll default">
+      <div class="w-full rounded-xl border min-w-fit overflow-hidden">
+        <table
+          class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+        >
+          <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="px-6 py-3">ID</th>
+              <th scope="col" class="px-6 py-3">Клиент</th>
+              <th scope="col" class="px-6 py-3">Маршрут</th>
+              <!-- <th scope="col" class="px-6 py-3">Тип кузова</th> -->
+              <th scope="col" class="px-6 py-3">Статус</th>
+              <th scope="col" class="px-6 py-3">Сумма</th>
+              <th scope="col" class="px-6 py-3">
+                <span class="sr-only">Edit</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(item, i) in application"
+              class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              <td class="px-6 py-4">{{ i + 1 }}</td>
+              <td class="px-6 py-4">Test</td>
+              <td
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+              {{ setFlags(item.locations,'from')[0] }} {{ setKeys(item.locations, "from") }}-{{ setFlags(item.locations,'to')[0] }} {{ setKeys(item.locations, "to") }}
+              </td>
+              
+              <td class="px-6 py-4">
+                <span
+                  class="inline-flex items-center rounded-full px-2.5 py-1.5 text-sm font-medium 'bg-green-100 text-green-800"
+                >
+                  wait
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                {{
+                  item.price
+                }}
+              </td>
+              <td
+                class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+              >
+                <div class="flex justify-end space-x-3">
+                  <button class="text-indigo-600 hover:text-indigo-900">
+                    <Icon name="line-md:edit" class="w-4 h-4"></Icon>
+                    <span class="sr-only">Редактировать</span>
+                  </button>
+                  <button class="text-red-600 hover:text-red-900">
+                    <Icon name="mi:delete-alt" class="w-4 h-4"></Icon>
+                    <span class="sr-only">Удалить</span>
+                  </button>
+                </div>
+              </td> 
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
       <div class="mt-5" v-if="application && application.length > 0">
         <!-- <h1 class="text-2xl font-semibold">
               найти подхонашиые и выгодны грузы
@@ -448,7 +513,9 @@ import { useOption } from "../store/option";
 import Empty from "~/components/Empty.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { useAuth } from "~/store/auth";
+import { useToast } from "primevue/usetoast";
 const isOpen = ref(false);
+const toast = useToast();
 const { getDatas, options } = useOption();
 const { user } = useAuth();
 const fromValue = ref(null);
@@ -497,8 +564,8 @@ const urlLists = computed(() => {
   let obj = {
     getUrl:
       user.role == "USER"
-        ? "/v1/cargo/applications"
-        : "/v1/driver/vehicle-applications",
+        ? "/v1/cargo/applications?status=wait"
+        : "/v1/driver/vehicle-applications?status=wait",
     postUrl:
       user.role == "USER"
         ? "/v1/cargo/application"
@@ -587,13 +654,16 @@ const requireConfirmation = (id) => {
         accept: () => {
             let putUrl=user.role == "USER"? `/v1/cargo/application/${id}`: `/v1/driver/vehicle/${id}`;
             useApi(putUrl,{
-              method: 'PUT',
+              method: 'PATCH',
               body: {
-                status: "archived ",
+                status: "archived",
                 user:user.id
               }
             }).then(()=>{
+              toast.add({ severity: 'success', summary: 'Muvaffaqiyatli', detail: 'Ma\'lumot o\'chirildi', life: 3000 });
               getApplications();
+            }).catch(()=>{
+              toast.add({ severity: 'error', summary: 'Xatolik', detail: 'Ma\'lumot o\'chirilmadi', life: 3000 });
             })
         },
         reject: () => {
@@ -634,7 +704,29 @@ async function toOptions(params) {
     }
   }
 }
-
+function setKeys(locations, keyname) {
+  if (locations) {
+    let str = locations
+      .map((d) => {
+        if (d.direction === keyname) {
+          return d.name;
+        }
+      })
+      .filter((name) => name != null);
+    return str.join(",");
+  }
+}
+function setFlags(locations, keyname) {
+  if (locations) {
+    let str = locations
+      .map((d) => {
+        if (d.direction === keyname) {
+          return d.country.flag;
+        }
+      }).filter((d)=>d!=null);
+    return str
+  }
+}
 async function getLocations(keyname) {
   let items = keyname == "from" ? fromValue.value : toValue.value;
   let coords = [];

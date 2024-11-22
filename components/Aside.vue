@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="fixed top-0 left-0 z-30 bg-black/15  w-0" :class="{'trans-custom !w-full':toggleNav}">
-      <div class="max-w-[220px] px-3 py-5 bg-white w-full h-auto min-h-screen hidden" :class="{'!block':toggleNav}">
+      <div class="max-w-[250px] px-3 py-5 bg-white w-full h-auto min-h-screen hidden" :class="{'!block':toggleNav}">
       <div class="flex w-full justify-end mb-5">
         <Icon name="material-symbols-light:cancel-outline-rounded" size="30px" @click="toggleNav=false" />
       </div>  
-    <aside class="w-full h-full">
+    <aside class="w-full h-full flex flex-col justify-between">
       <div class="w-full h-10 text-center text-[#202224] font-extrabold text-lg">
         <img src="../assets/images/FG1.png" class="w-full h-full object-cover" alt="">
         <!-- <span class="text-[#4880FF]">Fura</span>Go -->
@@ -57,9 +57,10 @@
     </aside>
   </div>
     </div>
-    <div class="max-w-[250px] px-3 py-5 bg-white w-full h-full min-h-screen max-lg:hidden">
-    <aside class="w-full h-full">
-      <div class="w-full h-10 text-center text-[#202224] font-extrabold text-lg">
+    <div class="max-w-[280px] px-3 py-5 bg-white w-full h-full min-h-screen max-lg:hidden">
+    <aside class="w-full h-full flex flex-col justify-between gap-5">
+      <div>
+        <div class="w-full h-10 text-center text-[#202224] font-extrabold text-lg">
         <img src="../assets/images/FG1.png" class="w-full h-full object-cover" alt="">
         <!-- <span class="text-[#4880FF]">Fura</span>Go -->
       </div>
@@ -122,6 +123,25 @@
             <span>Chiqish</span>
           </div>
         </div> -->
+      </div>
+      </div>
+      <div class="border-t border-slate-400 p-4">
+        <router-link to="/profile" class="flex items-center mb-4 hover:bg-slate-400 p-2 rounded-lg transition duration-200">
+          <div  class="w-10 h-10 rounded-md overflow-hidden !bg-transparent">
+            <img class="w-full h-full object-cover" src="../assets/images/profile.svg" alt="">
+           </div>
+          <div class="ml-3 !bg-transparent">
+            <p class="font-medium line-clamp-1 text-gray-900">{{ user.full_name }}</p>
+            <p class="text-sm text-gray-700">admin@example.com</p>
+          </div>
+        </router-link>
+        <button 
+          @click="logOut" 
+          class="w-full py-2 rounded-xl px-4 text-white bg-red-600 hover:bg-red-700 transition duration-200 flex items-center justify-center"
+        >
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Выйти
+        </button>
       </div>
     </aside>
   </div>

@@ -16,7 +16,7 @@
 }
 body{
     overflow-x: hidden;
-    background: #F5F6FA;
+    background: rgb(243 244 246 / var(--tw-bg-opacity, 1))//#F5F6FA;
 }
 
 body::-webkit-scrollbar {
@@ -44,10 +44,10 @@ body::-webkit-scrollbar {
 
   .p-datatable-thead{
      th{
-      background-color: #3b72f1;
-      color: #fff;
+      background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1));
+      color: rgb(17 24 39 / var(--tw-text-opacity, 1));
         svg{
-          color: #fff;
+          color: rgb(17 24 39 / var(--tw-text-opacity, 1));
         }
      }
   }
@@ -55,9 +55,9 @@ body::-webkit-scrollbar {
     opacity: 0.8;
     background-color: #3b72f1 !important;
     color: #fff !important;
-     svg{
-      color: #fff !important;
-     }
+    //  svg{
+    //   color: #fff !important;
+    //  }
   }
 
 .router-link-active {
@@ -98,4 +98,35 @@ body::-webkit-scrollbar {
 }
 .p-confirmdialog{
   width: 350px !important;
+}
+.scroll{
+  overflow: auto;
+  &.default{
+      &::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        
+          
+      }
+
+      &::-webkit-scrollbar-thumb {
+          background: #cfcfcf !important;
+          border-radius: 5px !important;
+          display: none;
+         
+      }
+
+      &::-webkit-scrollbar-track {
+          background: #f1f1f1 !important;
+          opacity: 0;
+          
+      }
+      &:hover{
+          &::-webkit-scrollbar-thumb{
+              display: block;
+          }
+  
+      }
+  }
+
 }
