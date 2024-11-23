@@ -475,7 +475,7 @@ const userAway = reactive({
   weight: null,
   volume: null,
   price: null,
-  currency: null,
+  currency: options?.currency[0]['id'],
   note: "Adfsdg",
   user: user.id,
 });
@@ -650,7 +650,6 @@ async function getLocations(keyname) {
   let items = keyname == "from" ? fromValue.value : toValue.value;
   let coords = [];
   let existingCoords = keyname == "from" ? fromCoord.value : toCoord.value;
-  console.log("Getting locations", existingCoords);
   items.forEach((element) => {
     if (element.uri) {
       useApi(`/v1/service/yandex-geocode?uri=${element.uri}`).then((res) => {
