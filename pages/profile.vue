@@ -488,7 +488,7 @@ watch(()=>isAddDoc.value,(newVal)=>{
       </button>
             </div>
           </div>
-          <div class="space-y-4 mt-4" v-for="(item,i) in getDocsData">
+          <div class="space-y-4 mt-4" v-for="(item,i) in getDocsData" v-if="!loading && getDocsData.length>0">
             <div class="bg-gray-50 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between hover:bg-gray-100 transition-colors duration-200">
               <!-- Основная информация -->
               <div class="flex-grow mb-4 md:mb-0">
