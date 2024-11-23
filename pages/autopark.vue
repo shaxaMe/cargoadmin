@@ -29,303 +29,320 @@
     <Modal v-model="isOpen" @_save="_save" :title="modalTitle">
       <div class="card">
         <Tabs value="0">
-            <TabList>
-                <Tab value="0">Основная информация</Tab>
-                <Tab value="1">Тех. паспорт</Tab>
-                <Tab value="2">Transport rasmlari</Tab>
-            </TabList>
-            <TabPanels>
-                <TabPanel value="0">
-                  <div
-        class="flex items-center mt-3 max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1"
-      >
-        <div class="flex-1 flex flex-col">
-          <label for="username" class="font-semibold mb-2"
-            >Transport turi</label
-          >
-          <Select
-            v-model="formData.type"
-            :options="options.vehicle_type"
-            :invalid="$v.type.$error"
-            optionLabel="name"
-            optionValue="id"
-            class="w-full text-sm"
-          />
-        </div>
-        <div class="flex-1 flex flex-col">
-          <label for="email" class="font-semibold mb-2">Kuzov turi</label>
-          <Select
-            v-model="formData.truck_body"
-            :options="options.truck_type_parametr"
-            :invalid="$v.truck_body.$error"
-            optionLabel="name"
-            optionValue="id"
-            class="w-full text-sm"
-          />
-        </div>
-      </div>
-      <div
-        class="flex items-center gap-5 mt-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1"
-      >
-        <div class="flex-1 flex flex-col">
-          <label for="username" class="font-semibold mb-2"
-            >Yuk ko’tarish vazni (t)</label
-          >
-          <InputNumber
-            v-model="formData.weight"
-            :invalid="$v.weight.$error"
-            id="username"
-            class="flex-auto"
-            autocomplete="off"
-          />
-        </div>
-        <div class="flex-1 flex flex-col">
-          <label for="email" class="font-semibold mb-2"
-            >Yuk olish hajmi (m3)</label
-          >
-          <InputNumber
-            v-model="formData.volume"
-            :invalid="$v.volume.$error"
-            id="email"
-            class="flex-auto"
-            autocomplete="off"
-          />
-        </div>
-        <div class="flex-1 flex flex-col">
-          <label for="email" class="font-semibold mb-2"
-            >Yuklash yo’nalishlari</label
-          >
-          <MultiSelect
-            v-model="formData.loading_type"
-            :options="options.truck_load_type"
-            optionLabel="name"
-            optionValue="id"
-            :invalid="$v.loading_type.$error"
-            class="w-full text-sm"
-          />
-        </div>
-      </div>
-                </TabPanel>
-                <TabPanel value="1">
-                  <div class="mt-3">
-        <!-- <h1 class="p-dialog-title">Texnik xarakteristikalar</h1> -->
-        <div
-          class="grid grid-cols-3 items-center gap-5 mt-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1"
-        >
-          <div class="flex-1 flex flex-col">
-            <label for="username" class="font-semibold mb-2"
-              >Davlat raqami</label
-            >
-            <InputText
-              id="username"
-              :invalid="$v.document.license_plate.$error"
-              v-model="formData.document.license_plate"
-              class="flex-auto"
-              autocomplete="off"
-            />
-          </div>
-          <div class="flex-1 flex flex-col">
-            <label for="email" class="font-semibold mb-2">Modeli</label>
-            <InputText
-              v-model="formData.document.model"
-              :invalid="$v.document.model.$error"
-              id="email"
-              class="flex-auto"
-              autocomplete="off"
-            />
-          </div>
-          <div class="flex-1 flex flex-col">
-            <label for="email" class="font-semibold mb-2">Yoqilg'i turi</label>
-            <MultiSelect
-              v-model="formData.document.fuel_type"
-              :options="options.fuel_type"
-              :invalid="$v.document.fuel_type.$error"
-              optionLabel="name"
-              optionValue="id"
-              class="w-full text-sm"
-            />
-          </div>
-          <div class="flex-1 flex flex-col">
-            <label for="email" class="font-semibold mb-2">Yili</label>
-            <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
-            <DatePicker
-              class="w-full h-full min-h-[40px]"
-              v-model="formData.document.ayear"
-              :invalid="$v.document.ayear.$error"
-              view="year"
-              dateFormat="yy"
-            />
-          </div>
-          <div class="flex-1 flex flex-col">
-            <label for="email" class="font-semibold mb-2">Turi</label>
-            <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
-            <InputText
-              v-model="formData.document.type"
-              class="flex-auto"
-              autocomplete="off"
-            />
-          </div>
-        </div>
-        <div class="flex items-start flex-col gap-5 mt-5">
-          <div class="flex flex-col max-md:w-full">
-            <label for="username" class="font-semibold mb-2"
-              >Tex pasport seriya va raqami</label
-            >
-            <InputText
-              v-model="formData.document.serial"
-              :invalid="$v.document.serial.$error"
-              id="username"
-              class="flex-auto"
-              autocomplete="off"
-            />
-          </div>
-          <div
-            class="flex-1 flex items-stretch gap-5 w-full max-md:grid max-md:grid-cols-1"
-          >
-            <div class="flex-1 flex flex-col max-w-[300px] max-md:max-w-full">
-              <label for="email" class="font-semibold mb-2">Old rasmi</label>
-              <!-- <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
-            <Icon name="ri:upload-cloud-2-fill" size="24px" />
-            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
-          </button> -->
-              <button
-                class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
-              >
-                <div
-                  class="flex flex-col items-center gap-6"
-                  v-show="!formData.document.main_file"
-                >
-                  <Icon name="uil:plus-circle" size="34px" />
-                  <!--  -->
-                  <input
-                    id="main_file"
-                    type="file"
-                    ref="main_file"
-                    @change="previewImage($event, 'main_file')"
-                    class="opacity-0 cursor-pointer absolute w-full h-full z-10"
-                  />
-                </div>
-                <div
-                  class="relative flex items-center justify-center group w-full h-full"
-                  v-if="formData.document.main_file"
-                >
-                  <img
-                    :src="formData.document.main_file"
-                    class="w-full h-full object-cover"
-                    alt="main file"
-                  />
-                  <div
-                    @click="_deleteImg('main_file')"
-                    class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
-                  >
-                    <Icon
-                      name="material-symbols:delete-outline"
-                      size="24px"
-                      class="text-red-400"
-                    />
-                  </div>
-                </div>
-              </button>
-            </div>
-            <div class="flex-1 flex flex-col max-w-[300px] max-md:max-w-full">
-              <label for="email" class="font-semibold mb-2">Orqa rasmi</label>
-              <!-- <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
-            <Icon name="ri:upload-cloud-2-fill" size="24px" />
-            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
-          </button> -->
-              <button
-                class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
-              >
-                <div
-                  class="flex flex-col items-center gap-6"
-                  v-show="!formData.document.back_file"
-                >
-                  <Icon name="uil:plus-circle" size="34px" />
-                  <input
-                    id="back_file"
-                    type="file"
-                    ref="back_file"
-                    @change="previewImage($event, 'back_file')"
-                    class="opacity-0 cursor-pointer absolute w-full h-full z-10"
-                  />
-                </div>
-                <div
-                  class="relative flex items-center justify-center group w-full h-full"
-                  v-if="formData.document.back_file"
-                >
-                  <img
-                    :src="formData.document.back_file"
-                    class="w-full h-full object-cover"
-                    alt="back file"
-                  />
-                  <div
-                    @click="_deleteImg('back_file')"
-                    class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
-                  >
-                    <Icon
-                      name="material-symbols:delete-outline"
-                      size="24px"
-                      class="text-red-400"
-                    />
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-                </TabPanel>
-                <TabPanel value="2">
-                  <div class="my-3">
-        <label class="font-semibold my-2">Transport rasmlari</label>
-        <div
-          class="w-full border border-dashed border-blue-400 px-4 py-3 rounded-md mt-5"
-        >
-          <div
-            class="flex-1 grid grid-cols-4 gap-2 max-lg:grid-cols-2 max-md:grid-cols-1"
-          >
-            <div
-              class="w-40 h-40 max-lg:w-full border border-blue-400 rounded-md flex justify-center relative items-center cursor-pointer"
-            >
-              <Icon
-                name="material-symbols:photo-camera-outline"
-                class="text-blue-400"
-                size="34px"
-              />
-              <input
-                type="file"
-                ref="imagesInput"
-                :disabled="formData.images.length >= 5"
-                id="multiple"
-                @change="previewImage($event, 'multiple')"
-                class="absolute top-0 left-0 h-full w-full opacity-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-0"
-              />
-            </div>
-            <div
-              class="w-full h-40 overflow-hidden rounded-md group relative flex justify-center items-center max-lg:items-end"
-              v-for="(item, i) in formData.images"
-              v-if="formData.images && formData.images.length > 0"
-            >
-              <img class="w-full h-full" :src="item.image" alt="fff" />
+          <TabList>
+            <Tab value="0">Основная информация</Tab>
+            <Tab value="1">Тех. паспорт</Tab>
+            <Tab value="2">Transport rasmlari</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel value="0">
               <div
-                @click="_deleteImg('multiple'), i"
-                class="p-4 bg-red-100 cursor-pointer max-lg:translate-y-0 max-lg:bottom-2 max-lg:right-2 rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
+                class="flex items-center mt-3 max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1"
               >
-                <Icon
-                  name="material-symbols:delete-outline"
-                  size="24px"
-                  class="text-red-400 max-lg:!text-sm"
-                />
+                <div class="flex-1 flex flex-col">
+                  <label for="username" class="font-semibold mb-2"
+                    >Transport turi</label
+                  >
+                  <Select
+                    v-model="formData.type"
+                    :options="options.vehicle_type"
+                    :invalid="$v.type.$error"
+                    optionLabel="name"
+                    optionValue="id"
+                    class="w-full text-sm"
+                  />
+                </div>
+                <div class="flex-1 flex flex-col">
+                  <label for="email" class="font-semibold mb-2"
+                    >Kuzov turi</label
+                  >
+                  <Select
+                    v-model="formData.truck_body"
+                    :options="options.truck_type_parametr"
+                    :invalid="$v.truck_body.$error"
+                    optionLabel="name"
+                    optionValue="id"
+                    class="w-full text-sm"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-                </TabPanel>
-            </TabPanels>
+              <div
+                class="flex items-center gap-5 mt-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1"
+              >
+                <div class="flex-1 flex flex-col">
+                  <label for="username" class="font-semibold mb-2"
+                    >Yuk ko’tarish vazni</label
+                  >
+                  <InputGroup>
+                    <InputNumber
+                      v-model="formData.weight"
+                      :invalid="$v.weight.$error"
+                      id="username"
+                      class="flex-auto"
+                      autocomplete="off"
+                    />
+                    <InputGroupAddon>тонн</InputGroupAddon>
+                  </InputGroup>
+                </div>
+                <div class="flex-1 flex flex-col">
+                  <label for="email" class="font-semibold mb-2"
+                    >Yuk olish hajmi</label
+                  >
+                  <InputGroup>
+                    <InputNumber
+                    v-model="formData.volume"
+                    :invalid="$v.volume.$error"
+                    id="email"
+                    class="flex-auto"
+                    autocomplete="off"
+                  />
+                  <InputGroupAddon>м³</InputGroupAddon>
+                  </InputGroup>
+                </div>
+                <div class="flex-1 flex flex-col">
+                  <label for="email" class="font-semibold mb-2"
+                    >Yuklash yo’nalishlari</label
+                  >
+                  <MultiSelect
+                    v-model="formData.loading_type"
+                    :options="options.truck_load_type"
+                    optionLabel="name"
+                    optionValue="id"
+                    :invalid="$v.loading_type.$error"
+                    class="w-full text-sm"
+                  />
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel value="1">
+              <div class="mt-3">
+                <!-- <h1 class="p-dialog-title">Texnik xarakteristikalar</h1> -->
+                <div
+                  class="grid grid-cols-3 items-center gap-5 mt-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1"
+                >
+                  <div class="flex-1 flex flex-col">
+                    <label for="username" class="font-semibold mb-2"
+                      >Davlat raqami</label
+                    >
+                    <InputText
+                      id="username"
+                      :invalid="$v.document.license_plate.$error"
+                      v-model="formData.document.license_plate"
+                      class="flex-auto"
+                      autocomplete="off"
+                    />
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    <label for="email" class="font-semibold mb-2">Modeli</label>
+                    <InputText
+                      v-model="formData.document.model"
+                      :invalid="$v.document.model.$error"
+                      id="email"
+                      class="flex-auto"
+                      autocomplete="off"
+                    />
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    <label for="email" class="font-semibold mb-2"
+                      >Yoqilg'i turi</label
+                    >
+                    <MultiSelect
+                      v-model="formData.document.fuel_type"
+                      :options="options.fuel_type"
+                      :invalid="$v.document.fuel_type.$error"
+                      optionLabel="name"
+                      optionValue="id"
+                      class="w-full text-sm"
+                    />
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    <label for="email" class="font-semibold mb-2">Yili</label>
+                    <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
+                    <DatePicker
+                      class="w-full h-full min-h-[40px]"
+                      v-model="formData.document.ayear"
+                      :invalid="$v.document.ayear.$error"
+                      view="year"
+                      dateFormat="yy"
+                    />
+                  </div>
+                  <div class="flex-1 flex flex-col">
+                    <label for="email" class="font-semibold mb-2">Turi</label>
+                    <!-- <InputText id="email" class="flex-auto" autocomplete="off" /> -->
+                    <InputText
+                      v-model="formData.document.type"
+                      class="flex-auto"
+                      autocomplete="off"
+                    />
+                  </div>
+                </div>
+                <div class="flex items-start flex-col gap-5 mt-5">
+                  <div class="flex flex-col max-md:w-full">
+                    <label for="username" class="font-semibold mb-2"
+                      >Tex pasport seriya va raqami</label
+                    >
+                    <InputText
+                      v-model="formData.document.serial"
+                      :invalid="$v.document.serial.$error"
+                      id="username"
+                      class="flex-auto"
+                      autocomplete="off"
+                    />
+                  </div>
+                  <div
+                    class="flex-1 flex items-stretch gap-5 w-full max-md:grid max-md:grid-cols-1"
+                  >
+                    <div
+                      class="flex-1 flex flex-col max-w-[300px] max-md:max-w-full"
+                    >
+                      <label for="email" class="font-semibold mb-2"
+                        >Old rasmi</label
+                      >
+                      <!-- <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
+            <Icon name="ri:upload-cloud-2-fill" size="24px" />
+            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
+          </button> -->
+                      <button
+                        class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
+                      >
+                        <div
+                          class="flex flex-col items-center gap-6"
+                          v-show="!formData.document.main_file"
+                        >
+                          <Icon name="uil:plus-circle" size="34px" />
+                          <!--  -->
+                          <input
+                            id="main_file"
+                            type="file"
+                            ref="main_file"
+                            @change="previewImage($event, 'main_file')"
+                            class="opacity-0 cursor-pointer absolute w-full h-full z-10"
+                          />
+                        </div>
+                        <div
+                          class="relative flex items-center justify-center group w-full h-full"
+                          v-if="formData.document.main_file"
+                        >
+                          <img
+                            :src="formData.document.main_file"
+                            class="w-full h-full object-cover"
+                            alt="main file"
+                          />
+                          <div
+                            @click="_deleteImg('main_file')"
+                            class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
+                          >
+                            <Icon
+                              name="material-symbols:delete-outline"
+                              size="24px"
+                              class="text-red-400"
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                    <div
+                      class="flex-1 flex flex-col max-w-[300px] max-md:max-w-full"
+                    >
+                      <label for="email" class="font-semibold mb-2"
+                        >Orqa rasmi</label
+                      >
+                      <!-- <button class="bg-white  min-h-[40px] w-full relative border border-[#4880FF] px-6 text-[#4880FF] rounded-md h-full flex items-center justify-start gap-1">
+            <Icon name="ri:upload-cloud-2-fill" size="24px" />
+            <input type="file"  class="opacity-0 absolute w-full h-full z-10" />
+          </button> -->
+                      <button
+                        class="bg-white overflow-hidden h-[150px] w-full relative border border-dashed flex-col border-[#4880FF] text-[#4880FF] rounded-md flex items-center justify-center"
+                      >
+                        <div
+                          class="flex flex-col items-center gap-6"
+                          v-show="!formData.document.back_file"
+                        >
+                          <Icon name="uil:plus-circle" size="34px" />
+                          <input
+                            id="back_file"
+                            type="file"
+                            ref="back_file"
+                            @change="previewImage($event, 'back_file')"
+                            class="opacity-0 cursor-pointer absolute w-full h-full z-10"
+                          />
+                        </div>
+                        <div
+                          class="relative flex items-center justify-center group w-full h-full"
+                          v-if="formData.document.back_file"
+                        >
+                          <img
+                            :src="formData.document.back_file"
+                            class="w-full h-full object-cover"
+                            alt="back file"
+                          />
+                          <div
+                            @click="_deleteImg('back_file')"
+                            class="p-4 bg-red-100 cursor-pointer rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
+                          >
+                            <Icon
+                              name="material-symbols:delete-outline"
+                              size="24px"
+                              class="text-red-400"
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel value="2">
+              <div class="my-3">
+                <label class="font-semibold my-2">Transport rasmlari</label>
+                <div
+                  class="w-full border border-dashed border-blue-400 px-4 py-3 rounded-md mt-5"
+                >
+                  <div
+                    class="flex-1 grid grid-cols-4 gap-2 max-lg:grid-cols-2 max-md:grid-cols-1"
+                  >
+                    <div
+                      class="w-40 h-40 max-lg:w-full border border-blue-400 rounded-md flex justify-center relative items-center cursor-pointer"
+                    >
+                      <Icon
+                        name="material-symbols:photo-camera-outline"
+                        class="text-blue-400"
+                        size="34px"
+                      />
+                      <input
+                        type="file"
+                        ref="imagesInput"
+                        :disabled="formData.images.length >= 5"
+                        id="multiple"
+                        @change="previewImage($event, 'multiple')"
+                        class="absolute top-0 left-0 h-full w-full opacity-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-0"
+                      />
+                    </div>
+                    <div
+                      class="w-full h-40 overflow-hidden rounded-md group relative flex justify-center items-center max-lg:items-end"
+                      v-for="(item, i) in formData.images"
+                      v-if="formData.images && formData.images.length > 0"
+                    >
+                      <img class="w-full h-full" :src="item.image" alt="fff" />
+                      <div
+                        @click="_deleteImg('multiple'), i"
+                        class="p-4 bg-red-100 cursor-pointer max-lg:translate-y-0 max-lg:bottom-2 max-lg:right-2 rounded-full flex justify-center items-center absolute z-10 translate-y-[400%] trans-delete group-hover:translate-y-0"
+                      >
+                        <Icon
+                          name="material-symbols:delete-outline"
+                          size="24px"
+                          class="text-red-400 max-lg:!text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+          </TabPanels>
         </Tabs>
-    </div>
+      </div>
     </Modal>
     <div
       v-if="loading"
@@ -440,8 +457,8 @@ const customers = ref([
   },
 ]);
 const formData = reactive({
-  type: "1",
-  truck_body: 2,
+  type: null,
+  truck_body: null,
   weight: null,
   volume: null,
   loading_type: null,

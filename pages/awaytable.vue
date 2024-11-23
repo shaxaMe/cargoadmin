@@ -35,6 +35,335 @@
           aria-label="Custom ProgressSpinner"
         />
       </div>
+      <Modal
+      v-model="isOpen"
+      @_save="_save"
+      :title="modalTitle"
+      v-if="user.role != 'USER'"
+    >
+      <div class="flex justify-between gap-4 py-3 items-stretch w-full">
+        <div class="flex-1 relative flex gap-1 items-center">
+          <InputGroup class="flex-1">
+            <FloatLabel variant="on">
+              <!-- <InputText id="username" v-model="value" /> -->
+              <MultiSelect
+                v-model="fromValue"
+                :options="fromOptions"
+                optionLabel="name"
+                filter
+                @change="getLocations('from')"
+                @filter="filterOptions"
+                :selectionLimit="1"
+                placeholder=""
+                @show="focusSearchInput"
+                :maxSelectedLabels="3"
+                class="w-full md:w-80 fromselect"
+              >
+                <template #empty>
+                  <div class="px-2 py-0">Manzil nomini kiriting</div>
+                </template>
+
+                <template #emptyfilter>
+                  <span>Natija topilmadi</span>
+                </template>
+              </MultiSelect>
+              <label for="username">Qayerdan</label>
+            </FloatLabel>
+
+            <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.from_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+        <div class="flex h-auto items-center justify-center cursor-pointer">
+          <Icon
+            name="tdesign:arrow-left-right-3"
+            class="text-gray-400"
+            size="25px"
+          />
+        </div>
+        <div class="flex-1 relative flex items-center gap-1">
+          <InputGroup class="flex-1">
+            <FloatLabel variant="on">
+              <!-- <InputText id="username" v-model="value" /> -->
+              <MultiSelect
+                optionLabel="name"
+                class="toselect"
+                filter
+                :selectionLimit="1"
+                v-model="toValue"
+                @show="focusSearchInput"
+                @change="getLocations('to')"
+                :options="toOptionsData"
+                @filter="toOptions"
+              >
+                <template #empty>
+                  <div class="px-2 py-0">Manzil nomini kiriting</div>
+                </template>
+
+                <template #emptyfilter>
+                  <span>Natija topilmadi</span>
+                </template>
+              </MultiSelect>
+              <label for="username">Qayerga</label>
+            </FloatLabel>
+            <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.to_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+      </div>
+      <div class="flex justify-between gap-4 items-stretch w-full mt-4">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
+          <InputGroup>
+            <FloatLabel variant="on">
+              <DatePicker
+                v-model="formData.departure_date"
+                showIcon
+                fluid
+                iconDisplay="input"
+                class="w-full h-full min-h-[40px]"
+                dateFormat="dd.mm.yy"
+              />
+              <label for="username">Jo'nash vaqti</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <Select
+                v-model="formData.vehicle"
+                :options="optionsCar"
+                optionLabel="name"
+                optionValue="id"
+                class="w-full text-sm"
+              />
+              <label for="username">Avtomobil</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup v-if="user.role == 'USER'">
+            <FloatLabel variant="on">
+              <Select
+                v-model="formData.truck_body"
+                :options="options.truck_type_parametr"
+                optionLabel="name"
+                optionValue="id"
+                class="w-full text-sm"
+              />
+              <label for="email" class="font-semibold mb-2">Kuzov turi</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.price" />
+              <label for="username">Narxi</label>
+            </FloatLabel>
+            <InputGroupAddon>
+              <Select
+                v-model="formData.currency"
+                :options="options.currency"
+                optionLabel="name"
+                optionValue="id"
+                size="small"
+                class="w-full text-sm currenceselect"
+            /></InputGroupAddon>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.weight" />
+              <label for="username">Vazni</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.volume" />
+              <label for="username">Hajmi</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+      </div>
+    </Modal>
+    <Modal v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
+      <div class="flex justify-between gap-4 py-3 items-stretch w-full">
+        <div class="flex-1 relative flex gap-1 items-center">
+          <InputGroup class="flex-1">
+            <FloatLabel variant="on">
+              <!-- <InputText id="username" v-model="value" /> -->
+              <MultiSelect
+                v-model="fromValue"
+                :options="fromOptions"
+                optionLabel="name"
+                filter
+                @change="getLocations('from')"
+                @filter="filterOptions"
+                @show="focusSearchInput"
+                :selectionLimit="1"
+                placeholder=""
+                :maxSelectedLabels="3"
+                class="w-full md:w-80 fromselect"
+              >
+                <template #empty>
+                  <div class="px-2 py-0">Manzil nomini kiriting</div>
+                </template>
+
+                <template #emptyfilter>
+                  <span>Natija topilmadi</span>
+                </template>
+              </MultiSelect>
+              <label for="username">Qayerdan</label>
+            </FloatLabel>
+
+            <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.from_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+        <div class="flex h-auto items-center justify-center cursor-pointer">
+          <Icon
+            name="tdesign:arrow-left-right-3"
+            class="text-gray-400"
+            size="25px"
+          />
+        </div>
+        <div class="flex-1 relative flex items-center gap-1">
+          <InputGroup class="flex-1">
+            <FloatLabel variant="on">
+              <!-- <InputText id="username" v-model="value" /> -->
+              <MultiSelect
+                optionLabel="name"
+                class="toselect"
+                filter
+                :selectionLimit="1"
+                v-model="toValue"
+                @show="focusSearchInput"
+                @change="getLocations('to')"
+                :options="toOptionsData"
+                @filter="toOptions"
+              >
+                <template #empty>
+                  <div class="px-2 py-0">Manzil nomini kiriting</div>
+                </template>
+
+                <template #emptyfilter>
+                  <span>Natija topilmadi</span>
+                </template>
+              </MultiSelect>
+              <label for="username">Qayerga</label>
+            </FloatLabel>
+            <!-- <InputGroupAddon class="text-xs">Radius (km)</InputGroupAddon> -->
+          </InputGroup>
+          <InputGroup class="flex-1 max-w-28">
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.to_radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+      </div>
+      <div class="flex justify-between gap-4 items-stretch w-full mt-4">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
+          <!-- <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="formData.radius" />
+              <label for="username">Radius</label>
+            </FloatLabel>
+          </InputGroup> -->
+          <InputGroup>
+            <FloatLabel variant="on">
+              <DatePicker
+                v-model="userAway.loading_date"
+                showIcon
+                fluid
+                iconDisplay="input"
+                class="w-full h-full min-h-[40px]"
+                dateFormat="dd.mm.yy"
+              />
+              <label for="username">Jo'nash vaqti</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup v-if="user.role != 'USER'">
+            <FloatLabel variant="on">
+              <Select
+                v-model="userAway.vehicle"
+                :options="optionsCar"
+                optionLabel="name"
+                optionValue="id"
+                class="w-full text-sm"
+              />
+              <label for="username">Avtomobil</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <Select
+                v-model="userAway.truck_body"
+                :options="options.truck_type_parametr"
+                optionLabel="name"
+                optionValue="id"
+                class="w-full text-sm"
+              />
+              <label for="email" class="font-semibold mb-2">Kuzov turi</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.price" />
+              <label for="username">Narxi </label>
+            </FloatLabel>
+            <InputGroupAddon>
+              <Select
+                v-model="userAway.currency"
+                :options="options.currency"
+                optionLabel="name"
+                optionValue="id"
+                size="small"
+                class="w-full text-sm currenceselect"
+            /></InputGroupAddon>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.weight" />
+              <label for="username">Vazni</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.volume" />
+              <label for="username">Hajmi</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup>
+            <FloatLabel variant="on">
+              <InputNumber id="username" v-model="userAway.vehicle_quantity" />
+              <label for="username">Mashina soni</label>
+            </FloatLabel>
+          </InputGroup>
+          <InputGroup v-if="user.role == 'USER'">
+            <FloatLabel variant="on">
+              <Select
+                v-model="userAway.cargo_type"
+                :options="options.cargoType"
+                optionLabel="name"
+                optionValue="id"
+                class="w-full text-sm"
+              />
+              <label for="email" class="font-semibold mb-2">Yuk turi</label>
+            </FloatLabel>
+          </InputGroup>
+        </div>
+      </div>
+    </Modal>
       <ConfirmDialog></ConfirmDialog>
     </div>
   </template>
@@ -46,7 +375,7 @@
   import { useConfirm } from "primevue/useconfirm";
   import { useAuth } from "~/store/auth";
   import { useToast } from "primevue/usetoast";
-import Awaytable from "~/components/Awaytable.vue";
+  import Awaytable from "~/components/Awaytable.vue";
   const isOpen = ref(false);
   const toast = useToast();
   const { getDatas, options } = useOption();
@@ -64,9 +393,10 @@ import Awaytable from "~/components/Awaytable.vue";
     weight: null,
     volume: null,
     price: null,
-    to_radius: null,
-    from_radius: null,
+    to_radius: 0,
+    from_radius: 0,
     vehicle: null,
+    currency:options?.currency[0]['id'],
     departure_date: null,
     locations: [],
   });
@@ -74,12 +404,12 @@ import Awaytable from "~/components/Awaytable.vue";
     from_name: null,
     from_latitude:null,
     from_longitude:null,
-    from_radius:null,
+    from_radius:0,
     from_country:null,
     to_name:null,
     to_latitude:null,
     to_longitude:null,
-    to_radius: null,
+    to_radius: 0,
     to_country: null,
     loading_date:null,
     vehicle_quantity:null,
@@ -88,7 +418,7 @@ import Awaytable from "~/components/Awaytable.vue";
     weight:null,
     volume:null,
     price:null,
-    currency:null,
+    currency:options?.currency[0]['id'],
     note: "Adfsdg",
     user: null,
   });
@@ -365,6 +695,22 @@ import Awaytable from "~/components/Awaytable.vue";
           }));
         });
       }
+      if(!newVal){
+      for(let i in formData){
+        formData[i] = null;
+        if(i == 'to_radius' || i=='from_radius'){
+          formData[i] = 0;
+        }
+      }
+      for(let i in userAway){
+        userAway[i] = null;
+        if(i == 'to_radius' || i=='from_radius'){
+          userAway[i] = 0;
+        }
+      }
+      toValue.value = null;
+      fromValue.value = null;
+    }
     }
   );
   </script>
