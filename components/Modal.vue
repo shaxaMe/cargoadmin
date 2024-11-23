@@ -34,7 +34,7 @@ watch(() => visible.value, (visible) => {
       modal
       :header="props.title??`Transport qo’shish`"
       class="max-lg:!w-[90dvw]"
-      :style="{ width: maxWidth?maxWidth:'70dvw' }"
+      :style="{ width: maxWidth?maxWidth:'50dvw' }"
     >
      <slot></slot>
       <div class="flex justify-end gap-2 mt-10 max-md:flex-col">
