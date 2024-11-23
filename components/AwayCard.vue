@@ -146,7 +146,7 @@
         </div>
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
-        <div class="flex-1 relative grid gap-3 grid-cols-5">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
           <!-- <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.radius" />
@@ -307,7 +307,7 @@
         </div>
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
-        <div class="flex-1 relative grid gap-3 grid-cols-5">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
           <!-- <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.radius" />
@@ -451,22 +451,23 @@ const formData = reactive({
   weight: null,
   volume: null,
   price: null,
-  to_radius: null,
-  from_radius: null,
+  to_radius: 0,
+  from_radius: 0,
   vehicle: null,
   departure_date: null,
   locations: [],
+  currency: options?.currency[0]['id'],
 });
 const userAway = reactive({
   from_name: null,
   from_latitude: null,
   from_longitude: null,
-  from_radius: null,
+  from_radius: 0,
   from_country: null,
   to_name: null,
   to_latitude: null,
   to_longitude:null,
-  to_radius: null,
+  to_radius: 0,
   to_country:null,
   loading_date:null,
   vehicle_quantity: null,
@@ -773,6 +774,22 @@ watch(
           name: d.document.model,
         }));
       });
+    }
+    if(!newVal){
+      for(let i in formData){
+        formData[i] = null;
+        if(i == 'to_radius' || i=='from_radius'){
+          formData[i] = 0;
+        }
+      }
+      for(let i in userAway){
+        userAway[i] = null;
+        if(i == 'to_radius' || i=='from_radius'){
+          userAway[i] = 0;
+        }
+      }
+      toValue.value = null;
+      fromValue.value = null;
     }
   }
 );
