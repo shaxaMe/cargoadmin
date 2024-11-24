@@ -42,6 +42,7 @@
     <Modal
       v-model="isOpen"
       @_save="_save"
+      :loading="saveLoading"
       :title="modalTitle"
       v-if="user.role != 'USER'"
     >
@@ -184,17 +185,19 @@
               <InputNumber id="username" v-model="formData.weight" />
               <label for="username">Vazni</label>
             </FloatLabel>
+            <InputGroupAddon>тонн</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.volume" />
               <label for="username">Hajmi</label>
             </FloatLabel>
+            <InputGroupAddon>м³</InputGroupAddon>
           </InputGroup>
         </div>
       </div>
     </Modal>
-    <Modal v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
+    <Modal :loading="saveLoading" v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
         <div class="flex-1 relative flex gap-1 items-center">
           <InputGroup class="flex-1">
@@ -340,12 +343,14 @@
               <InputNumber id="username" v-model="userAway.weight" />
               <label for="username">Vazni</label>
             </FloatLabel>
+            <InputGroupAddon>тонн</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="userAway.volume" />
               <label for="username">Hajmi</label>
             </FloatLabel>
+            <InputGroupAddon>м³</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
@@ -404,6 +409,7 @@ const toCoord = ref([]);
 const optionsCar = ref([]);
 const confirm = useConfirm();
 let loading = ref(true);
+let saveLoading = ref(false);
 const formData = reactive({
   weight: null,
   volume: null,
@@ -640,12 +646,17 @@ async function getLocations(keyname) {
 
 function _save() {
   formData.locations = [...fromCoord.value, ...toCoord.value];
+  saveLoading.value = true;
   useApi(urlLists.value.postUrl, {
     method: "POST",
     body: { ...formData, departure_date: formatDate(formData.departure_date) },
   }).then(() => {
     getApplications();
+    saveLoading.value = false;
     isOpen.value = false;
+  }).catch(() => {
+    saveLoading.value = false;
+    toast.add({ severity: "error", summary: "Xatolik", detail: "Ma'lumot saqlanmadi", life: 3000 });
   });
 }
 function _saveUserAway() {
@@ -657,13 +668,18 @@ function _saveUserAway() {
     userAway.to_latitude = toCoord.value[0]["latitude"],
     userAway.to_longitude = toCoord.value[0]["longitude"],
     userAway.to_country = toCoord.value[0]["country"];
-    userAway.user = user.id
+    userAway.user = user.id;
+    saveLoading.value = true;
   useApi(urlLists.value.postUrl, {
     method: "POST",
     body: { ...userAway, loading_date: formatDate(userAway.loading_date) },
   }).then(() => {
+    saveLoading.value = false;
     getApplications();
     isOpen.value = false;
+  }).catch(() => {
+    saveLoading.value = false;
+    toast.add({ severity: "error", summary: "Xatolik", detail: "Ma'lumot saqlanmadi", life: 3000 });
   });
 }
 

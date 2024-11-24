@@ -39,12 +39,13 @@ watch(() => visible.value, (visible) => {
      <slot></slot>
       <div class="flex justify-end gap-2 mt-10 max-md:flex-col">
         <Button
+         :disabled="btnLoad"
           type="button"
           label="Bekor qilish"
           severity="secondary"
           @click="_close"
         ></Button>
-        <Button type="button" @click="save" class="max-md:-order-1"><Icon v-if="!!btnLoad" name="line-md:loading-twotone-loop" /> Saqlash</Button>
+        <Button type="button" @click="save" :disabled="btnLoad" class="max-md:-order-1"><Icon v-if="!!btnLoad" name="line-md:loading-twotone-loop" /> Saqlash</Button>
       </div>
     </Dialog>
   </div>

@@ -19,7 +19,7 @@
         <div>
           <div>
             <span class="font-bold text-lg">{{ cardData?.document?.model }}</span>
-            <span class="text-gray-400 ml-1">01 601 BGA</span>
+            <span class="text-gray-400 ml-1">{{ cardData.document.license_plate }}</span>
           </div>
           <p class="text-gray-400">
             тентованный, {{ cardData.volume }} м3, {{ cardData.weight }} т
@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-    <Modal v-model="isOpen" @_save="_save" :loading="updateLoading" title="Avtobilni o'gartirish">
+    <Modal  v-model="isOpen" @_save="_save" :loading="updateLoading" title="Avtobilni o'gartirish">
       <div class="flex items-center max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1">
         <div class="flex-1 flex flex-col">
           <label for="username" class="font-semibold mb-2"
@@ -542,7 +542,7 @@ async function _save() {
   //   return;
   // }
   try {
-    updateLoading.value = true;
+    
     if (
       formData.document.main_file &&
       !formData.document.main_file.includes("http://api.furago.uz/media")
@@ -573,6 +573,7 @@ async function _save() {
     if (formData.images.length == 0) {
       delete formData.images;
     }
+    updateLoading.value = true;
     await useApi(`/v1/driver/vehicle/${props.cardData.id}`, {
       method: "PATCH",
       body: formData,
