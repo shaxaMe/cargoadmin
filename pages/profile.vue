@@ -12,6 +12,7 @@ const auth = useAuth()
 const {setUser,user} = auth;
 const isAddDoc = ref(false);
 const docsSaveId = ref(null);
+const IsDocSaves = ref(false);
 const docsSaveData = ref({
   serial:null,
   expired_date:null,
@@ -78,6 +79,13 @@ function getUserProfile() {
 function getUserDocuments() {
   useApi("/v1/user/documents").then((response) => {
     getDocsData.value = response.results;
+    if(response.results){
+       let filtered = new Set(response.results.map((item) => item.type));
+        let arr = docsType.value.filter((doc) => !filtered.has(doc.type));  
+        if(arr.length==0){
+          IsDocSaves.value = true;
+        } 
+    }
     loading.value = false;
   }).catch((error) => {
      loading.value = false;
@@ -135,147 +143,7 @@ function _save(img) {
   setUser(formValues)
 
 }
-function saveForeignPassport() {
-  if (!foreginpassport_main_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Xorijiy passport old rasmini kiriting",
-      life: 3000,
-    });
-  } else if (!foreginpassport_back_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Xorijiy passport orqa rasmini kiriting",
-      life: 3000,
-    });
-  } else {
-    const data = new FormData();
-    foreginpassportData.expired_date?data.append(
-      "expired_date",
-      timeFormatter(foreginpassportData.expired_date)
-    ):'';
-    foreginpassportData.given_date?data.append("given_date", timeFormatter(foreginpassportData.given_date)):'';
-    foreginpassportData.serial?data.append("serial", foreginpassportData.serial.replaceAll(" ", "")):'';
-    data.append("main_file", imgUrls.foreginpassport_main_file.base64);
-    data.append("back_file", imgUrls.foreginpassport_back_file.base64);
-    data.append("type", "foreign_passport");
-    data.append('user',auth.user.id);
-    data.append('driving_license_category',[1])
-    useApi("/v1/user/document", { method: "POST", body: data })
-      .then((response) => {
-        getUserDocuments()
-        toast.add({
-          severity: "success",
-          summary: "Muvaffaqiyatli",
-          detail: "Malumotlar saqlandi",
-          life: 3000,
-        });
-      })
-      .catch((error) => {
-        toast.add({
-          severity: "error",
-          summary: "Xatolik",
-          detail: error.message,
-          life: 3000,
-        });
-      });
-  }
-}
-function saveDriverLicense() {
-  if (!driver_license_front_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Haydovchilik guvohnomasi old rasmini kiriting",
-      life: 3000,
-    });
-  } else if (!driver_license_back_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Haydovchilik guvohnomasi orqa rasmini kiriting",
-      life: 3000,
-    });
-  } else {
-    const data = new FormData();
-    driver_pass.expired_date?data.append("expired_date", timeFormatter(driver_pass.expired_date)):'';
-    driver_pass.given_date?data.append("given_date", timeFormatter(driver_pass.given_date)):'';
-    data.append("serial", driver_pass.serial.replaceAll(" ", ""));
-    data.append("main_file", imgUrls.driver_license_front_file.base64);
-    data.append("back_file", imgUrls.driver_license_back_file.base64);
-    data.append('user',auth.user.id);
-    driver_pass.driving_license_category.forEach((item, index) => {
-      data.append("driving_license_category", item);
-    });
-    data.append("type", "driver_passport");
-    useApi("/v1/user/document", { method: "POST", body: data })
-      .then((response) => {
-        getUserDocuments();
-        toast.add({
-          severity: "success",
-          summary: "Muvaffaqiyatli",
-          detail: "Malumotlar saqlandi",
-          life: 3000,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.add({
-          severity: "error",
-          summary: "Xatolik",
-          detail: error.back_file[0],
-          life: 3000,
-        });
-      });
-  }
-}
-function savePassport() {
-  if (!passport_main_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Passport old rasmini kiriting",
-      life: 3000,
-    });
-  } else if (!passport_back_file.value) {
-    toast.add({
-      severity: "error",
-      summary: "Xatolik",
-      detail: "Passport orqa rasmini kiriting",
-      life: 3000,
-    });
-  }else{
-    const data = new FormData();
-  data.append("expired_date", timeFormatter(passportData.expired_date));
-  data.append("given_date", timeFormatter(passportData.given_date));
-  data.append("serial", passportData.serial.replaceAll(" ", ""));
-  data.append("main_file", imgUrls.passport_main_file.base64);
-  data.append("back_file", imgUrls.passport_back_file.base64);
-  data.append("type", "passport");
-  data.append('user',auth.user.id);
-  data.append('driving_license_category',[1]);
-  useApi("/v1/user/document", { method: "POST", body: data })
-    .then((response) => {
-      getUserDocuments();
-      toast.add({
-        severity: "success",
-        summary: "Muvaffaqiyatli",
-        detail: "Malumotlar saqlandi",
-        life: 3000,
-      });
-    })
-    // .catch((error) => {
-    //   toast.add({
-    //     severity: "error",
-    //     summary: "Xatolik",
-    //     detail: error.message,
-    //     life: 3000,
-    //   });
-    // });
-  }
-}
+
 function isValidFuragoMediaUrl(url) {
     const baseUrl = "http://api.furago.uz/media";
     return url.includes(baseUrl);
@@ -331,7 +199,12 @@ function saveEditProfile(editedType) {
 }
 
 function userDocsNames(type){
-  return docsType.value.find((d)=>d.type==type)['name']
+  let obj = {
+    passport: "Pasport",
+    driver_license: "Qayta qaytish haqqi",
+    foreign_passport: "Axborot qayta qaytish haqqi",
+  }
+  return obj[type]
 }
 function openModalEdit( item ){
    isDocEdit.value = true;
@@ -362,13 +235,23 @@ function saveProfile(){
   }
   data.expired_date=timeFormatter(docsSaveData.value.expired_date);
   data.given_date=timeFormatter(docsSaveData.value.given_date);
-  data.user=auth.user.id,
-  data.back_file = imgUrls.docs_save_back.base64;
-  data.main_file = imgUrls.docs_save_old.base64;
+  data.user=auth.user.id;
+  if(!!isValidFuragoMediaUrl(imgUrls.docs_save_back.url)){
+    delete data.back_file
+  }else{
+   data.back_file = imgUrls.docs_save_back.base64;
+  }
+  if(!!isValidFuragoMediaUrl(imgUrls.docs_save_old.url)){
+    delete data.main_file
+  }else{
+   data.main_file = imgUrls.docs_save_old.base64;
+  }
   if(isDocEdit.value==false){
     useApi("/v1/user/document", { method: "POST", body: data })
     .then((response) => {
       getUserDocuments();
+      isAddDoc.value = false;
+      resetFields()
       toast.add({
         severity: "success",
         summary: "Muvaffaqiyatli",
@@ -379,12 +262,14 @@ function saveProfile(){
   }else{
     useApi(`v1/user/document/${docsSaveId.value}`, { method: "PUT", body: JSON.stringify(data) }).then((response) => {
       getUserDocuments();
+      isAddDoc.value = false;
       toast.add({
         severity: "success",
         summary: "Muvaffaqiyatli",
         detail: "Malumotlar saqlandi",
         life: 3000,
       });
+      resetFields()
      }).catch((error) => {
       toast.add({
         severity: "error",
@@ -400,6 +285,9 @@ function resetFields(){
     docsSaveData.value[i] = ''
   }
   docsSaveId.value = null;
+  imgUrls.docs_save_back.url = '';
+    imgUrls.docs_save_old.url = '';
+    isDocEdit.value = false;
 }
 //actins
 
@@ -407,6 +295,9 @@ onMounted(() => {
   setTimeout(() => {
     getUserProfile();
     getUserDocuments();
+    if(auth.user.role=="USER"){
+      docsType.value = docsType.value.filter(d=>d.type!='driver_passport')
+    }
   }, 200);
 });
 
@@ -415,9 +306,7 @@ onMounted(() => {
 watch(()=>isAddDoc.value,(newVal)=>{
   if(!newVal){
     resetFields();
-    imgUrls.docs_save_back.url = '';
-    imgUrls.docs_save_old.url = '';
-    isDocEdit.value = false;
+    
   }
 })
 </script>
@@ -480,8 +369,9 @@ watch(()=>isAddDoc.value,(newVal)=>{
             <h2 class="text-xl font-semibold text-gray-900">Документы</h2>
             <div>
               <button
+              :disabled="IsDocSaves"
         @click="isAddDoc = true"
-        class="bg-[#3b72f1] gap-2 text-white text-sm flex justify-center items-center text-center px-3 py-2 rounded-lg"
+        class="bg-[#3b72f1] gap-2 disabled:cursor-not-allowed disabled:opacity-60 text-white text-sm flex justify-center items-center text-center px-3 py-2 rounded-lg"
       >
         <Icon size="15px" name="material-symbols:add-2" />
         <span>Hujjat qo'shish </span>

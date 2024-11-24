@@ -288,21 +288,6 @@
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-5 mt-5">
-        <div class="flex-1 flex flex-col max-w-[380px]">
-          <label for="username" class="font-semibold mb-2"
-            >Haydovchi biriktirish</label
-          >
-          <!-- <InputText id="username" class="flex-auto" autocomplete="off" /> -->
-          <Select
-            v-model="selectedCity"
-            :options="cities"
-            optionLabel="name"
-            optionValue="code"
-            class="w-full text-sm"
-          />
-        </div>
-      </div>
       <div class="my-4">
         <label class="font-semibold my-2">Transport rasmlari</label>
         <div
