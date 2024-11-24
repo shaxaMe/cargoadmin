@@ -126,7 +126,7 @@
         </div>
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
-        <div class="flex-1 relative grid gap-3 grid-cols-5">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
           <InputGroup>
             <FloatLabel variant="on">
               <DatePicker
@@ -276,7 +276,7 @@
         </div>
       </div>
       <div class="flex justify-between gap-4 items-stretch w-full mt-4">
-        <div class="flex-1 relative grid gap-3 grid-cols-5">
+        <div class="flex-1 relative grid gap-3 grid-cols-2">
           <!-- <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.radius" />
@@ -366,32 +366,6 @@
             </FloatLabel>
           </InputGroup>
         </div>
-        <!-- <div class="flex-1 relative grid gap-2 grid-cols-4">
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Vazni</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Vazni (gacha)</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Hajmi</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Hajmi(gacha)</label>
-            </FloatLabel>
-          </InputGroup>
-        </div> -->
       </div>
     </Modal>
     <div
