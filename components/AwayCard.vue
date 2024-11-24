@@ -771,7 +771,7 @@ watch(
       useApi("/v1/driver/vehicles").then((res) => {
         optionsCar.value = res.results.map((d) => ({
           id: d.id,
-          name: d.document.model,
+          name: d?.document?.model,
         }));
       });
     }
