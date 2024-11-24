@@ -37,12 +37,16 @@
         <Tag severity="secondary" :value="`${item.volume} ㎥`"></Tag>
       </div>
     </div>
+    
     <div class="flex gap-1 flex-1 justify-between">
       <div class="flex gap-2 items-center">
         <p class="line-clamp-1">
           {{ item.price }}
         </p>
       </div>
+      <div class="flex cursor-pointer bg-slate-100 rounded-xl px-2 py-1 max-w-[160px] text-center text-xs items-center">
+      10 ta mos yuk topildi
+    </div>
       <div class="card flex justify-center">
         <Button
           type="button"
@@ -65,6 +69,7 @@
     </div>
     <Modal
       v-model="isOpen"
+      :loading="saveLoading"
       v-if="user.role != 'USER'"
       @_save="_save"
       title="Йўналишни ўзгартириш"
@@ -189,12 +194,14 @@
               <InputNumber id="username" v-model="formData.weight" />
               <label for="username">Vazni</label>
             </FloatLabel>
+            <InputGroupAddon>тонн</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="formData.volume" />
               <label for="username">Hajmi</label>
             </FloatLabel>
+            <InputGroupAddon>м³</InputGroupAddon>
           </InputGroup>
         </div>
         <!-- <div class="flex-1 relative grid gap-2 grid-cols-4">
@@ -225,7 +232,7 @@
         </div> -->
       </div>
     </Modal>
-    <Modal v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
+    <Modal :loading="saveLoading" v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
       <div class="flex justify-between gap-4 py-3 items-stretch w-full">
         <div class="flex-1 relative flex gap-1 items-center">
           <InputGroup class="flex-1">
@@ -371,12 +378,14 @@
               <InputNumber id="username" v-model="userAway.weight" />
               <label for="username">Vazni</label>
             </FloatLabel>
+            <InputGroupAddon>тонн</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
               <InputNumber id="username" v-model="userAway.volume" />
               <label for="username">Hajmi</label>
             </FloatLabel>
+            <InputGroupAddon>м³</InputGroupAddon>
           </InputGroup>
           <InputGroup>
             <FloatLabel variant="on">
@@ -434,7 +443,7 @@ import { useOption } from "../store/option";
 const props = defineProps({
   item: { type: Object, required: true },
 });
-
+const saveLoading = ref(false);
 const { options } = useOption();
 const emit = defineEmits(["_update",'_dalete']);
 const fromValue = ref(null);
@@ -636,6 +645,7 @@ function _saveUserAway(){
     userAway.to_longitude = toCoord.value[0]["longitude"],
     userAway.to_country = toCoord.value[0]["country"];
     userAway.user = user.id
+    saveLoading.value = true;
     useApi(urlLists.value.putUrl, {
     method: "PUT",
     body: {
@@ -643,8 +653,11 @@ function _saveUserAway(){
       loading_date: formatDate(userAway.loading_date),
     },
   }).then((res) => {
+    saveLoading.value = false;
     isOpen.value = false;
     emit("_update");
+  }).catch((e)=>{
+    saveLoading.value = false;
   });
 }
 async function getLocations(keyname) {
@@ -752,7 +765,7 @@ function getEditData() {
 }
 function _save() {
   formData.locations = [...fromCoord.value, ...toCoord.value];
-
+  saveLoading.value = true;
   useApi(urlLists.value.putUrl, {
     method: "PUT",
     body: {
@@ -760,8 +773,11 @@ function _save() {
       departure_date: formatDate(formData.departure_date),
     },
   }).then((res) => {
+    saveLoading.value = false;
     isOpen.value = false;
     emit("_update");
+  }).catch(()=>{
+    saveLoading.value = false;
   });
 }
 watch(

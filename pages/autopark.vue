@@ -26,7 +26,7 @@
         subtitle="Avtomobil qo'shing"
       />
     </div>
-    <Modal v-model="isOpen" @_save="_save" :title="modalTitle">
+    <Modal :loading="saveLoading" v-model="isOpen" @_save="_save" :title="modalTitle">
       <div class="card">
         <Tabs value="0">
           <TabList>
@@ -376,6 +376,7 @@ const selectedCity = ref();
 let loading = ref(true);
 const imagesInput = ref(null);
 const confirm = useConfirm();
+const saveLoading = ref(false);
 const results = ref([]);
 const cities = ref([
   { name: "New York", code: "NY" },
@@ -697,13 +698,13 @@ const _save = async () => {
           : null,
       },
     };
-
+    saveLoading.value = true;
     await useApi("/v1/driver/vehicle", {
       method: "POST",
       body: formDataToSend,
-    });
-
-    isOpen.value = false;
+    }).then(()=>{
+      saveLoading.value = false;
+      isOpen.value = false;
     getVihicle();
 
     toast.add({
@@ -712,6 +713,17 @@ const _save = async () => {
       detail: "Malumotlar saqlandi",
       life: 3000,
     });
+    }).catch(()=>{
+      saveLoading.value = false;
+      toast.add({
+      severity: "error",
+      summary: "Xəta",
+      detail: "Serverda xatolik",
+      life: 3000,
+    });
+    });
+
+    
   } catch (error) {
     // toast.add({
     //   severity: "error",
