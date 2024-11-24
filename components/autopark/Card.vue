@@ -18,7 +18,7 @@
         </div>
         <div>
           <div>
-            <span class="font-bold text-lg">{{ cardData.document.model }}</span>
+            <span class="font-bold text-lg">{{ cardData?.document?.model }}</span>
             <span class="text-gray-400 ml-1">01 601 BGA</span>
           </div>
           <p class="text-gray-400">
