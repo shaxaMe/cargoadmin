@@ -14,7 +14,7 @@
         </p> -->
         <p class="line-clamp-1">{{ setKeys(item.locations, "from") }}</p>
       </div>
-      <p class="text-gray-500 text-xs mt-1">
+      <p class="text-gray-500 text-xs mt-1 ">
         {{ item.departure_date.split("-").reverse().join("-") }}
       </p>
     </div>
@@ -37,7 +37,9 @@
         <Tag severity="secondary" :value="`${item.volume} ㎥`"></Tag>
       </div>
     </div>
-    
+    <div class="flex-1 flex justify-start items-center">
+       {{ carName(item.vehicle.id) }}
+    </div>
     <div class="flex gap-1 flex-1 justify-between">
       <div class="flex gap-2 items-center">
         <p class="line-clamp-1">
@@ -67,6 +69,7 @@
         </Menu>
       </div>
     </div>
+   
     <Modal
       v-model="isOpen"
       :loading="saveLoading"
@@ -531,7 +534,10 @@ const toggle = (event) => {
   // let data = menuitem.value[0];
   menuitem.value.toggle(event);
 };
-
+function carName(id){
+  let data = optionsCar.value.find(d=>d.id == id);
+  return data?.name || '';
+}
 // async function filterOptions(key) {
 //   if (key.value) {
 //     useApi(`/v1/service/yandex-suggest?text=${key.value}&results=20`).then(
@@ -783,14 +789,14 @@ function _save() {
 watch(
   () => isOpen.value,
   (newVal) => {
-    if (newVal) {
-      useApi("/v1/driver/vehicles").then((res) => {
-        optionsCar.value = res.results.map((d) => ({
-          id: d.id,
-          name: d?.document?.model,
-        }));
-      });
-    }
+    // if (newVal) {
+    //   useApi("/v1/driver/vehicles").then((res) => {
+    //     optionsCar.value = res.results.map((d) => ({
+    //       id: d.id,
+    //       name: d?.document?.license_plate,
+    //     }));
+    //   });
+    // }
     if(!newVal){
       for(let i in formData){
         formData[i] = null;
@@ -809,6 +815,14 @@ watch(
     }
   }
 );
+onMounted(()=>{
+  useApi("/v1/driver/vehicles").then((res) => {
+        optionsCar.value = res.results.map((d) => ({
+          id: d.id,
+          name: d?.document?.license_plate,
+        }));
+      });
+})
 </script>
 
 <style lang="scss" scoped></style>
