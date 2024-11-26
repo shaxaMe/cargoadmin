@@ -25,8 +25,8 @@
             <p class="text-sm text-gray-400 flex-1">Қаердан</p>
             <p class="text-sm text-gray-400 flex-1">Қаерга</p>
             <p class="text-sm text-gray-400 flex-1">Қўшимча маълумот</p>
+            <p class="text-sm text-gray-400 flex-1">Автомобил рақами</p> 
             <p class="text-sm text-gray-400 flex-1">Сумма</p>
-            <!-- <p class="text-sm text-gray-400">ОТВЕТСТВЕННЫЙ</p> -->
           </div>
           <div v-for="(item, i) in application">
             <AwayCard :item="item" @_update="getApplications" @_dalete="requireConfirmation" class="my-1" />
