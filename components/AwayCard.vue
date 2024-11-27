@@ -46,9 +46,9 @@
           {{ item.price }}
         </p>
       </div>
-      <div class="flex cursor-pointer bg-slate-100 rounded-xl px-2 py-1 max-w-[160px] text-center text-xs items-center">
+      <nuxt-link :to="{ path: '/cargosearch', query: setQuery(item) }" class="flex cursor-pointer bg-slate-100 rounded-xl px-2 py-1 max-w-[160px] text-center text-xs items-center">
       10 ta mos yuk topildi
-    </div>
+    </nuxt-link>
       <div class="card flex justify-center">
         <Button
           type="button"
@@ -534,6 +534,17 @@ const toggle = (event) => {
   // let data = menuitem.value[0];
   menuitem.value.toggle(event);
 };
+function setQuery(item){
+  console.log(item);
+  let obj = {
+    departure_date:item.departure_date,
+    // from_volume:item.from_volume,
+    from_volume: item.volume,
+    // to_weight: item.to_weight,
+    from_weight: item.weight,
+  }
+  return obj;
+}
 function carName(id){
   let data = optionsCar.value.find(d=>d.id == id);
   return data?.name || '';
