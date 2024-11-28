@@ -13,6 +13,7 @@ const {setUser,user} = auth;
 const isAddDoc = ref(false);
 const docsSaveId = ref(null);
 const IsDocSaves = ref(false);
+const isEditProfile = ref(false);
 const docsSaveData = ref({
   serial:null,
   expired_date:null,
@@ -57,7 +58,7 @@ const imgUrls = reactive({
   },
 });
 const formValues = reactive({});
-const passport_main_file = ref(null);
+const editValues = reactive(formValues);
 const docs_save_old = ref(null);
 const docs_save_back = ref(null);
 
@@ -148,55 +149,7 @@ function isValidFuragoMediaUrl(url) {
     const baseUrl = "http://api.furago.uz/media";
     return url.includes(baseUrl);
 }
-function saveEditProfile(editedType) {
-  let id = null;
-   let data = {}
-     if(editedType === 'passport'){
-       id=passportData.id;
-       data.serial=passportData.serial.replaceAll(" ", "");
-       !!isValidFuragoMediaUrl(imgUrls.passport_main_file.url)?"":data.main_file=imgUrls.passport_main_file.base64;
-       !!isValidFuragoMediaUrl(imgUrls.passport_back_file.url)?"":data.back_file=imgUrls.passport_back_file.base64;
-       data.type='passport';
-       data.given_date=passportData.given_date? timeFormatter(passportData.given_date) : '';
-       data.expired_date=passportData.expired_date? timeFormatter(passportData.expired_date) : '';
-     }
-     else if(editedType === 'driver_license'){
-      id  = driver_pass.id
-       data.serial=driver_pass.serial.replaceAll(" ", "");
-       !!isValidFuragoMediaUrl(imgUrls.driver_license_front_file.url)?"":data.main_file=imgUrls.driver_license_front_file.base64;
-       isValidFuragoMediaUrl(imgUrls.driver_license_back_file.url)?"":data.back_file=imgUrls.driver_license_back_file.base64;
-       data.type='driver_passport';
-       data.driving_license_category=driver_pass.driving_license_category;
-       data.given_date=driver_pass.given_date? timeFormatter(driver_pass.given_date) : '';
-       data.expired_date=driver_pass.expired_date? timeFormatter(driver_pass.expired_date) : '';
-     }
-     else if(editedType === 'foreign_passport'){
-       data.serial=foreginpassportData.serial.replaceAll(" ", "");
-       isValidFuragoMediaUrl(imgUrls.foreginpassport_main_file.url)?"":data.main_file=imgUrls.foreginpassport_main_file.base64;
-       isValidFuragoMediaUrl(imgUrls.foreginpassport_back_file.url)?"":data.back_file=imgUrls.foreginpassport_back_file.base64;
-       data.type='foreign_passport';
-       data.given_date=foreginpassportData.given_date? timeFormatter(foreginpassportData.given_date) : '';
-       data.expired_date=foreginpassportData.expired_date? timeFormatter(foreginpassportData.expired_date) : '';
-       id = foreginpassportData.id
-     }
-     data.user=auth.user.id;
-     useApi(`v1/user/document/${id}`, { method: "PUT", body: JSON.stringify(data) }).then((response) => {
-      getUserDocuments();
-      toast.add({
-        severity: "success",
-        summary: "Muvaffaqiyatli",
-        detail: "Malumotlar saqlandi",
-        life: 3000,
-      });
-     }).catch((error) => {
-      toast.add({
-        severity: "error",
-        summary: "Xatolik",
-        detail: 'Qayta urinib kuring',
-        life: 3000,
-      });
-     })
-}
+
 
 function userDocsNames(type){
   let obj = {
@@ -280,6 +233,25 @@ function saveProfile(){
      })
   }
 }
+function saveEditProfile(){
+  let data = {
+    full_name:editValues.full_name,
+    phone:formatNum(editValues.phone, " ").substr(1)
+  }
+  useApi(`/v1/user/info`,{
+    method: "PATCH",
+    body: JSON.stringify(data),
+  }).then(()=>{
+    toast.add({
+      severity: "success",
+      summary: "Muvaffaqiyatli",
+      detail: "Malumotlar o'zgartirildi",
+      life: 3000,
+    });
+    isEditProfile.value = false;
+    getUserProfile();
+  })
+}
 function resetFields(){
   for(let i in docsSaveData.value){
     docsSaveData.value[i] = ''
@@ -288,6 +260,12 @@ function resetFields(){
   imgUrls.docs_save_back.url = '';
     imgUrls.docs_save_old.url = '';
     isDocEdit.value = false;
+}
+
+function _focus() {
+  if (!editValues.phone) {
+    editValues.phone = "+998 ";
+  }
 }
 //actins
 
@@ -357,7 +335,7 @@ watch(()=>isAddDoc.value,(newVal)=>{
         </div>
         
       </div>
-      <div class="flex justify-start gap-1 items-center text-blue-600 cursor-pointer">
+      <div class="flex justify-start gap-1 items-center text-blue-600 cursor-pointer" @click="isEditProfile=true">
         <Icon name="line-md:edit" class="w-5 h-5" />
         <p class="underline text-blue-600 hover:text-blue-800">O'zgartirish</p>
       </div>
@@ -560,6 +538,32 @@ watch(()=>isAddDoc.value,(newVal)=>{
             </div>
           </button>
         </div>
+      </div>
+    </Modal>
+    <Modal v-model="isEditProfile" title="Profilni o'zgartirish" maxWidth="400px" @_save="saveEditProfile">
+      <div
+        class="form-container w-full grid grid-cols-1 mt-5 items-stretch gap-5"
+      >
+        <FloatLabel variant="on">
+          <InputText
+            class="w-full h-full min-h-[40px]"
+            id="full_name"
+            v-model="editValues.full_name"
+          />
+          <label for="full_name">Foydalanuvchi nomi</label>
+        </FloatLabel>
+        <FloatLabel variant="on" class="w-full">
+          <InputText
+            type="tel"
+            class="w-full"
+            @focus="_focus"
+            v-mask="'+998 ## ### ## ##'"
+            id="phone_num"
+            pattern="[0-9]*"
+            v-model="editValues.phone"
+          />
+          <label for="phone_num">Telefon raqam</label>
+        </FloatLabel>
       </div>
     </Modal>
   </div>

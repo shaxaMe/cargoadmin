@@ -5,7 +5,7 @@
         <div class="p-4">
           <h2 class="text-lg font-semibold mb-4">Список грузов</h2>
           <!-- Список грузов -->
-          <div class="space-y-3">
+          <div class="space-y-3 max-h-[80dvh] overflow-x-auto">
             <div v-if="!loading && cargoList && cargoList.length>0" v-for="cargo in cargoList" 
                  :key="cargo.id" 
                  @click="selectCargo(cargo)"
@@ -114,7 +114,7 @@
           <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
             <div class="bg-white rounded-lg shadow-sm p-4 h-full">
               <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
-              <div class="space-y-4 h-[calc(100%-8rem)] overflow-y-auto">
+              <div class="space-y-4 h-[50dvh] overflow-y-auto">
                 <div v-for="(message, index) in chatMessages" 
                      :key="index"
                      :class="['flex', message.isOwner ? 'justify-start' : 'justify-end']">
