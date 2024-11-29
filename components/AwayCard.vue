@@ -37,17 +37,17 @@
         <Tag severity="secondary" :value="`${item.volume} ㎥`"></Tag>
       </div>
     </div>
-    <div class="flex-1 flex justify-start items-center">
+    <div class="flex-1 flex justify-start items-center" v-if="user.role != 'USER'">
        {{ carName(item.vehicle.id) }}
     </div>
     <div class="flex gap-1 flex-1 justify-between">
-      <div class="flex gap-2 items-center">
+      <div class="flex gap-3 items-center">
         <p class="line-clamp-1">
           {{ item.price }}
         </p>
       </div>
       <nuxt-link :to="{ path: '/cargosearch', query: setQuery(item) }" class="flex cursor-pointer bg-slate-100 rounded-xl px-2 py-1 max-w-[160px] text-center text-xs items-center">
-      10 ta mos yuk topildi
+      {{ user.role == "DRIVER"?"10 ta mos yuk topildi":"10 ta mos mashina topildi"  }}
     </nuxt-link>
       <div class="card flex justify-center">
         <Button
@@ -537,11 +537,11 @@ const toggle = (event) => {
 function setQuery(item){
   console.log(item);
   let obj = {
-    departure_date:item.departure_date,
+    vehicle_application_id:item.id,
     // from_volume:item.from_volume,
-    from_volume: item.volume,
-    // to_weight: item.to_weight,
-    from_weight: item.weight,
+    // from_volume: item.volume,
+    // // to_weight: item.to_weight,
+    // from_weight: item.weight,
   }
   return obj;
 }
