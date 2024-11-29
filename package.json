@@ -17,6 +17,7 @@
     "@primevue/themes": "^4.1.1",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
+    "centrifuge": "^5.2.2",
     "date-fns": "^4.1.0",
     "flowbite": "^2.5.2",
     "nuxt": "^3.13.0",

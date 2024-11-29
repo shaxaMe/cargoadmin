@@ -25,7 +25,7 @@
             <p class="text-sm text-gray-400 flex-1">Қаердан</p>
             <p class="text-sm text-gray-400 flex-1">Қаерга</p>
             <p class="text-sm text-gray-400 flex-1">Қўшимча маълумот</p>
-            <p class="text-sm text-gray-400 flex-1">Автомобил рақами</p> 
+            <p class="text-sm text-gray-400 flex-1" v-if="user.role != 'USER'">Автомобил рақами</p> 
             <p class="text-sm text-gray-400 flex-1">Сумма</p>
           </div>
           <div v-for="(item, i) in application">
