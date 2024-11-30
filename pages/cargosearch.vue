@@ -267,7 +267,7 @@ const toast = useToast();
     //   }
     // ]
     loading.value = true;
-    useApi('/v1/driver/vehicle-applications/filter',{
+    useApi('v1/cargo/applications/driver/filter',{
         params:route.query
     }).then((res)=>{
         cargoList.value = res.results;
@@ -296,7 +296,6 @@ const toast = useToast();
         isOwner: true
       }
     ]
-    console.log(route.query)
   })
   
   // Методы
