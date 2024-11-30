@@ -2,74 +2,128 @@
   <div
     class="flex justify-between bg-white shadow-md px-4 py-3 gap-4 rounded-md"
   >
-    <div class="flex flex-col gap-1 flex-1 w-fit">
-      <div class="flex gap-2 items-center">
-        <!-- <p
-          class="p-1 rounded-md bg-gray-200 text-gray-500 flex items-center gap-1"
-        >
-          <Icon name="twemoji:flag-russia" size="1.2em" /><span
-            class="text-[.9em]"
-            >Ru</span
-          >
-        </p> -->
-        <p class="line-clamp-1">{{ setKeys(item.locations, "from") }}</p>
-      </div>
-      <p class="text-gray-500 text-xs mt-1 ">
-        {{ item.departure_date.split("-").reverse().join("-") }}
-      </p>
-    </div>
-    <div class="flex flex-col gap-1 flex-1 w-fit">
-      <div class="flex gap-2 items-center">
-        <!-- <p
-          class="p-1 rounded-md bg-gray-200 text-gray-500 flex items-center gap-1"
-        >
-          <Icon name="twemoji:flag-russia" size="1.2em" /><span
-            class="text-[.9em]"
-            >Ru</span
-          >
-        </p> -->
-        <p class="line-clamp-1">{{ setKeys(item.locations, "to") }}</p>
-      </div>
-    </div>
-    <div class="flex flex-col justify-start items-start gap-1 flex-1">
-      <div class="flex gap-2 items-center flex-wrap">
-        <Tag severity="secondary" :value="`${item.weight} t`"></Tag>
-        <Tag severity="secondary" :value="`${item.volume} ㎥`"></Tag>
-      </div>
-    </div>
-    <div class="flex-1 flex justify-start items-center" v-if="user.role != 'USER'">
-       {{ carName(item.vehicle.id) }}
-    </div>
-    <div class="flex gap-1 flex-1 justify-between">
-      <div class="flex gap-3 items-center">
-        <p class="line-clamp-1">
-          {{ item.price }}
-        </p>
-      </div>
-      <nuxt-link :to="{ path: '/cargosearch', query: setQuery(item) }" class="flex cursor-pointer bg-slate-100 rounded-xl px-2 py-1 max-w-[160px] text-center text-xs items-center">
-      {{ user.role == "DRIVER"?"10 ta mos yuk topildi":"10 ta mos mashina topildi"  }}
-    </nuxt-link>
-      <div class="card flex justify-center">
-        <Button
-          type="button"
-          icon="pi pi-ellipsis-v"
-          @click="toggle"
-          class="!bg-transparent !border-none !text-gray-400"
-          aria-haspopup="true"
-          aria-controls="card_option"
-        />
-        <!-- <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" /> -->
-        <Menu ref="menuitem" id="card_option" :model="items" :popup="true">
-          <template #item="{ item, props }">
-            <div class="flex items-center justify-start gap-1 px-4 py-1">
-              <Icon :name="item.icon" />
-              <span class="ml-2">{{ item.label }}</span>
+        <div class="w-full">
+          <div class="flex flex-col space-y-3">
+            <!-- Верхняя часть -->
+            <div class="flex items-start justify-between">
+              <!-- Маршрут и статус -->
+              <div class="flex items-center space-x-3 min-w-0">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                  <Icon name="fa6-solid:truck-moving" class="text-blue-600" />
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-lg font-medium text-gray-900 truncate max-w-md">
+                      {{ setKeys(item.locations, "from") }} → {{ setKeys(item.locations, "to") }}
+                    </h3>
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                      >
+                     new
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-500">
+                    ID: {{ item.id }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Действия -->
+              <div class="flex items-center space-x-1">
+                <button
+                  @click="getEditData(cargo)"
+                  class="p-2 w-10 h-10 text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200"
+                  title="Редактировать"
+                >
+                  <Icon name="material-symbols-light:edit-rounded" size="20px" />
+                </button>
+                <button
+                  @click="$emit('_dalete',item.id)"
+                  class="p-2 w-10 h-10 text-red-600 hover:bg-red-50 rounded-full transition-colors duration-200"
+                  title="Удалить"
+                >
+                  <Icon name="material-symbols:delete" size="20px" />
+                </button>
+              </div>
             </div>
-          </template>
-        </Menu>
-      </div>
-    </div>
-   
+
+            <!-- Основная информация -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-gray-100">
+              <!-- Даты -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-5">
+                  <i class="fas fa-calendar-alt text-gray-400"></i>
+                </div>
+                <div class="text-sm">
+                  <div class="text-gray-900">Загрузка</div>
+                  <div class="text-gray-500">{{ item.departure_date.split("-").reverse().join("-") }}</div>
+                  <div class="text-gray-900 mt-1">Выгрузка</div>
+                  <!-- <div class="text-gray-500">{{ formatDate(cargo.unloadingDate) }}</div> -->
+                </div>
+              </div>
+
+              <!-- Характеристики -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-5">
+                  <i class="fas fa-weight-hanging text-gray-400"></i>
+                </div>
+                <div class="text-sm">
+                  <div class="flex items-baseline space-x-2">
+                    <span class="text-gray-500">Вес:</span>
+                    <span class="text-gray-900 font-medium">{{ item.weight }} кг</span>
+                  </div>
+                  <div class="flex items-baseline space-x-2">
+                    <span class="text-gray-500">Объем:</span>
+                    <span class="text-gray-900 font-medium">{{ item.volume }} м³</span>
+                  </div>
+                  <div class="flex items-baseline space-x-2 mt-1">
+                    <span class="text-gray-500">Машин:</span>
+                    <span class="text-gray-900 font-medium">{{ carName(item.vehicle.id) }} </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Тип и цена -->
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-5">
+                  <i class="fas fa-box text-gray-400"></i>
+                </div>
+                <div class="text-sm">
+                  <!-- <div class="mb-2">
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                      :class="getCargoTypeClass(cargo.cargoType)">
+                      {{ getCargoTypeName(cargo.cargoType) }}
+                    </span>
+                  </div> -->
+                  <div class="flex items-baseline space-x-2 mt-1">
+                    <span class="text-gray-500">Price:</span>
+                    <span class="text-gray-900 font-medium">{{ item.price }} </span>
+                  </div>
+                  
+                </div>
+              </div>
+              <div class="flex items-baseline space-x-2 mt-1">
+                <nuxt-link :to="{ path: '/cargosearch', query: setQuery(item) }" class="flex cursor-pointer bg-slate-100 rounded-xl px-4 py-3 max-w-[160px] text-center text-xs items-center">
+      {{ user.role == "DRIVER"?`${item.cargo_count} ta mos yuk topildi`:`${item.cargo_count} ta mos mashina topildi`  }}
+    </nuxt-link>
+                  </div>
+              <!-- Контактная информация -->
+              <div class="flex items-start space-x-3" v-if="1==2">
+                <div class="flex-shrink-0 w-5">
+                  <i class="fas fa-user text-gray-400"></i>
+                </div>
+                <div class="text-sm">
+                  <div class="text-gray-900">{{ cargo.contactPerson }}</div>
+                  <div class="text-gray-500">{{ cargo.contactPhone }}</div>
+                  <div v-if="cargo.notes" class="mt-1 text-gray-500 italic">
+                    {{ cargo.notes }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <!-- Сообщение, если нет грузов -->
     <Modal
       v-model="isOpen"
       :loading="saveLoading"
@@ -207,32 +261,6 @@
             <InputGroupAddon>м³</InputGroupAddon>
           </InputGroup>
         </div>
-        <!-- <div class="flex-1 relative grid gap-2 grid-cols-4">
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Vazni</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Vazni (gacha)</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Hajmi</label>
-            </FloatLabel>
-          </InputGroup>
-          <InputGroup>
-            <FloatLabel variant="on">
-              <InputText id="username" v-model="value" />
-              <label for="username">Hajmi(gacha)</label>
-            </FloatLabel>
-          </InputGroup>
-        </div> -->
       </div>
     </Modal>
     <Modal :loading="saveLoading" v-model="isOpen" @_save="_saveUserAway" :title="modalTitle" v-else>
@@ -445,6 +473,7 @@ import { useAuth } from "~/store/auth";
 import { useOption } from "../store/option";
 const props = defineProps({
   item: { type: Object, required: true },
+  optionsCar: { type: Array, required: true },
 });
 const saveLoading = ref(false);
 const { options } = useOption();
@@ -458,7 +487,6 @@ const fromCoord = ref([]);
 const toCoord = ref([]);
 const isOpen = ref(false);
 const menuitem = ref(null);
-const optionsCar = ref([]);
 const formData = reactive({
   weight: null,
   volume: null,
@@ -546,7 +574,7 @@ function setQuery(item){
   return obj;
 }
 function carName(id){
-  let data = optionsCar.value.find(d=>d.id == id);
+  let data = props.optionsCar.find(d=>d.id == id);
   return data?.name || '';
 }
 // async function filterOptions(key) {
@@ -827,12 +855,7 @@ watch(
   }
 );
 onMounted(()=>{
-  useApi("/v1/driver/vehicles").then((res) => {
-        optionsCar.value = res.results.map((d) => ({
-          id: d.id,
-          name: d?.document?.license_plate,
-        }));
-      });
+  
 })
 </script>
 

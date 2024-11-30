@@ -20,16 +20,16 @@
         <!-- <h1 class="text-2xl font-semibold">
               найти подхонашиые и выгодны грузы
             </h1> -->
-        <div class="flex justify-between flex-col gap-1 px-3 py-4">
-          <div class="flex justify-between">
+        <div class="grid grid-cols-1 gap-3 px-3 py-4">
+          <!-- <div class="flex justify-between">
             <p class="text-sm text-gray-400 flex-1">Қаердан</p>
             <p class="text-sm text-gray-400 flex-1">Қаерга</p>
             <p class="text-sm text-gray-400 flex-1">Қўшимча маълумот</p>
             <p class="text-sm text-gray-400 flex-1" v-if="user.role != 'USER'">Автомобил рақами</p> 
             <p class="text-sm text-gray-400 flex-1">Сумма</p>
-          </div>
-          <div v-for="(item, i) in application">
-            <AwayCard :item="item" @_update="getApplications" @_dalete="requireConfirmation" class="my-1" />
+          </div> -->
+          <div v-for="(item, i) in application" >
+            <AwayCard :item="item" @_update="getApplications" @_dalete="requireConfirmation" class="my-1" :optionsCar="optionsCar" />
           </div>
         </div>
       </div>
@@ -736,6 +736,12 @@ function getApplications() {
 onMounted(() => {
   getDatas();
   getApplications();
+  useApi("/v1/driver/vehicles").then((res) => {
+        optionsCar.value = res.results.map((d) => ({
+          id: d.id,
+          name: d.document.model,
+        }));
+      });
 });
 watch(
   () => isOpen.value,
@@ -743,12 +749,6 @@ watch(
     if (newVal) {
       formData.currency = options.currency[0]['id'];
       userAway.currency = options.currency[0]['id'];
-      useApi("/v1/driver/vehicles").then((res) => {
-        optionsCar.value = res.results.map((d) => ({
-          id: d.id,
-          name: d.document.model,
-        }));
-      });
     }
     if(!newVal){
       for(let i in formData){
