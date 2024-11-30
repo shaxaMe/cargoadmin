@@ -20,7 +20,7 @@ export const useChatStore = defineStore('chat', {
             const { user, token } = authStore
             if(token){
                 this.chatClient = new Centrifuge("wss://centrifugo.furago.uz/centrifugo/connection/websocket", {
-                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM3MjIiLCJleHAiOjE3MzM1NjgxMDcsImlhdCI6MTczMjk2MzMwN30.VuhdarXx4mLwzDnYwY7MxWfPLJtdxeTceNyNMml6zbk",
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZW50cmlmdWdvX2NsaWVudCIsIm5hbWUiOiJjZW50cmlmdWdvX2NsaWVudCIsImlhdCI6MTUxNjIzOTAyMn0.cZ18MklqgFvfF0pIF19-8LMdwWS3_RTrM7C3t0BNOUA",
                     resubscribe: true,
                     debug: true, // Enable debug logs
                 });

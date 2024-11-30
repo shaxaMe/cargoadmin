@@ -148,10 +148,10 @@
           <!-- Кнопки действий -->
           <div class="p-6 bg-white border-t border-gray-200">
             <div class="flex justify-end gap-4">
-              <button @click="takeCargo"
+              <!-- <button @click="takeCargo"
                       class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                 Забрать груз
-              </button>
+              </button> -->
               <button @click="confirmCargo"
                       class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                 Подтвердить
@@ -168,12 +168,15 @@
           </div>
         </div>
       </div>
+      <Toast />
+      <ConfirmDialog></ConfirmDialog>
     </div>
   </template>
   
   <script setup>
  // import { formatDate, formatPrice, getStatusClass, getStatusName } from '../utils/formatters'
-  
+ import { useConfirm } from "primevue/useconfirm";
+ import { useToast } from "primevue/usetoast";
   // Состояние
   const cargoList = ref([])
   const selectedCargo = ref(null)
@@ -181,6 +184,8 @@
   const newMessage = ref('');
   const loading = ref(true);
   const route = useRoute();
+  const confirm = useConfirm();
+const toast = useToast();
   // Загрузка данных
   onMounted(async () => {
     // TODO: Загрузка списка грузов с сервера
@@ -330,7 +335,34 @@
   }
   const confirmCargo = () => {
     // TODO: Реализовать логику подтверждения
-    console.log('Подтвердить груз:', selectedCargo.value.id)
+    confirm.require({
+        message: 'Siz rostan ham yukni qabul qilasizmi?',
+        header: 'tasdiqlash',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Yo\'q',
+            severity: 'Ha',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Save'
+        },
+        accept: () => {
+          useApi(`/v1/order/update/${selectedCargo.value.id}`,{
+      method: 'PATCH',
+      data: {
+        status: 'created'
+      }
+    }).then(()=>{
+      toast.add({ severity: 'success', summary: 'Muvaffaqiyatli', detail: 'Yuk qabul qilindi', life: 3000 });
+    })
+            
+        },
+        reject: () => {
+            // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+    
   }
   </script>
   
