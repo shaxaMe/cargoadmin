@@ -19,12 +19,26 @@ export const useChatStore = defineStore('chat', {
             const authStore = useAuth()
             const { user, token } = authStore
             if(token){
-                this.chatClient = new Centrifuge("wss://centrifugo.furago.uz/connection/websocket",
-                {
-                    token: "17ac3f42-593f-4265-9c12-4665c6fbbdbg",
-                    resubscribe: true
+                this.chatClient = new Centrifuge("wss://centrifugo.furago.uz/centrifugo/connection/websocket", {
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM3MjIiLCJleHAiOjE3MzM1NjgxMDcsImlhdCI6MTczMjk2MzMwN30.VuhdarXx4mLwzDnYwY7MxWfPLJtdxeTceNyNMml6zbk",
+                    resubscribe: true,
+                    debug: true, // Enable debug logs
                 });
+                
+                this.chatClient.on('connect', (context) => {
+                    console.log('Connected:', context);
+                });
+                
+                this.chatClient.on('disconnect', (context) => {
+                    console.error('Disconnected:', context);
+                });
+                
+                this.chatClient.on('error', (error) => {
+                    console.error('Error:', error);
+                });
+                
                 this.chatClient.connect();
+                
                 let tin = null
                 if (user.org_id) {
                     tin = user.org_id

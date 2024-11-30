@@ -316,7 +316,6 @@
     console.log('Забрать груз:', selectedCargo.value.id)
   }
   function setNamesFlags(direction,item){
-    console.log(item[0])
     let cargo = null;
     if(item && item.length > 0){
       cargo =loading.value == false?item.find(loc=>loc.direction == direction):''
