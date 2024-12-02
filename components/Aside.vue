@@ -102,6 +102,13 @@
             <span> Mashinalar </span>
           </div>
         </nuxt-link>
+        <nuxt-link :to="localePath('/orders')" class="cursor-pointer group relative w-full gap-3 flex justify-start">
+          <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
+          <div class="flex items-center gap-2 ml-3 trans-custom text-white text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
+            <Icon size="18px" name="material-symbols-light:remove-shopping-cart" />
+            <span> Buyurtmalar </span>
+          </div>
+        </nuxt-link>
         <!-- <div class="cursor-pointer group relative w-full gap-3 flex justify-start">
           <span class="absolute -left-2 top-0 trans-custom  h-full rounded-xl opacity-0 group-hover:opacity-100 group-hover:bg-[#4880FF] w-1"></span>
           <div class="flex items-center gap-2 ml-3 trans-custom text-white text-base py-2 px-5 rounded-xl group-hover:text-white group-hover:bg-[#4880FF] flex-1">
