@@ -77,7 +77,7 @@
                   </div>
                   <div class="flex items-baseline space-x-2 mt-1">
                     <span class="text-gray-500">Машин:</span>
-                    <span class="text-gray-900 font-medium">{{ carName(item.vehicle.id) }} </span>
+                    <span class="text-gray-900 font-medium">{{ user.role == 'DRIVER'?carName(item.vehicle.id):item.vehicle_quantity }} </span>
                   </div>
                 </div>
               </div>
@@ -103,7 +103,7 @@
               </div>
               <div class="flex items-baseline space-x-2 mt-1">
                 <nuxt-link :to="{ path: '/cargosearch', query: setQuery(item) }" class="flex cursor-pointer bg-slate-100 rounded-xl px-4 py-3 max-w-[160px] text-center text-xs items-center">
-      {{ user.role == "DRIVER"?`${item.cargo_count} ta mos yuk topildi`:`${item.cargo_count} ta mos mashina topildi`  }}
+      {{ user.role == "DRIVER"?`${item.cargo_count??0} ta mos yuk topildi`:`${item.vehicle_count??0} ta mos mashina topildi`  }}
     </nuxt-link>
                   </div>
               <!-- Контактная информация -->
@@ -563,13 +563,18 @@ const toggle = (event) => {
   menuitem.value.toggle(event);
 };
 function setQuery(item){
-  console.log(item);
   let obj = {
     vehicle_application_id:item.id,
+    cargo_application_id:item.id,
     // from_volume:item.from_volume,
     // from_volume: item.volume,
     // // to_weight: item.to_weight,
     // from_weight: item.weight,
+  }
+  if(user.role == 'USER'){
+    delete obj.vehicle_application_id
+  }else{
+    delete obj.cargo_application_id
   }
   return obj;
 }
@@ -854,9 +859,7 @@ watch(
     }
   }
 );
-onMounted(()=>{
-  
-})
+
 </script>
 
 <style lang="scss" scoped></style>

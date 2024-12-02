@@ -696,6 +696,7 @@ function getApplications() {
         price: item.price,
         from_radius: item.from_radius,
         to_radius: item.to_radius,
+        vehicle_count: item.vehicle_count,
         locations: [
           {
             id: item.id * 10 + 1, // location ID o'ylab berilmoqda

@@ -28,14 +28,6 @@
     </div>
     <Modal :loading="saveLoading" v-model="isOpen" @_save="_save" :title="modalTitle">
       <div class="card">
-        <Tabs value="0">
-          <TabList>
-            <Tab value="0">Основная информация</Tab>
-            <Tab value="1">Тех. паспорт</Tab>
-            <Tab value="2">Transport rasmlari</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel value="0">
               <div
                 class="flex items-center mt-3 max-lg:flex-wrap gap-5 max-md:grid max-md:grid-cols-1"
               >
@@ -113,8 +105,6 @@
                   />
                 </div>
               </div>
-            </TabPanel>
-            <TabPanel value="1">
               <div class="mt-3">
                 <!-- <h1 class="p-dialog-title">Texnik xarakteristikalar</h1> -->
                 <div
@@ -292,8 +282,6 @@
                   </div>
                 </div>
               </div>
-            </TabPanel>
-            <TabPanel value="2">
               <div class="my-3">
                 <label class="font-semibold my-2">Transport rasmlari</label>
                 <div
@@ -339,9 +327,6 @@
                   </div>
                 </div>
               </div>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
       </div>
     </Modal>
     <div
