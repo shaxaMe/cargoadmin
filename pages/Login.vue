@@ -1,6 +1,4 @@
 <script setup>
-import { useAuth } from "~/store/auth";
-import { useToast } from "primevue/usetoast";
 import AuthImg from "~/assets/images/auth-img.png";
 import Logo from "../public/FG1.png"
 definePageMeta({
@@ -8,8 +6,6 @@ definePageMeta({
 });
 
 //data
-const user_type = ref("");
-const isNext = ref(false);
 
 
 //methods
@@ -69,7 +65,7 @@ const isNext = ref(false);
             </button>
        </div>
     </div> -->
-    <div class="bg-white w-full min-w-[35dvw] max-lg:min-w-[95dvw] rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[650px]">
+    <div class="bg-white w-full min-w-[30dvw] max-lg:min-w-[95dvw] rounded-2xl p-6 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] max-w-[550px]">
       <LoginUser />
       <!-- <LoginAdmin v-if="!!isNext && user_type=='admin'"  /> -->
     </div>
