@@ -472,7 +472,7 @@ const confirmCargo = () => {
         data.price = selectedCargo.value.price;
         data.vehicle = route.query.vehicle_id;
       }else{
-        data.driver = selectedCargo.value.main_driver.id,
+        data.driver = selectedCargo.value.main_driver.id;
         data.owner = user.id;
         data.price = selectedCargo.value.price;
         data.vehicle = selectedCargo.value.vehicle.id;
