@@ -76,9 +76,7 @@
                   <div>
                     <div class="text-sm text-gray-500">Куда</div>
                     <div class="font-medium">
-                      {{
-                        setNamesFlags("to", selectedCargo.locations)["flag"]
-                      }}
+                      {{ setNamesFlags("to", selectedCargo.locations)["flag"] }}
                       {{ setNamesFlags("to", selectedCargo.locations)["name"] }}
                     </div>
                   </div>
@@ -121,13 +119,21 @@
                 <div>
                   <div class="text-sm text-gray-500">Контактное лицо</div>
                   <div class="font-medium">
-                    {{ user.role=='USER'?selectedCargo.main_driver["full_name"]:selectedCargo.user.full_name }}
+                    {{
+                      user.role == "USER"
+                        ? selectedCargo.main_driver["full_name"]
+                        : selectedCargo.user.full_name
+                    }}
                   </div>
                 </div>
                 <div>
                   <div class="text-sm text-gray-500">Телефон</div>
                   <div class="font-medium">
-                    +{{ user.role=='USER'?selectedCargo.main_driver["phone"]:selectedCargo.user.phone }}
+                    +{{
+                      user.role == "USER"
+                        ? selectedCargo.main_driver["phone"]
+                        : selectedCargo.user.phone
+                    }}
                   </div>
                 </div>
                 <div v-if="selectedCargo.notes">
@@ -366,31 +372,29 @@ function getApplications() {
   useApi(url, {
     params: route.query,
   }).then((res) => {
-
     if (user.role == "DRIVER") {
       cargoList.value = res.results.map((item) => {
-        
-          const locations = [
-            {
-              id: item.id * 10 + 1, // Unique ID creation
-              direction: "from",
-              name: item.from_name,
-              latitude: item.from_latitude,
-              longitude: item.from_longitude,
-              radius: item.from_radius,
-              country: item.from_country,
-            },
-            {
-              id: item.id * 10 + 2, // Unique ID creation
-              direction: "to",
-              name: item.to_name,
-              latitude: item.to_latitude,
-              longitude: item.to_longitude,
-              radius: item.to_radius,
-              country: item.to_country,
-            },
-          ];
-          return { ...item, locations };
+        const locations = [
+          {
+            id: item.id * 10 + 1, // Unique ID creation
+            direction: "from",
+            name: item.from_name,
+            latitude: item.from_latitude,
+            longitude: item.from_longitude,
+            radius: item.from_radius,
+            country: item.from_country,
+          },
+          {
+            id: item.id * 10 + 2, // Unique ID creation
+            direction: "to",
+            name: item.to_name,
+            latitude: item.to_latitude,
+            longitude: item.to_longitude,
+            radius: item.to_radius,
+            country: item.to_country,
+          },
+        ];
+        return { ...item, locations };
       });
     } else {
       cargoList.value = res.results;
@@ -454,11 +458,30 @@ const confirmCargo = () => {
       label: "Save",
     },
     accept: () => {
-      useApi(`/v1/order/update/${selectedCargo.value.id}`, {
-        method: "PATCH",
-        data: {
-          status: "created",
-        },
+      let data = {
+        vehicle_application: route.query.vehicle_application_id,
+        cargo_application: selectedCargo.value.id,
+        driver: null,
+        owner: null,
+        price: null,
+        vehicle: null,
+      };
+      if(user.role == "DRIVER"){
+        data.driver = user.id;
+        data.owner = selectedCargo.value.user.id;
+        data.price = selectedCargo.value.price;
+        data.vehicle = route.query.vehicle_id;
+      }else{
+        data.driver = selectedCargo.value.main_driver.id,
+        data.owner = user.id;
+        data.price = selectedCargo.value.price;
+        data.vehicle = selectedCargo.value.vehicle.id;
+        data.vehicle_application = selectedCargo.value.id;
+        data.cargo_application = route.query.cargo_application_id;
+      }
+      useApi(`/v1/order/create`, {
+        method: "POST",
+        body: data,
       }).then(() => {
         toast.add({
           severity: "success",

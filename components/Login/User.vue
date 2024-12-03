@@ -7,8 +7,6 @@ const toast = useToast();
 const auth = useAuth();
 const router = useRouter();
 const { setLogin, set_token, setUser } = auth;
-import AuthImg from "~/assets/images/auth-img.png";
-import { set } from "date-fns";
 definePageMeta({
   layout: "LoginLayout",
 });

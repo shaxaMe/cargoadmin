@@ -566,6 +566,7 @@ function setQuery(item){
   let obj = {
     vehicle_application_id:item.id,
     cargo_application_id:item.id,
+    vehicle_id:item.vehicle.id,
     // from_volume:item.from_volume,
     // from_volume: item.volume,
     // // to_weight: item.to_weight,
