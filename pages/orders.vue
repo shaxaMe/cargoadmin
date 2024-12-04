@@ -141,36 +141,36 @@
     loading.value = true;
     useApi('/v1/order/list').then((res)=>{
       // orders.value = res.results;
-      if (user.role == "DRIVER") {
+      // if (user.role == "DRIVER") {
         orders.value = res.results.map((item) => {
         const locations = [
           {
             id: item.id * 10 + 1, // Unique ID creation
             direction: "from",
-            name: item.from_name,
-            latitude: item.from_latitude,
-            longitude: item.from_longitude,
-            radius: item.from_radius,
-            country: item.from_country,
+            name: item.cargo_application.from_name,
+            latitude: item.cargo_application.from_latitude,
+            longitude: item.cargo_application.from_longitude,
+            radius: item.cargo_application.from_radius,
+            country: item.cargo_application.from_country,
           },
           {
             id: item.id * 10 + 2, // Unique ID creation
             direction: "to",
-            name: item.to_name,
-            latitude: item.to_latitude,
-            longitude: item.to_longitude,
-            radius: item.to_radius,
-            country: item.to_country,
+            name: item.cargo_application.to_name,
+            latitude: item.cargo_application.to_latitude,
+            longitude: item.cargo_application.to_longitude,
+            radius: item.cargo_application.to_radius,
+            country: item.cargo_application.to_country,
           },
         ];
         return { ...item, locations };
 
       });
       loading.value = false;
-    } else {
-      orders.value = res.results;
-      loading.value = false;
-    }
+    // } else {
+    //   orders.value = res.results;
+    //   loading.value = false;
+    // }
     })
   })
   </script>
