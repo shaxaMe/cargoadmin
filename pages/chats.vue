@@ -1,59 +1,373 @@
 <template>
-  <section class="w-full flex justify-center py-6 px-4 z-0">
-    <div class="bg-white w-full h-full px-5 rounded-md py-5">
-      <!-- <h1 class="text-3xl">
-        Xabarlar
-        
-      </h1> -->
-      <span
-          class="bg-gray-100 px-2 py-1 rounded-lg text-blue-500 text-sm font-bold"
-          >Xabarlar</span
-        >
-      <div class="w-full flex min-h-[70dvh] border-2 rounded-lg mt-4">
-        <div class="flex-1 max-w-[300px] border-r-2 p-2">
-          <IconField class="w-full">
-            <InputIcon class="pi pi-search" />
-            <InputText class="w-full" v-model="value1" placeholder="Search" />
-          </IconField>
-          <div class="py-2 flex flex-col gap-1 justify-start items-stretch max-h-[70dvh] overflow-y-auto">
-              <div v-for="item in 15" class="w-full flex items-center py-2 px-3 cursor-pointer group trans-custom hover:bg-[#5715B0] rounded-xl">
-                  <div class="w-10 h-10 overflow-hidden rounded-full ">
-                    <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=800" alt="">
-                  </div>
-                  <div class="flex flex-col pl-2 group-hover:text-white">
-                    <p class="text-lg">Jon Sena</p>
-                  </div>
+  <div class="flex h-screen py-3">
+    <!-- Левая панель со списком грузов -->
+    <div class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
+      <div class="px-4">
+        <h2 class="text-lg font-semibold mb-4">Список грузов</h2>
+        <!-- Список грузов -->
+        <div class="space-y-3 max-h-[80dvh] overflow-x-auto">
+          <div
+            v-if="!loading && cargoList && cargoList.length > 0"
+            v-for="cargo in cargoList"
+            :key="cargo.id"
+            @click="selectCargo(cargo)"
+            :class="[
+              'p-4 rounded-lg cursor-pointer transition-all duration-200',
+              selectedCargo?.id === cargo.id
+                ? 'bg-blue-50 border-blue-200'
+                : 'bg-gray-50 hover:bg-gray-100 border-gray-200',
+            ]"
+            class="border"
+          >
+            <!-- Краткая информация о грузе -->
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="font-medium text-gray-900">
+                  {{ cargo.id }}
+                </div>
               </div>
+            </div>
           </div>
-        </div>
-        <div class="flex-1">
-           <div class="w-full h-full flex items-center flex-col justify-center">
-                 <img src="../assets/images/empty.png" alt="empty">
-                 <div>
-                    <p>Hech qanday xabar tanlanmagan</p>
-                 </div>
-           </div>
         </div>
       </div>
     </div>
-  </section>
+
+    <!-- Правая панель с детальной информацией -->
+    <div class="flex-1 flex flex-col h-full bg-gray-50">
+      <div v-if="selectedCargo" class="h-full">
+
+        <!-- Чат -->
+        <div class="flex-1 px-6 h-full overflow-y-auto bg-gray-50">
+          <div class="bg-white rounded-lg shadow-sm p-4 h-full">
+            <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
+            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto chatContainer">
+              <div
+                v-for="(message, index) in chatMessages"
+                :key="index"
+                :class="[
+                  'flex',
+                  message.isOwner ? 'justify-end' : 'justify-start',
+                ]"
+              >
+                <div
+                  :class="[
+                    'max-w-[70%] rounded-lg p-3',
+                    message.isOwner
+                      ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900',
+                  ]"
+                >
+                  {{ message.text }}
+                  <div
+                    :class="[
+                      'text-xs mt-1',
+                      message.isOwner ? 'text-blue-100':'text-gray-500',
+                    ]"
+                  >
+                    {{ message.time }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Ввод сообщения -->
+            <div class="mt-4 flex gap-2">
+              <input
+                type="text"
+                v-model="newMessage"
+                @keyup.enter="sendMessage"
+                placeholder="Введите сообщение..."
+                class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                @click="sendMessage"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопки действий -->
+      </div>
+
+      <!-- Заглушка при отсутствии выбранного груза -->
+      <div v-else class="h-full flex items-center justify-center text-gray-500">
+        <div class="text-center">
+          <i class="fas fa-truck text-6xl mb-4"></i>
+          <p>Выберите груз из списка слева</p>
+        </div>
+      </div>
+    </div>
+    <Toast />
+    <ConfirmDialog></ConfirmDialog>
+    <div
+      v-if="loading"
+      class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center"
+    >
+      <ProgressSpinner
+        style="width: 50px; height: 50px"
+        strokeWidth="8"
+        fill="transparent"
+        animationDuration=".5s"
+        aria-label="Custom ProgressSpinner"
+      />
+    </div>
+  </div>
 </template>
-<script setup></script>
 
-<style>
-.animated-message {
-  transition: all 3.5s ease;
-  animation: replay 3.5s forwards;
+<script setup>
+// import { formatDate, formatPrice, getStatusClass, getStatusName } from '../utils/formatters'
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import { useAuth } from "~/store/auth";
+import {useChatStore} from "~/store/chat";
+import { Centrifuge } from 'centrifuge'
+
+// Состояние
+const cargoList = ref([]);
+const selectedCargo = ref(null);
+const chatMessages = ref([]);
+const newMessage = ref("");
+const loading = ref(true);
+const chatStore = useChatStore();
+const {SetChannel,chatClient} = chatStore;
+const {centrafugoToken} = storeToRefs(chatStore);
+const route = useRoute();
+const confirm = useConfirm();
+const toast = useToast();
+const { user } = useAuth();
+let channelId = ref(null);
+const centrifuge = ref(null);
+const channel = ref(null);
+// Загрузка данных
+onMounted(async () => {
+  getApplications();
+  // Тестовые сообщения чата
+  // chatMessages.value = [
+  //   {
+  //     text: "Здравствуйте! Груз еще доступен?",
+  //     time: "10:30",
+  //     isOwner: false,
+  //   },
+  //   {
+  //     text: "Да, конечно! Когда сможете забрать?",
+  //     time: "10:32",
+  //     isOwner: true,
+  //   },
+  //   {
+  //     text: "Смогу забрать завтра утром. Какие документы нужны?",
+  //     time: "10:35",
+  //     isOwner: false,
+  //   },
+  //   {
+  //     text: "Нужен паспорт и доверенность от компании",
+  //     time: "10:38",
+  //     isOwner: true,
+  //   },
+  // ];
+});
+
+// Методы
+
+function getApplications() {
+  let url ='/v1/chat/channel';
+  loading.value = true;
+  useApi(url, {
+    params: route.query,
+  }).then((res) => {
+    cargoList.value = res.results;
+    loading.value = false;
+  });
 }
 
-@keyframes replay {
-  0% {
-    background: rgba(202, 240, 192, 0.5);
-    /* background: linear-gradient(90deg, rgba(0,149,255,1) 0%, rgba(0,149,255,1) 0%, rgba(0,230,26,0.47942927170868344) 0%, rgba(9,255,0,0.3533788515406162) 100%); */
+const selectCargo = (cargo) => {
+  selectedCargo.value = cargo;
+  useApi(`/v1/chat/channel/message?channel=${cargo.id}`).then((res)=>{
+    chatMessages.value = res.results.map(res=>{
+      return {...res, isOwner: res.created_by === user.id }
+    })
+  })
+};
+
+const sendMessage = () => {
+  if (!newMessage.value.trim()) return;
+  const chatContainer = document.querySelector(".chatContainer");
+
+// Wait for the DOM to fully render
+setTimeout(() => {
+  chatContainer.scrollTo({
+    top: chatContainer.scrollHeight,
+    behavior: "smooth", // Optional
+  });
+}, 100); // Adjust delay if necessary
+
+  chatMessages.value.push({
+    text: newMessage.value,
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    isOwner: false,
+  });
+  useApi('/v1/chat/channel/message',{
+    method:"POST",
+    body:{
+    "channel":channelId.value,
+    "text":newMessage.value
+    }
+  })
+  newMessage.value = "";
+};
+
+async function SetChannelSelected(id) {
+    // Unsubscribe from the previous channel if it exists
+    console.log(centrifuge.value)
+    if (channel.value) {
+        channel.value.unsubscribe();
+        console.log("Unsubscribed from previous channel");
+    }
+
+    // Create a new subscription for the selected channel
+    channel.value = centrifuge.value.getSubscription(id);
+    if(channel.value){
+      channel.value.subscribe()
+    }else{
+      channel.value = centrifuge.value.newSubscription(id)
+            channel.value.on('publication', function (ctx) {
+               console.log("New message received:", ctx.data);
+            })
+            channel.value.on('subscribing', function (ctx) {
+               console.log("Subscribing to channel:", id);
+            })
+            channel.value.subscribe()
+    }
+    // Event: Message publication
+    channel.value.on("publication", function (ctx) {
+        console.log("New message received:", ctx.data);
+        // Uncomment to process messages
+        // AllMessages.value.push(ctx.data);
+        // SetMessageList(AllMessages.value);
+    });
+
+    // Event: Subscribing
+    channel.value.on("subscribing", function (ctx) {
+        console.log("Subscribing to channel:", id);
+    });
+
+    // Event: Subscribed successfully
+    channel.value.on("subscribed", function (ctx) {
+        console.log("Subscribed successfully to channel:", id, ctx);
+    });
+
+    // Event: Unsubscribed
+    channel.value.on("unsubscribed", function (ctx) {
+        console.log("Unsubscribed from channel:", id);
+    });
+
+    // Subscribe to the channel
+    // try {
+       // await channel.value.subscribe();
+        // centrifuge.value.connect();
+        console.log("Subscription process initiated for channel:", id);
+    // } catch (error) {
+    //     console.error("Error subscribing to channel:", id, error);
+    // }
+}
+function setNamesFlags(direction, item) {
+  let cargo = null;
+  if (item && item.length > 0) {
+    cargo =
+      loading.value == false
+        ? item.find((loc) => loc.direction == direction)
+        : "";
   }
 
-  100% {
-    background: none;
-  }
+  let obj = {
+    name: cargo?.name,
+    flag: cargo?.country?.flag,
+  };
+
+  return obj;
 }
-</style>
+const confirmCargo = () => {
+  // TODO: Реализовать логику подтверждения
+  confirm.require({
+    message: "Siz rostan ham yukni qabul qilasizmi?",
+    header: "tasdiqlash",
+    icon: "pi pi-exclamation-triangle",
+    rejectProps: {
+      label: "Yo'q",
+      severity: "Ha",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Save",
+    },
+    accept: () => {
+      let data = {
+        vehicle_application: route.query.vehicle_application_id,
+        cargo_application: selectedCargo.value.id,
+        driver: null,
+        owner: null,
+        price: null,
+        vehicle: null,
+      };
+      if(user.role == "DRIVER"){
+        data.driver = user.id;
+        data.owner = selectedCargo.value.user.id;
+        data.price = selectedCargo.value.price;
+        data.vehicle = route.query.vehicle_id;
+      }else{
+        data.driver = selectedCargo.value.main_driver.id;
+        data.owner = user.id;
+        data.price = selectedCargo.value.price;
+        data.vehicle = selectedCargo.value.vehicle.id;
+        data.vehicle_application = selectedCargo.value.id;
+        data.cargo_application = route.query.cargo_application_id;
+      }
+      useApi(`/v1/order/create`, {
+        method: "POST",
+        body: data,
+      }).then(() => {
+        toast.add({
+          severity: "success",
+          summary: "Muvaffaqiyatli",
+          detail: "Yuk qabul qilindi",
+          life: 3000,
+        });
+      });
+    },
+    reject: () => {
+      // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    },
+  });
+};
+
+async function Load() {
+  if(centrafugoToken.value){
+    centrifuge.value = new Centrifuge("wss://centrifugo.furago.uz/connection/websocket", {
+        token: centrafugoToken.value, // Token for authentication
+        resubscribe: true,      // Automatically resubscribe on reconnect
+    });
+
+    // Attach event handlers for Centrifuge connection
+    centrifuge.value.on("connect", function (ctx) {
+        console.log("Connected to Centrifugo:", ctx);
+    });
+
+    centrifuge.value.on("disconnect", function (ctx) {
+        console.log("Disconnected from Centrifugo:", ctx);
+    });
+
+    centrifuge.value.connect(); 
+  }
+    // Establish connection
+}
+
+
+watch(()=>centrafugoToken.value,(newVal)=>{
+  if(newVal){
+    Load();
+  }
+})
+</script>

@@ -14,8 +14,16 @@
   --p-button-primary-active-background: #3b72f1 !important;
   --p-button-primary-active-border-color: #3b72f1 !important;
 }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  // overflow: hidden;
+}
+
 body{
     overflow-x: hidden;
+    box-sizing: border-box;
     background: rgb(243 244 246 / var(--tw-bg-opacity, 1))//#F5F6FA;
 }
 

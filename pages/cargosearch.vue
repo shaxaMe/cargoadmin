@@ -149,7 +149,7 @@
         <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
-            <div class="space-y-4 h-[50dvh] overflow-y-auto">
+            <div class="space-y-4 h-[50dvh] overflow-y-auto chatContainer">
               <div
                 v-for="(message, index) in chatMessages"
                 :key="index"
@@ -244,16 +244,25 @@
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { useAuth } from "~/store/auth";
+import {useChatStore} from "~/store/chat";
+import { Centrifuge } from 'centrifuge'
+
 // Состояние
 const cargoList = ref([]);
 const selectedCargo = ref(null);
 const chatMessages = ref([]);
 const newMessage = ref("");
 const loading = ref(true);
+const chatStore = useChatStore();
+const {SetChannel,chatClient} = chatStore;
+const {centrafugoToken} = storeToRefs(chatStore);
 const route = useRoute();
 const confirm = useConfirm();
 const toast = useToast();
 const { user } = useAuth();
+let channelId = ref(null);
+const centrifuge = ref(null);
+const channel = ref(null);
 // Загрузка данных
 onMounted(async () => {
   // TODO: Загрузка списка грузов с сервера
@@ -336,28 +345,7 @@ onMounted(async () => {
   // ]
   getApplications();
   // Тестовые сообщения чата
-  chatMessages.value = [
-    {
-      text: "Здравствуйте! Груз еще доступен?",
-      time: "10:30",
-      isOwner: false,
-    },
-    {
-      text: "Да, конечно! Когда сможете забрать?",
-      time: "10:32",
-      isOwner: true,
-    },
-    {
-      text: "Смогу забрать завтра утром. Какие документы нужны?",
-      time: "10:35",
-      isOwner: false,
-    },
-    {
-      text: "Нужен паспорт и доверенность от компании",
-      time: "10:38",
-      isOwner: true,
-    },
-  ];
+  
 });
 
 // Методы
@@ -406,10 +394,35 @@ function getApplications() {
 
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
+  useApi(`/v1/chat/channel`,{
+    method: 'POST',
+    body: {
+       "sender": user.id,
+       "receiver":cargo.user.id
+     },
+  }).then((response)=>{
+    channelId.value = response.id;
+    // SetChannel(response.id)
+    SetChannelSelected(channelId.value);
+    useApi(`/v1/chat/channel/message?channel=${channelId.value}`).then((res)=>{
+    chatMessages.value = res.results.map(res=>{
+      return {...res, isOwner: res.created_by !== user.id }
+    })
+  })
+  })
 };
 
 const sendMessage = () => {
   if (!newMessage.value.trim()) return;
+  const chatContainer = document.querySelector(".chatContainer");
+
+// Wait for the DOM to fully render
+setTimeout(() => {
+  chatContainer.scrollTo({
+    top: chatContainer.scrollHeight,
+    behavior: "smooth", // Optional
+  });
+}, 100); // Adjust delay if necessary
 
   chatMessages.value.push({
     text: newMessage.value,
@@ -419,14 +432,70 @@ const sendMessage = () => {
     }),
     isOwner: false,
   });
-
+  useApi('/v1/chat/channel/message',{
+    method:"POST",
+    body:{
+    "channel":channelId.value,
+    "text":newMessage.value
+    }
+  })
   newMessage.value = "";
 };
 
-const takeCargo = () => {
-  // TODO: Реализовать логику забора груза
-  console.log("Забрать груз:", selectedCargo.value.id);
-};
+async function SetChannelSelected(id) {
+    // Unsubscribe from the previous channel if it exists
+    console.log(centrifuge.value)
+    if (channel.value) {
+        channel.value.unsubscribe();
+        console.log("Unsubscribed from previous channel");
+    }
+
+    // Create a new subscription for the selected channel
+    channel.value = centrifuge.value.getSubscription(id);
+    if(channel.value){
+      channel.value.subscribe()
+    }else{
+      channel.value = centrifuge.value.newSubscription(id)
+            channel.value.on('publication', function (ctx) {
+               console.log("New message received:", ctx.data);
+            })
+            channel.value.on('subscribing', function (ctx) {
+               console.log("Subscribing to channel:", id);
+            })
+            channel.value.subscribe()
+    }
+    // Event: Message publication
+    channel.value.on("publication", function (ctx) {
+        console.log("New message received:", ctx.data);
+        // Uncomment to process messages
+        // AllMessages.value.push(ctx.data);
+        // SetMessageList(AllMessages.value);
+    });
+
+    // Event: Subscribing
+    channel.value.on("subscribing", function (ctx) {
+        console.log("Subscribing to channel:", id);
+    });
+
+    // Event: Subscribed successfully
+    channel.value.on("subscribed", function (ctx) {
+        console.log("Subscribed successfully to channel:", id, ctx);
+    });
+
+    // Event: Unsubscribed
+    channel.value.on("unsubscribed", function (ctx) {
+        console.log("Unsubscribed from channel:", id);
+    });
+
+    // Subscribe to the channel
+    // try {
+       // await channel.value.subscribe();
+        // centrifuge.value.connect();
+        console.log("Subscription process initiated for channel:", id);
+    // } catch (error) {
+    //     console.error("Error subscribing to channel:", id, error);
+    // }
+}
 function setNamesFlags(direction, item) {
   let cargo = null;
   if (item && item.length > 0) {
@@ -496,4 +565,32 @@ const confirmCargo = () => {
     },
   });
 };
+
+async function Load() {
+  if(centrafugoToken.value){
+    centrifuge.value = new Centrifuge("wss://centrifugo.furago.uz/connection/websocket", {
+        token: centrafugoToken.value, // Token for authentication
+        resubscribe: true,      // Automatically resubscribe on reconnect
+    });
+
+    // Attach event handlers for Centrifuge connection
+    centrifuge.value.on("connect", function (ctx) {
+        console.log("Connected to Centrifugo:", ctx);
+    });
+
+    centrifuge.value.on("disconnect", function (ctx) {
+        console.log("Disconnected from Centrifugo:", ctx);
+    });
+
+    centrifuge.value.connect(); 
+  }
+    // Establish connection
+}
+
+
+watch(()=>centrafugoToken.value,(newVal)=>{
+  if(newVal){
+    Load();
+  }
+})
 </script>
