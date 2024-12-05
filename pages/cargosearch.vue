@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex">
+  <div class="flex h-screen py-3">
     <!-- Левая панель со списком грузов -->
     <div class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
       <div class="p-4">
@@ -404,7 +404,7 @@ const selectCargo = (cargo) => {
     channelId.value = response.id;
     // SetChannel(response.id)
     SetChannelSelected(channelId.value);
-    useApi(`/v1/chat/channel/message?channel=${channelId.value}`).then((res)=>{
+    useApi(`/v1/chat/channel/messages?channel=${channelId.value}`).then((res)=>{
     chatMessages.value = res.results.map(res=>{
       return {...res, isOwner: res.created_by !== user.id }
     })
@@ -443,59 +443,59 @@ setTimeout(() => {
 };
 
 async function SetChannelSelected(id) {
-    // Unsubscribe from the previous channel if it exists
-    console.log(centrifuge.value)
-    if (channel.value) {
-        channel.value.unsubscribe();
-        console.log("Unsubscribed from previous channel");
+    try {
+        // Ensure the Centrifugo instance exists
+        if (!centrifuge.value) {
+            console.error("Centrifugo instance is not initialized.");
+            return;
+        }
+
+        // Unsubscribe from the previous channel if it exists
+        if (channel.value) {
+            channel.value.unsubscribe();
+            console.log("Unsubscribed from previous channel:", channel.value.channel);
+        }
+
+        // Check if the subscription already exists
+        let existingSubscription = centrifuge.value.getSubscription(id);
+
+        if (existingSubscription) {
+            console.log("Using existing subscription for channel:", id);
+            channel.value = existingSubscription;
+        } else {
+            console.log("Creating a new subscription for channel:", id);
+            channel.value = centrifuge.value.newSubscription(id);
+
+            // Attach event listeners only once
+            channel.value.on("publication", (ctx) => {
+                console.log("New message received:", ctx.data);
+            });
+            channel.value.on("subscribing", () => {
+                console.log("Subscribing to channel:", id);
+            });
+            channel.value.on("subscribed", (ctx) => {
+                console.log("Subscribed successfully to channel:", id, ctx);
+            });
+            channel.value.on("unsubscribed", () => {
+                console.log("Unsubscribed from channel:", id);
+            });
+        }
+
+        // Subscribe to the channel
+        await channel.value.subscribe();
+
+        console.log("Subscription initiated for channel:", id);
+
+        // Ensure the Centrifugo connection is active
+        if (!centrifuge.value.isConnected()) {
+            centrifuge.value.connect();
+            console.log("Connecting to Centrifugo server...");
+        }
+    } catch (error) {
+        console.error("Error in SetChannelSelected:", error);
     }
-
-    // Create a new subscription for the selected channel
-    channel.value = centrifuge.value.getSubscription(id);
-    if(channel.value){
-      channel.value.subscribe()
-    }else{
-      channel.value = centrifuge.value.newSubscription(id)
-            channel.value.on('publication', function (ctx) {
-               console.log("New message received:", ctx.data);
-            })
-            channel.value.on('subscribing', function (ctx) {
-               console.log("Subscribing to channel:", id);
-            })
-            channel.value.subscribe()
-    }
-    // Event: Message publication
-    channel.value.on("publication", function (ctx) {
-        console.log("New message received:", ctx.data);
-        // Uncomment to process messages
-        // AllMessages.value.push(ctx.data);
-        // SetMessageList(AllMessages.value);
-    });
-
-    // Event: Subscribing
-    channel.value.on("subscribing", function (ctx) {
-        console.log("Subscribing to channel:", id);
-    });
-
-    // Event: Subscribed successfully
-    channel.value.on("subscribed", function (ctx) {
-        console.log("Subscribed successfully to channel:", id, ctx);
-    });
-
-    // Event: Unsubscribed
-    channel.value.on("unsubscribed", function (ctx) {
-        console.log("Unsubscribed from channel:", id);
-    });
-
-    // Subscribe to the channel
-    // try {
-       // await channel.value.subscribe();
-        // centrifuge.value.connect();
-        console.log("Subscription process initiated for channel:", id);
-    // } catch (error) {
-    //     console.error("Error subscribing to channel:", id, error);
-    // }
 }
+
 function setNamesFlags(direction, item) {
   let cargo = null;
   if (item && item.length > 0) {

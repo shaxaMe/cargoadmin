@@ -20,10 +20,14 @@
             class="border"
           >
             <!-- Краткая информация о грузе -->
-            <div class="flex items-start justify-between">
+            <div class="flex items-start justify-start gap-4">
+            <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden flex justify-center items-center">
+               <Icon v-if="!cargo.receiver.photo" name="material-symbols:account-circle-outline" size="20px" />
+               <img :src="cargo.receiver.photo" alt="senderphoto" v-else>
+            </div>
               <div>
                 <div class="font-medium text-gray-900">
-                  {{ cargo.id }}
+                  {{ cargo.receiver.full_name }}
                 </div>
               </div>
             </div>
@@ -39,7 +43,17 @@
         <!-- Чат -->
         <div class="flex-1 px-6 h-full overflow-y-auto bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
-            <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
+            <div class="w-full mb-2 flex justify-start items-center gap-4 border-b py-2">
+              <div class="w-14 h-14 bg-gray-300 rounded-full overflow-hidden flex justify-center items-center">
+               <Icon v-if="!selectedCargo.receiver.photo" name="material-symbols:account-circle-outline" size="30px" />
+               <img :src="selectedCargo.receiver.photo" alt="senderphoto" v-else>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900">
+                {{ selectedCargo.receiver.full_name }}
+             </div>
+            </div>
+            </div>
             <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto chatContainer">
               <div
                 v-for="(message, index) in chatMessages"
@@ -170,7 +184,7 @@ onMounted(async () => {
 // Методы
 
 function getApplications() {
-  let url ='/v1/chat/channel';
+  let url ='/v1/chat/channels';
   loading.value = true;
   useApi(url, {
     params: route.query,
@@ -182,7 +196,7 @@ function getApplications() {
 
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
-  useApi(`/v1/chat/channel/message?channel=${cargo.id}`).then((res)=>{
+  useApi(`/v1/chat/channel/messages?channel=${cargo.id}`).then((res)=>{
     chatMessages.value = res.results.map(res=>{
       return {...res, isOwner: res.created_by === user.id }
     })
