@@ -54,7 +54,7 @@
              </div>
             </div>
             </div>
-            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto chatContainer">
+            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto chatContainer" v-if="!chatLoading">
               <div
                 v-for="(message, index) in chatMessages"
                 :key="index"
@@ -81,6 +81,15 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="h-full flex items-center justify-center" v-else>
+              <ProgressSpinner
+        style="width: 50px; height: 50px"
+        strokeWidth="8"
+        fill="transparent"
+        animationDuration=".5s"
+        aria-label="Custom ProgressSpinner"
+      />
             </div>
             <!-- Ввод сообщения -->
             <div class="mt-4 flex gap-2">
@@ -148,6 +157,7 @@ const {SetChannel,chatClient} = chatStore;
 const {centrafugoToken} = storeToRefs(chatStore);
 const route = useRoute();
 const confirm = useConfirm();
+const chatLoading = ref(true);
 const toast = useToast();
 const { user } = useAuth();
 let channelId = ref(null);
@@ -196,10 +206,12 @@ function getApplications() {
 
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
+  chatLoading.value = true;
   useApi(`/v1/chat/channel/messages?channel=${cargo.id}`).then((res)=>{
     chatMessages.value = res.results.map(res=>{
       return {...res, isOwner: res.created_by === user.id }
-    })
+    });
+    chatLoading.value = false;
   })
 };
 
