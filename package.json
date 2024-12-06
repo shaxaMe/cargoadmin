@@ -27,7 +27,8 @@
     "primevue": "^4.1.1",
     "vue": "latest",
     "vue-router": "latest",
-    "vue-the-mask": "^0.11.1"
+    "vue-the-mask": "^0.11.1",
+    "vue-yandex-maps": "^1.1.0"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.1",

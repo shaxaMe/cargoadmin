@@ -149,7 +149,7 @@
         <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
-            <div class="space-y-4 h-[50dvh] overflow-y-auto chatContainer">
+            <div class="space-y-4 h-[50dvh] overflow-y-auto chatContainer" v-if="!chatLoading">
               <div
                 v-for="(message, index) in chatMessages"
                 :key="index"
@@ -177,6 +177,15 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="h-[50dvh] flex items-center justify-center" v-else>
+              <ProgressSpinner
+        style="width: 50px; height: 50px"
+        strokeWidth="8"
+        fill="transparent"
+        animationDuration=".5s"
+        aria-label="Custom ProgressSpinner"
+      />
             </div>
             <!-- Ввод сообщения -->
             <div class="mt-4 flex gap-2">
@@ -260,6 +269,7 @@ const route = useRoute();
 const confirm = useConfirm();
 const toast = useToast();
 const { user } = useAuth();
+const chatLoading = ref(true);
 let channelId = ref(null);
 const centrifuge = ref(null);
 const channel = ref(null);
@@ -394,6 +404,7 @@ function getApplications() {
 
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
+  chatLoading.value = true;
   useApi(`/v1/chat/channel`,{
     method: 'POST',
     body: {
@@ -407,7 +418,8 @@ const selectCargo = (cargo) => {
     useApi(`/v1/chat/channel/messages?channel=${channelId.value}`).then((res)=>{
     chatMessages.value = res.results.map(res=>{
       return {...res, isOwner: res.created_by !== user.id }
-    })
+    });
+    chatLoading.value = false;
   })
   })
 };

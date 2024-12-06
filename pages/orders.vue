@@ -54,6 +54,18 @@
           </div>
         </div>
       </div>
+      <div
+      v-if="loading"
+      class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center"
+    >
+      <ProgressSpinner
+        style="width: 50px; height: 50px"
+        strokeWidth="8"
+        fill="transparent"
+        animationDuration=".5s"
+        aria-label="Custom ProgressSpinner"
+      />
+    </div>
     </div>
   </template>
   
@@ -63,7 +75,7 @@
   const {user} = useAuth();
   const selectedStatus = ref('all')
   const searchQuery = ref('')
-  const loading = ref(true)
+  const loading = ref(true);
   const orders = ref([
     // {
     //   id: '1234',

@@ -7,18 +7,22 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   css:['primeicons/primeicons.css','../assets/scss/main.scss'],
-  plugins:['~/plugins/vmask.js','~/plugins/peristit.ts','~/plugins/validate.js'],
+  plugins:['~/plugins/vmask.js','~/plugins/peristit.ts','~/plugins/validate.js', { src: '~/plugins/ymap.js', mode: 'client' },],
   modules: [
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss',
     '@nuxt/icon',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    // 'vue-yandex-maps/nuxt'
   ],
   // i18n: {
   //   vueI18n: './i18n.config.ts',
   //    // if you are using custom path, default
+  // },
+  // yandexMaps:{
+  //     apikey:"a1078e60-f7ec-4b02-9419-0e839bf3ef5b"
   // },
   i18n: {
     lazy: true,
