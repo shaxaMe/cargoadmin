@@ -96,7 +96,7 @@
                   </div> -->
                   <div class="flex items-baseline space-x-2 mt-1">
                     <span class="text-gray-500">Narxi:</span>
-                    <span class="text-gray-900 font-medium">{{ item.price }} {{ item.currency.code }} </span>
+                    <span class="text-gray-900 font-medium">{{ item.price }} {{ item?.currency?.code }} </span>
                   </div>
                   
                 </div>

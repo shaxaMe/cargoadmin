@@ -5,7 +5,7 @@
       <div class="px-4">
         <h2 class="text-lg font-semibold mb-4">Список грузов</h2>
         <!-- Список грузов -->
-        <div class="space-y-3 max-h-[80dvh] overflow-x-auto">
+        <div class="space-y-3 max-h-[60dvh] overflow-x-auto">
           <div
             v-if="!loading && cargoList && cargoList.length > 0"
             v-for="cargo in cargoList"
@@ -54,9 +54,9 @@
              </div>
             </div>
             </div>
-            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto overflow-x-hidden chatContainer" v-if="!chatLoading">
+            <div class="space-y-4 h-full max-h-[75dvh] overflow-y-auto overflow-x-hidden chatContainer" v-if="!chatLoading">
               <div
-                v-for="(message, index) in chatMessages"
+                v-for="(message, index) in chatList"
                 :key="index"
                 :class="[
                   'flex',
@@ -163,6 +163,10 @@ const { user } = useAuth();
 let channelId = ref(null);
 const centrifuge = ref(null);
 const channel = ref(null);
+
+const chatList = computed(()=>{
+  return chatMessages.value
+})
 // Загрузка данных
 onMounted(async () => {
   getApplications();
@@ -232,14 +236,14 @@ setTimeout(() => {
   });
 }, 100); // Adjust delay if necessary
 
-  chatMessages.value.push({
-    text: newMessage.value,
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    isOwner: false,
-  });
+  // chatMessages.value.push({
+  //   text: newMessage.value,
+  //   time: new Date().toLocaleTimeString([], {
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   }),
+  //   isOwner: false,
+  // });
   useApi('/v1/chat/channel/message',{
     method:"POST",
     body:{
@@ -272,11 +276,26 @@ async function SetChannelSelected(id) {
             channel.value.subscribe()
     }
     // Event: Message publication
-    channel.value.on("publication", function (ctx) {
-        getMessage(channelId.value);
-        // Uncomment to process messages
-        // AllMessages.value.push(ctx.data);
-        // SetMessageList(AllMessages.value);
+    channel.value.on("publication", (ctx) => {
+      // getMessage();
+      chatMessages.value.push({
+        text: ctx.data.text,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        isOwner: ctx.data.created_by != user.id,
+      });
+      console.log(ctx.data.created_by == user.id,user.id, ctx.data.created_by);
+      const chatContainer = document.querySelector(".chatContainer");
+
+  // Wait for the DOM to fully render
+  setTimeout(() => {
+    chatContainer.scrollTo({
+      top: chatContainer.scrollHeight,
+      behavior: "smooth", // Optional
+    });
+  }, 100); // Adjust delay if necessary
     });
 
     // Event: Subscribing
