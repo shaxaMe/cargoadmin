@@ -4,7 +4,7 @@
           <input @change="_uploadImage" ref="imgInput" class="opacity-0 absolute w-full h-24 z-10" type="file">
           
         </div>
-        <Modal v-model="isOpen" maxWidth="500px" @_save="save">
+        <Modal v-model="isOpen" maxWidth="500px" @_save="save" title="Profil rasmini o'zgartirish">
            <div class="w-full">
                 <img :src="img" alt="al">
            </div>
