@@ -41,7 +41,7 @@
       <div v-if="selectedCargo" class="h-full">
 
         <!-- Чат -->
-        <div class="flex-1 px-6 h-full overflow-y-auto bg-gray-50">
+        <div class="flex-1 px-6 h-full bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <div class="w-full mb-2 flex justify-start items-center gap-4 border-b py-2">
               <div class="w-14 h-14 bg-gray-300 rounded-full overflow-hidden flex justify-center items-center">
@@ -54,7 +54,7 @@
              </div>
             </div>
             </div>
-            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto chatContainer" v-if="!chatLoading">
+            <div class="space-y-4 h-full max-h-[80dvh] overflow-y-auto overflow-x-hidden chatContainer" v-if="!chatLoading">
               <div
                 v-for="(message, index) in chatMessages"
                 :key="index"
@@ -207,14 +207,19 @@ function getApplications() {
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
   chatLoading.value = true;
-  useApi(`/v1/chat/channel/messages?channel=${cargo.id}`).then((res)=>{
+  channelId.value = cargo.id;
+  SetChannelSelected(cargo.id);
+  getMessage(cargo.id);
+};
+
+const getMessage = (id) => {
+  useApi(`/v1/chat/channel/messages?channel=${id}`).then((res)=>{
     chatMessages.value = res.results.map(res=>{
       return {...res, isOwner: res.created_by === user.id }
     });
     chatLoading.value = false;
   })
-};
-
+}
 const sendMessage = () => {
   if (!newMessage.value.trim()) return;
   const chatContainer = document.querySelector(".chatContainer");
@@ -247,7 +252,6 @@ setTimeout(() => {
 
 async function SetChannelSelected(id) {
     // Unsubscribe from the previous channel if it exists
-    console.log(centrifuge.value)
     if (channel.value) {
         channel.value.unsubscribe();
         console.log("Unsubscribed from previous channel");
@@ -269,7 +273,7 @@ async function SetChannelSelected(id) {
     }
     // Event: Message publication
     channel.value.on("publication", function (ctx) {
-        console.log("New message received:", ctx.data);
+        getMessage(channelId.value);
         // Uncomment to process messages
         // AllMessages.value.push(ctx.data);
         // SetMessageList(AllMessages.value);

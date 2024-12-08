@@ -30,7 +30,7 @@
               <!-- Действия -->
               <div class="flex items-center space-x-1">
                 <button
-                  @click="getEditData(cargo)"
+                  @click="getEditData"
                   class="p-2 w-10 h-10 text-blue-600 hover:bg-blue-50 rounded-full transition-colors duration-200"
                   title="Редактировать"
                 >
@@ -95,8 +95,8 @@
                     </span>
                   </div> -->
                   <div class="flex items-baseline space-x-2 mt-1">
-                    <span class="text-gray-500">Price:</span>
-                    <span class="text-gray-900 font-medium">{{ item.price }} </span>
+                    <span class="text-gray-500">Narxi:</span>
+                    <span class="text-gray-900 font-medium">{{ item.price }} {{ item.currency.code }} </span>
                   </div>
                   
                 </div>

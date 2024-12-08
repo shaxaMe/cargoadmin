@@ -146,12 +146,15 @@
         </div>
 
         <!-- Чат -->
-        <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
+        <div class="flex-1 p-6 bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
-            <div class="space-y-4 h-[50dvh] overflow-y-auto chatContainer" v-if="!chatLoading">
+            <div
+              class="space-y-4 h-[40dvh] overflow-y-auto chatContainer"
+              v-if="!chatLoading"
+            >
               <div
-                v-for="(message, index) in chatMessages"
+                v-for="(message, index) in chatList"
                 :key="index"
                 :class="[
                   'flex',
@@ -180,12 +183,12 @@
             </div>
             <div class="h-[50dvh] flex items-center justify-center" v-else>
               <ProgressSpinner
-        style="width: 50px; height: 50px"
-        strokeWidth="8"
-        fill="transparent"
-        animationDuration=".5s"
-        aria-label="Custom ProgressSpinner"
-      />
+                style="width: 50px; height: 50px"
+                strokeWidth="8"
+                fill="transparent"
+                animationDuration=".5s"
+                aria-label="Custom ProgressSpinner"
+              />
             </div>
             <!-- Ввод сообщения -->
             <div class="mt-4 flex gap-2">
@@ -253,8 +256,8 @@
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { useAuth } from "~/store/auth";
-import {useChatStore} from "~/store/chat";
-import { Centrifuge } from 'centrifuge'
+import { useChatStore } from "~/store/chat";
+import { Centrifuge } from "centrifuge";
 
 // Состояние
 const cargoList = ref([]);
@@ -263,8 +266,8 @@ const chatMessages = ref([]);
 const newMessage = ref("");
 const loading = ref(true);
 const chatStore = useChatStore();
-const {SetChannel,chatClient} = chatStore;
-const {centrafugoToken} = storeToRefs(chatStore);
+const { SetChannel, chatClient } = chatStore;
+const { centrafugoToken } = storeToRefs(chatStore);
 const route = useRoute();
 const confirm = useConfirm();
 const toast = useToast();
@@ -273,6 +276,10 @@ const chatLoading = ref(true);
 let channelId = ref(null);
 const centrifuge = ref(null);
 const channel = ref(null);
+
+const chatList = computed(()=>{
+  return chatMessages.value
+})
 // Загрузка данных
 onMounted(async () => {
   // TODO: Загрузка списка грузов с сервера
@@ -355,7 +362,6 @@ onMounted(async () => {
   // ]
   getApplications();
   // Тестовые сообщения чата
-  
 });
 
 // Методы
@@ -405,107 +411,118 @@ function getApplications() {
 const selectCargo = (cargo) => {
   selectedCargo.value = cargo;
   chatLoading.value = true;
-  useApi(`/v1/chat/channel`,{
-    method: 'POST',
+  useApi(`/v1/chat/channel`, {
+    method: "POST",
     body: {
-       "sender": user.id,
-       "receiver":cargo.user.id
-     },
-  }).then((response)=>{
+      sender: user.id,
+      receiver: user.role=='DRIVER' ? cargo.user.id : cargo.main_driver.id,
+    },
+  }).then((response) => {
     channelId.value = response.id;
     // SetChannel(response.id)
     SetChannelSelected(channelId.value);
-    useApi(`/v1/chat/channel/messages?channel=${channelId.value}`).then((res)=>{
-    chatMessages.value = res.results.map(res=>{
-      return {...res, isOwner: res.created_by !== user.id }
-    });
-    chatLoading.value = false;
-  })
-  })
+    getMessage();
+  });
 };
 
+function getMessage() {
+  useApi(`/v1/chat/channel/messages?channel=${channelId.value}`).then((res) => {
+    chatMessages.value = res.results.map((res) => {
+      return { ...res, isOwner: res.created_by !== user.id };
+    });
+    chatLoading.value = false;
+  });
+}
 const sendMessage = () => {
   if (!newMessage.value.trim()) return;
   const chatContainer = document.querySelector(".chatContainer");
 
-// Wait for the DOM to fully render
-setTimeout(() => {
-  chatContainer.scrollTo({
-    top: chatContainer.scrollHeight,
-    behavior: "smooth", // Optional
-  });
-}, 100); // Adjust delay if necessary
+  // Wait for the DOM to fully render
+  setTimeout(() => {
+    chatContainer.scrollTo({
+      top: chatContainer.scrollHeight,
+      behavior: "smooth", // Optional
+    });
+  }, 100); // Adjust delay if necessary
 
-  chatMessages.value.push({
-    text: newMessage.value,
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    isOwner: false,
+  useApi("/v1/chat/channel/message", {
+    method: "POST",
+    body: {
+      channel: channelId.value,
+      text: newMessage.value,
+    },
   });
-  useApi('/v1/chat/channel/message',{
-    method:"POST",
-    body:{
-    "channel":channelId.value,
-    "text":newMessage.value
-    }
-  })
   newMessage.value = "";
 };
 
 async function SetChannelSelected(id) {
-    try {
-        // Ensure the Centrifugo instance exists
-        if (!centrifuge.value) {
-            console.error("Centrifugo instance is not initialized.");
-            return;
-        }
+  try {
+    // Ensure the Centrifugo instance exists
+    
 
-        // Unsubscribe from the previous channel if it exists
-        if (channel.value) {
-            channel.value.unsubscribe();
-            console.log("Unsubscribed from previous channel:", channel.value.channel);
-        }
-
-        // Check if the subscription already exists
-        let existingSubscription = centrifuge.value.getSubscription(id);
-
-        if (existingSubscription) {
-            console.log("Using existing subscription for channel:", id);
-            channel.value = existingSubscription;
-        } else {
-            console.log("Creating a new subscription for channel:", id);
-            channel.value = centrifuge.value.newSubscription(id);
-
-            // Attach event listeners only once
-            channel.value.on("publication", (ctx) => {
-                console.log("New message received:", ctx.data);
-            });
-            channel.value.on("subscribing", () => {
-                console.log("Subscribing to channel:", id);
-            });
-            channel.value.on("subscribed", (ctx) => {
-                console.log("Subscribed successfully to channel:", id, ctx);
-            });
-            channel.value.on("unsubscribed", () => {
-                console.log("Unsubscribed from channel:", id);
-            });
-        }
-
-        // Subscribe to the channel
-        await channel.value.subscribe();
-
-        console.log("Subscription initiated for channel:", id);
-
-        // Ensure the Centrifugo connection is active
-        if (!centrifuge.value.isConnected()) {
-            centrifuge.value.connect();
-            console.log("Connecting to Centrifugo server...");
-        }
-    } catch (error) {
-        console.error("Error in SetChannelSelected:", error);
+    // Unsubscribe from the previous channel if it exists
+    if (channel.value) {
+      channel.value.unsubscribe();
     }
+
+    // Check if the subscription already exists
+    let existingSubscription = centrifuge.value.getSubscription(id);
+
+    if (existingSubscription) {
+      console.log("Using existing subscription for channel:", id);
+      channel.value = existingSubscription;
+    } else {
+      console.log("Creating a new subscription for channel:", id);
+      channel.value = centrifuge.value.newSubscription(id);
+
+      // Attach event listeners only once
+      channel.value.on("publication", (ctx) => {
+        console.log("New message received:", ctx.data);
+      });
+      channel.value.on("subscribing", () => {
+        console.log("Subscribing to channel:", id);
+      });
+      channel.value.on("subscribed", (ctx) => {
+        console.log("Subscribed successfully to channel:", id, ctx);
+      });
+      channel.value.on("unsubscribed", () => {
+        console.log("Unsubscribed from channel:", id);
+      });
+    }
+
+    // Subscribe to the channel
+    await channel.value.subscribe();
+
+    channel.value.on("publication", (ctx) => {
+      // getMessage();
+      chatMessages.value.push({
+        text: ctx.data.text,
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        isOwner: ctx.data.created_by != user.id,
+      });
+      console.log(ctx.data.created_by == user.id,user.id, ctx.data.created_by);
+      const chatContainer = document.querySelector(".chatContainer");
+
+  // Wait for the DOM to fully render
+  setTimeout(() => {
+    chatContainer.scrollTo({
+      top: chatContainer.scrollHeight,
+      behavior: "smooth", // Optional
+    });
+  }, 100); // Adjust delay if necessary
+    });
+
+    // Ensure the Centrifugo connection is active
+    if (centrifuge.value&&!centrifuge.value.isConnected()) {
+      centrifuge.value.connect();
+      console.log("Connecting to Centrifugo server...");
+    }
+  } catch (error) {
+    console.error("Error in SetChannelSelected:", error);
+  }
 }
 
 function setNamesFlags(direction, item) {
@@ -547,12 +564,12 @@ const confirmCargo = () => {
         price: null,
         vehicle: null,
       };
-      if(user.role == "DRIVER"){
+      if (user.role == "DRIVER") {
         data.driver = user.id;
         data.owner = selectedCargo.value.user.id;
         data.price = selectedCargo.value.price;
         data.vehicle = route.query.vehicle_id;
-      }else{
+      } else {
         data.driver = selectedCargo.value.main_driver.id;
         data.owner = user.id;
         data.price = selectedCargo.value.price;
@@ -579,30 +596,36 @@ const confirmCargo = () => {
 };
 
 async function Load() {
-  if(centrafugoToken.value){
-    centrifuge.value = new Centrifuge("wss://centrifugo.furago.uz/connection/websocket", {
+  if (centrafugoToken.value) {
+    console.log('load')
+    centrifuge.value = new Centrifuge(
+      "wss://centrifugo.furago.uz/connection/websocket",
+      {
         token: centrafugoToken.value, // Token for authentication
-        resubscribe: true,      // Automatically resubscribe on reconnect
-    });
+        resubscribe: true, // Automatically resubscribe on reconnect
+      }
+    );
 
     // Attach event handlers for Centrifuge connection
     centrifuge.value.on("connect", function (ctx) {
-        console.log("Connected to Centrifugo:", ctx);
+      console.log("Connected to Centrifugo:", ctx);
     });
 
     centrifuge.value.on("disconnect", function (ctx) {
-        console.log("Disconnected from Centrifugo:", ctx);
+      console.log("Disconnected from Centrifugo:", ctx);
     });
 
-    centrifuge.value.connect(); 
+    centrifuge.value.connect();
   }
-    // Establish connection
+  // Establish connection
 }
 
-
-watch(()=>centrafugoToken.value,(newVal)=>{
-  if(newVal){
-    Load();
+watch(
+  () => centrafugoToken.value,
+  (newVal) => {
+    if (newVal) {
+      Load();
+    }
   }
-})
+);
 </script>
