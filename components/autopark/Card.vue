@@ -46,7 +46,8 @@
       <div
         class="flex items-center gap-3 max-md:absolute max-md:top-0 max-md:right-0"
       >
-        <Tag severity="success" class="max-lg:!hidden" value="Tasdiqlangan"></Tag>
+        <Tag v-if="cardData.status=='accepted'" severity="success" class="max-lg:!hidden" value="Tasdiqlangan"></Tag>
+        <Tag v-else severity="warn" class="max-lg:!hidden" value="Tasdiqlanmagan"></Tag>
         <div class="card flex justify-center">
           <Button
             type="button"

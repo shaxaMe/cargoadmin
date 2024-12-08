@@ -23,10 +23,10 @@
               <td class="px-6 py-4 whitespace-nowrap">{{ setNamesFlags("from", order.locations)['name'] }}-{{ setNamesFlags("to", order.locations)['name'] }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getStatusClass(order.status)" class="px-2 py-1 text-xs rounded-full">
-                  {{ order.status }}
+                  {{ getStatusName(order.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ order.price }} ₸</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ order.price }}</td>
             </tr>
           </tbody>
         </table>
@@ -50,7 +50,7 @@
             <p class="text-sm text-gray-500">{{ order.route }}</p>
           </div>
           <div class="text-right">
-            <span class="font-medium">{{ order.amount }} ₸</span>
+            <span class="font-medium">{{ order.amount }}</span>
           </div>
         </div>
       </div>
@@ -127,11 +127,19 @@
   
   const getStatusClass = (status) => {
     const classes = {
-      'created': 'bg-blue-100 text-blue-800',
-      'Доставлен': 'bg-green-100 text-green-800',
-      'Обработка': 'bg-yellow-100 text-yellow-800'
+      'created': 'bg-slate-100 text-slate-800',
+      'wait': 'bg-yellow-100 text-yellow-800',
+      'accept': 'bg-yellow-100 text-yellow-800'
     }
     return classes[status] || 'bg-gray-100 text-gray-800'
+  }
+  function getStatusName(status){
+       const statusName = {
+        'created': 'Yaratildi',
+        'wait': 'Kutilmoqda',
+        'accept': 'Qabul qilingan'
+       }
+       return statusName[status] || 'Unknown'
   }
   function setNamesFlags(direction, item) {
   let cargo = null;
