@@ -12,15 +12,13 @@
 
 <script setup>
 import { useFlowbite } from '~/composables/useFlowbite';
-import {useChatStore} from "~/store/chat";
+
 import { 
     initDropdowns} from 'flowbite'
-    const { createChat } = useChatStore();
     onMounted(() => {
     useFlowbite(() => {
         initDropdowns();
     });
-    createChat()
 })
 </script>
 

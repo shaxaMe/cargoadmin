@@ -10,10 +10,12 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Клиент</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Маршрут</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Сумма</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mijoz</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Yo'nalish</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Holati</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Narxi</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Yaratilgan vaqti</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Boshqarish</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -26,7 +28,9 @@
                   {{ getStatusName(order.status) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ order.price }}</td>
+              <td class="px-6 py-4 whitespace-nowrap"  @click="isOpenOrder=true">{{ order.price }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ order.created_at }}</td>
+              
             </tr>
           </tbody>
         </table>
@@ -66,6 +70,58 @@
         aria-label="Custom ProgressSpinner"
       />
     </div>
+    <Modal v-model="isOpenOrder" :max-width="'600px'">
+      <div class="card flex justify-center">
+        <Stepper v-model:value="activeStep" class="basis-[40rem]">
+            <StepList>
+                <Step v-slot="{ activateCallback, value, a11yAttrs }" asChild :value="1">
+                    <div class="flex flex-row flex-auto gap-2" v-bind="a11yAttrs.root">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" @click="activateCallback" v-bind="a11yAttrs.header">
+                            <span
+                                :class="[
+                                    'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center',
+                                    { 'bg-primary text-primary-contrast border-primary': value <= activeStep, 'border-surface-200 dark:border-surface-700': value > activeStep }
+                                ]"
+                            >
+                                <i class="pi pi-user" />
+                            </span>
+                        </button>
+                        <Divider />
+                    </div>
+                </Step>
+                <Step v-slot="{ activateCallback, value, a11yAttrs }" asChild :value="2">
+                    <div class="flex flex-row flex-auto gap-2 pl-2" v-bind="a11yAttrs.root">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" @click="activateCallback" v-bind="a11yAttrs.header">
+                            <span
+                                :class="[
+                                    'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center',
+                                    { 'bg-primary text-primary-contrast border-primary': value <= activeStep, 'border-surface-200 dark:border-surface-700': value > activeStep }
+                                ]"
+                            >
+                                <i class="pi pi-star" />
+                            </span>
+                        </button>
+                        <Divider />
+                    </div>
+                </Step>
+                <Step v-slot="{ activateCallback, value, a11yAttrs }" asChild :value="3">
+                    <div class="flex flex-row pl-2" v-bind="a11yAttrs.root">
+                        <button class="bg-transparent border-0 inline-flex flex-col gap-2" @click="activateCallback" v-bind="a11yAttrs.header">
+                            <span
+                                :class="[
+                                    'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center',
+                                    { 'bg-primary text-primary-contrast border-primary': value <= activeStep, 'border-surface-200 dark:border-surface-700': value > activeStep }
+                                ]"
+                            >
+                                <i class="pi pi-id-card" />
+                            </span>
+                        </button>
+                    </div>
+                </Step>
+            </StepList>
+        </Stepper>
+    </div>
+    </Modal>
     </div>
   </template>
   
@@ -112,7 +168,9 @@
     //   status: 'В пути',
     //   amount: '180,000'
     // }
-  ])
+  ]);
+  const isOpenOrder = ref(false);
+  const activeStep = ref(1);
   
   const filteredOrders = computed(() => {
     return orders.value
