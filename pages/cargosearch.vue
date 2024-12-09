@@ -261,12 +261,13 @@ import { Centrifuge } from "centrifuge";
 
 // Состояние
 const cargoList = ref([]);
+
 const selectedCargo = ref(null);
 const chatMessages = ref([]);
 const newMessage = ref("");
 const loading = ref(true);
 const chatStore = useChatStore();
-const { SetChannel, chatClient } = chatStore;
+const { createChat } = chatStore;
 const { centrafugoToken } = storeToRefs(chatStore);
 const route = useRoute();
 const confirm = useConfirm();
@@ -361,6 +362,7 @@ onMounted(async () => {
   //   }
   // ]
   getApplications();
+  createChat()
   // Тестовые сообщения чата
 });
 
@@ -516,10 +518,6 @@ async function SetChannelSelected(id) {
     });
 
     // Ensure the Centrifugo connection is active
-    if (centrifuge.value&&!centrifuge.value.isConnected()) {
-      centrifuge.value.connect();
-      console.log("Connecting to Centrifugo server...");
-    }
   } catch (error) {
     console.error("Error in SetChannelSelected:", error);
   }

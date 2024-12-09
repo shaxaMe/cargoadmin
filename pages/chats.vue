@@ -163,6 +163,7 @@ const { user } = useAuth();
 let channelId = ref(null);
 const centrifuge = ref(null);
 const channel = ref(null);
+const { createChat } = chatStore;
 
 const chatList = computed(()=>{
   return chatMessages.value
@@ -193,6 +194,7 @@ onMounted(async () => {
   //     isOwner: true,
   //   },
   // ];
+  createChat()
 });
 
 // Методы
@@ -284,9 +286,8 @@ async function SetChannelSelected(id) {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        isOwner: ctx.data.created_by != user.id,
+        isOwner: ctx.data.created_by == user.id,
       });
-      console.log(ctx.data.created_by == user.id,user.id, ctx.data.created_by);
       const chatContainer = document.querySelector(".chatContainer");
 
   // Wait for the DOM to fully render
