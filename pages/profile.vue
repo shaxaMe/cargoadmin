@@ -349,8 +349,8 @@ watch(
             />
           </div>
           <div class="flex-1 relative">
-            <div class="px-3 py-2 text-xs absolute right-0 w-fit rounded-lg" :class="{'bg-green-200 text-green-400':formValues.status == 'accept','bg-yellow-50 text-yellow-400':formValues.status=='wait'}">
-               {{ statusList[formValues.status] }}
+            <div class="px-3 py-2 text-xs absolute right-0 w-fit rounded-lg" :class="userStatus(formValues.status)['class'] || 'bg-gray-300'">
+               {{ userStatus(formValues.status)['status'] }}
             </div>
             <p class="text-2xl font-bold text-gray-900">
               {{ formValues.full_name }}
@@ -400,7 +400,7 @@ watch(
               <div class="flex items-center mb-2">
                 <Icon name="hugeicons:passport" class="w-6 h-6" />
                 <h3 class="font-semibold text-lg ml-2">
-                  {{ userDocsNames(item.type) }}  <span class="px-3 py-2 text-xs ml-3 w-fit rounded-lg" :class="{'bg-green-200 text-green-400':item.status == 'accept','bg-yellow-50 text-yellow-400':item.status=='wait'}">{{ statusList[item.status] }}</span>
+                  <span class="px-3 py-2 text-xs ml-3 w-fit rounded-lg" :class="userDocsStatus(item.status)['class']|| 'bg-gray-300'">{{ userDocsStatus(item.status)['status'] }}</span>
                 </h3>
               </div>
               <div class="ml-8 space-y-1 text-gray-600">
