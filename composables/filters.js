@@ -1,4 +1,5 @@
 // Форматирование даты
+
 export const formatDate = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
@@ -52,7 +53,56 @@ export const formatDate = (dateString) => {
     return classes[type] || 'bg-gray-100 text-gray-800'
   }
   
+  export const userStatus = (userStatus) =>{
+    let status = {
+      active: 'Aktive',
+      activeClass:'bg-green-50 text-green-400',
+      inactiveClass:'bg-red-50 text-red-400',
+      inactive: 'Aktiv emas',
+      wait: "Kutilmoqda",
+      waitClass: 'bg-yellow-50 font-semibold text-yellow-400',
+      registered:"Ro'yxatdan o'tgan",
+      registeredClass:'bg-yellow-50 text-yellow-400'
+    }
+    let obj = {
+      status:status[userStatus],
+      class:status[userStatus+'Class']
+    }
+    return obj || 'Aniqlanmagan'
+  }
+  export const userDocsStatus = (docStatus)=>{
+    let status = {
+      accept: 'Qabul qilingan',
+      acceptClass:'bg-green-50 text-green-400',
+      archivedClass:'bg-yellow-50 text-yellow-400',
+      archived: 'Arxiv',
+      wait: "Kutilmoqda",
+      waitClass: 'bg-yellow-50 text-yellow-400',
+      rejected:"Ro'yxatdan o'tgan",
+      rejectedClass:'bg-red-50 text-red-400'
+    }
+    let obj = {
+      status:status[docStatus],
+      class:status[docStatus+'Class']
+    }
+    return obj || 'Aniqlanmagan'
+  }
   // Получение названия типа груза
+  export const vehicleStatus =(vehicleStatus)=>{
+     let status = {
+      accept: 'Qabul qilingan',
+      acceptClass:'bg-green-50 text-green-400',
+      archived: 'Arxiv',
+      archivedClass:'bg-yellow-50 text-yellow-400',
+      wait: "Kutilmoqda",
+      waitClass: 'bg-yellow-50 text-yellow-400',
+     }
+     let obj = {
+       status:status[vehicleStatus],
+       class:status[vehicleStatus+'Class']
+     }
+     return obj || 'Aniqlanmagan'
+  }
   export const getCargoTypeName = (type) => {
     const names = {
       general: 'Обычный',

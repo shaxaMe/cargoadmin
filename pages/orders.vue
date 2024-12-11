@@ -346,6 +346,7 @@ function getOrderData(id,item) {
     activeStep.value = 1;
   });
 }
+
 const getStatusClass = (status) => {
   const classes = {
     created: "bg-slate-100 text-slate-800",
