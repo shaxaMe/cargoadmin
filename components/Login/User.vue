@@ -6,7 +6,7 @@ import { required, sameAs } from "@vuelidate/validators";
 const toast = useToast();
 const auth = useAuth();
 const router = useRouter();
-const { setLogin, set_token, setUser } = auth;
+const { setLogin, set_token, setUser,setRefreshToken } = auth;
 definePageMeta({
   layout: "LoginLayout",
 });
@@ -63,7 +63,16 @@ function signIn() {
   result.then((res) => {
     if (res) {
       if (type.value == "new") {
-        type.value = "sms";
+    
+        useApi("/v1/sms/phone/register", {
+              method: "POST",
+              body: {
+                phone: phone,
+              },
+            }).then((res) => {
+              formValues.secret_key = res.secret_key;
+              type.value = "sms";
+            });
         setTimeout(() => {
           const inputs = document.querySelectorAll(
             ".p-inputotp.p-component input"
@@ -87,6 +96,7 @@ function signIn() {
         })
           .then((res) => {
             set_token(res.access);
+            setRefreshToken(res.refresh);
             setUser(res.user);
             setLogin(true);
             router.push("/");
@@ -132,6 +142,7 @@ function loggin() {
     })
       .then((res) => {
         set_token(res.access);
+        setRefreshToken(res.refresh);
         setUser(res.user);
         setLogin(true);
         router.push("/");
@@ -170,14 +181,6 @@ watch(
             type.value = "login";
           } else {
             type.value = "new";
-            useApi("/v1/sms/phone/register", {
-              method: "POST",
-              body: {
-                phone: str,
-              },
-            }).then((res) => {
-              formValues.secret_key = res.secret_key;
-            });
           }
         })
         .catch((e) => {
