@@ -1,5 +1,5 @@
 <template>
-  <div class="px-5 py-6">
+  <div class="px-5 py-6 w-full overflow-x-auto">
     <div
       class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0"
     >
@@ -50,16 +50,16 @@
         </thead>
         <tbody class="divide-y divide-gray-200">
           <tr v-for="order in filteredOrders" :key="order.id">
-            <td class="px-6 py-4 whitespace-nowrap">#{{ order.id }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 ">#{{ order.id }}</td>
+            <td class="px-6 py-4 ">
               {{ order?.owner?.full_name }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 ">
               {{ setNamesFlags("from", order.locations)["name"] }}-{{
                 setNamesFlags("to", order.locations)["name"]
               }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 ">
               <span
                 :class="getStatusClass(order.status)"
                 class="px-2 py-1 text-xs rounded-full"
@@ -67,22 +67,22 @@
                 {{ getStatusName(order.status) }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ order.price }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">{{ order.created_at }}</td>
-            <td class="px-6 py-4 whitespace-nowrap flex">
+            <td class="px-6 py-4 ">{{ order.price }}</td>
+            <td class="px-6 py-4 ">{{ order.created_at }}</td>
+            <td class="px-6 py-4  flex">
               <button
                 :disabled="orderLoading"
-                @click="getOrderData(order.id)"
+                @click="getOrderData(order.id,order)"
                 class="text-indigo-600 disabled:opacity-55 flex justify-center items-center hover:text-indigo-900 bg-slate-100 rounded-xl px-4 py-3"
                 title="Ko'rish"
               >
                 <i
-                  v-if="orderLoading"
+                  v-if="order.isLoad"
                   class="pi pi-spin pi-spinner"
                   style="font-size: 1rem"
                 ></i
                 ><Icon
-                  v-if="!orderLoading"
+                  v-if="!order.isLoad"
                   name="ic:baseline-remove-red-eye"
                   class="w-5 h-5"
                 ></Icon>
@@ -337,11 +337,11 @@ const filteredOrders = computed(() => {
   // })
 });
 
-function getOrderData(id) {
-  orderLoading.value = true;
+function getOrderData(id,item) {
+  item.isLoad = true;
   useApi(`/v1/order/${id}`).then((res) => {
     selectedOrder.value = res;
-    orderLoading.value = false;
+    item.isLoad = false;
     isOpenOrder.value = true;
     activeStep.value = 1;
   });
@@ -404,7 +404,7 @@ onMounted(() => {
           country: item.cargo_application.to_country,
         },
       ];
-      return { ...item, locations };
+      return { ...item, locations,isLoad:false };
     });
     loading.value = false;
     // } else {
