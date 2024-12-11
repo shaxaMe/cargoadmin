@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="fixed top-0 left-0 z-30 bg-black/15  w-0" :class="{'trans-custom !w-full':toggleNav}">
-      <div class="max-w-[250px] px-3 py-5 bg-white w-full h-auto min-h-screen hidden" :class="{'!block':toggleNav}">
+      <div class="max-w-[250px] px-3 py-5 bg-gray-800 w-full h-auto min-h-screen hidden" :class="{'!block':toggleNav}">
       <div class="flex w-full justify-end mb-5">
         <Icon name="material-symbols-light:cancel-outline-rounded" size="30px" @click="toggleNav=false" />
       </div>  
-    <aside class="w-full h-full flex flex-col justify-between">
+    <aside class="w-full h-full  flex flex-col justify-between">
       <div class="w-full h-10 text-center text-white font-extrabold text-lg">
         <img src="../assets/images/FG1.png" class="w-full h-full object-cover" alt="">
         <!-- <span class="text-[#4880FF]">Fura</span>Go -->
