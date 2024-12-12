@@ -418,6 +418,8 @@ const selectCargo = (cargo) => {
     body: {
       sender: user.id,
       receiver: user.role=='DRIVER' ? cargo.user.id : cargo.main_driver.id,
+      vehicle_application: user.role=='DRIVER' ?route.query.vehicle_application_id:cargo.id,
+      cargo_application:user.role=='DRIVER'?cargo.id:route.query.cargo_application_id
     },
   }).then((response) => {
     channelId.value = response.id;

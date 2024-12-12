@@ -19,6 +19,7 @@
             ]"
             class="border"
           >
+
             <!-- Краткая информация о грузе -->
             <div class="flex items-start justify-start gap-4">
             <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden flex justify-center items-center">
@@ -27,7 +28,14 @@
             </div>
               <div>
                 <div class="font-medium text-gray-900">
-                  {{ cargo.receiver.full_name }}
+                  <!-- {{ cargo.receiver.full_name }} -->
+                  <div class="font-medium text-gray-900">
+                  {{ setNamesFlags("from", cargo.vehicle_application.locations)["name"] }} →
+                  {{ setNamesFlags("to", cargo.vehicle_application.locations)["name"] }}
+                </div>
+                <div class="text-gray-500 text-sm">
+                  {{  cargo.receiver.full_name  }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -217,6 +225,7 @@ const selectCargo = (cargo) => {
   SetChannelSelected(cargo.id);
   getMessage(cargo.id);
 };
+
 
 const getMessage = (id) => {
   useApi(`/v1/chat/channel/messages?channel=${id}`).then((res)=>{
