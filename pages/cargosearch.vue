@@ -150,7 +150,7 @@
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
             <div
-              class="space-y-4 h-full max-h-[500px] max-2xl:max-h-[42dvh] overflow-y-auto chatContainer"
+              class="space-y-4 h-full max-h-[500px] max-2xl:max-h-[42dvh] overflow-y-auto chatContainer my-2"
               v-if="!chatLoading"
             >
               <div
@@ -191,7 +191,7 @@
               />
             </div>
             <!-- Ввод сообщения -->
-            <div class="mt-4 flex gap-2">
+            <div class="flex gap-2">
               <input
                 type="text"
                 v-model="newMessage"
