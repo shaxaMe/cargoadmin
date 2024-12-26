@@ -35,8 +35,8 @@
                   </span>
                 </div>
               </div>
-              <div class="text-lg font-semibold text-gray-900">
-                {{ formatPrice(cargo.price) }}
+              <div class="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                {{ formatPrice(cargo.price) }}  {{ cargo.currency.code }}
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@
                   <div>
                     <div class="text-sm text-gray-500">Цена</div>
                     <div class="font-medium">
-                      {{ formatPrice(selectedCargo.price) }}
+                      {{ formatPrice(selectedCargo.price) }} {{ selectedCargo.currency.code }}
                     </div>
                   </div>
                 </div>
