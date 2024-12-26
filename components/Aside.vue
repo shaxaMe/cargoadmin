@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="fixed top-0 left-0 z-30 bg-black/15  w-0" :class="{'trans-custom !w-full':toggleNav}">
-      <div class="max-w-[250px] px-3 py-5 bg-gray-800 w-full h-auto min-h-screen hidden" :class="{'!block':toggleNav}">
+      <div class="max-w-[250px] px-3 py-5 bg-gray-800 w-full h-full max-h-[100dvh] hidden" :class="{'!block':toggleNav}">
       <div class="flex w-full justify-end mb-5">
         <Icon name="material-symbols-light:cancel-outline-rounded" size="30px" @click="toggleNav=false" />
       </div>  
@@ -57,7 +57,7 @@
     </aside>
   </div>
     </div>
-    <div class="max-w-[280px] px-3 py-5 bg-gray-800 text-white  w-full h-full min-h-screen max-lg:hidden">
+    <div class="max-w-[280px] px-3 py-5 bg-gray-800 text-white  w-full h-full max-lg:hidden">
     <aside class="w-full h-full flex flex-col justify-between gap-5">
       <div>
         <div class="w-full h-10 text-center text-white font-extrabold text-lg">
