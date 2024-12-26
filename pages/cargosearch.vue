@@ -1,24 +1,18 @@
 <template>
-  <div class="flex mt-4 h-[calc(100vh-45px)]">
+  <div class="flex h-full items-stretch">
     <!-- Левая панель со списком грузов -->
     <div class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto">
       <div class="p-4">
         <h2 class="text-lg font-semibold mb-4">Список грузов</h2>
         <!-- Список грузов -->
         <div class="space-y-3 overflow-x-auto">
-          <div
-            v-if="!loading && cargoList && cargoList.length > 0"
-            v-for="cargo in cargoList"
-            :key="cargo.id"
-            @click="selectCargo(cargo)"
-            :class="[
+          <div v-if="!loading && cargoList && cargoList.length > 0" v-for="cargo in cargoList" :key="cargo.id"
+            @click="selectCargo(cargo)" :class="[
               'p-4 rounded-lg cursor-pointer transition-all duration-200',
               selectedCargo?.id === cargo.id
                 ? 'bg-blue-50 border-blue-200'
                 : 'bg-gray-50 hover:bg-gray-100 border-gray-200',
-            ]"
-            class="border"
-          >
+            ]" class="border">
             <!-- Краткая информация о грузе -->
             <div class="flex items-start justify-between">
               <div>
@@ -52,10 +46,10 @@
 
     <!-- Правая панель с детальной информацией -->
     <div class="flex-1 flex flex-col bg-gray-50">
-      <template v-if="selectedCargo">
+      <div v-if="selectedCargo">
         <!-- Детальная информация о грузе -->
         <div class="px-6 py-3 bg-white border-b border-gray-200">
-          <div class="grid grid-cols-2 gap-6">
+          <div class="grid grid-cols-3 gap-6">
             <div>
               <h2 class="text-xl font-semibold text-gray-900 mb-4">
                 Информация о грузе
@@ -88,10 +82,6 @@
                       {{ formatDate(selectedCargo.departure_date) }}
                     </div>
                   </div>
-                  <!-- <div>
-                      <div class="text-sm text-gray-500">Дата выгрузки</div>
-                      <div class="font-medium">{{ formatDate(selectedCargo.unloadingDate) }}</div>
-                    </div> -->
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                   <div>
@@ -141,6 +131,13 @@
                   <div class="font-medium">{{ selectedCargo?.notes }}</div>
                 </div>
               </div>
+
+            </div>
+            <div class="flex justify-end">
+              <button @click="confirmCargo"
+                class="px-6 py-2 bg-green-500 w-fit h-fit text-white rounded-lg hover:bg-green-600 transition-colors">
+                Подтвердить
+              </button>
             </div>
           </div>
         </div>
@@ -149,60 +146,37 @@
         <div class="flex-1 p-6 bg-gray-50">
           <div class="bg-white rounded-lg shadow-sm p-4 h-full">
             <h3 class="text-lg font-semibold mb-4">Чат с владельцем груза</h3>
-            <div
-              class="space-y-4 h-full max-h-[500px] max-2xl:max-h-[42dvh] overflow-y-auto chatContainer my-2"
-              v-if="!chatLoading"
-            >
-              <div
-                v-for="(message, index) in chatList"
-                :key="index"
-                :class="[
-                  'flex',
-                  message.isOwner ? 'justify-start' : 'justify-end',
-                ]"
-              >
-                <div
-                  :class="[
-                    'max-w-[70%] rounded-lg p-3',
-                    message.isOwner
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'bg-blue-500 text-white',
-                  ]"
-                >
+            <div class="space-y-4 h-full max-h-[60dvh] overflow-y-auto chatContainer my-2" v-if="!chatLoading">
+              <div v-for="(message, index) in chatList" :key="index" :class="[
+                'flex',
+                message.isOwner ? 'justify-start' : 'justify-end',
+              ]">
+                <div :class="[
+                  'max-w-[70%] rounded-lg p-3',
+                  message.isOwner
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'bg-blue-500 text-white',
+                ]">
                   {{ message.text }}
-                  <div
-                    :class="[
-                      'text-xs mt-1',
-                      message.isOwner ? 'text-gray-500' : 'text-blue-100',
-                    ]"
-                  >
+                  <div :class="[
+                    'text-xs mt-1',
+                    message.isOwner ? 'text-gray-500' : 'text-blue-100',
+                  ]">
                     {{ message.time }}
                   </div>
                 </div>
               </div>
             </div>
             <div class="h-[50dvh] flex items-center justify-center" v-else>
-              <ProgressSpinner
-                style="width: 50px; height: 50px"
-                strokeWidth="8"
-                fill="transparent"
-                animationDuration=".5s"
-                aria-label="Custom ProgressSpinner"
-              />
+              <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+                animationDuration=".5s" aria-label="Custom ProgressSpinner" />
             </div>
             <!-- Ввод сообщения -->
             <div class="flex gap-2">
-              <input
-                type="text"
-                v-model="newMessage"
-                @keyup.enter="sendMessage"
-                placeholder="Введите сообщение..."
-                class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                @click="sendMessage"
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
+              <input type="text" v-model="newMessage" @keyup.enter="sendMessage" placeholder="Введите сообщение..."
+                class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button @click="sendMessage"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                 Отправить
               </button>
             </div>
@@ -210,12 +184,12 @@
         </div>
 
         <!-- Кнопки действий -->
-        <div class="px-6 py-3 bg-white border-t border-gray-200">
+        <!-- <div class="px-6 py-3 bg-white border-t border-gray-200">
           <div class="flex justify-end gap-4">
-            <!-- <button @click="takeCargo"
+             <button @click="takeCargo"
                       class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                 Забрать груз
-              </button> -->
+              </button> 
             <button
               @click="confirmCargo"
               class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
@@ -223,8 +197,8 @@
               Подтвердить
             </button>
           </div>
-        </div>
-      </template>
+        </div> -->
+      </div>
 
       <!-- Заглушка при отсутствии выбранного груза -->
       <div v-else class="h-full flex items-center justify-center text-gray-500">
@@ -236,17 +210,10 @@
     </div>
     <Toast />
     <ConfirmDialog></ConfirmDialog>
-    <div
-      v-if="loading"
-      class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center"
-    >
-      <ProgressSpinner
-        style="width: 50px; height: 50px"
-        strokeWidth="8"
-        fill="transparent"
-        animationDuration=".5s"
-        aria-label="Custom ProgressSpinner"
-      />
+    <div v-if="loading"
+      class="fixed w-screen h-screen top-0 left-0 backdrop-blur-sm bg-white/10 flex justify-center items-center">
+      <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent" animationDuration=".5s"
+        aria-label="Custom ProgressSpinner" />
     </div>
   </div>
 </template>
@@ -278,7 +245,7 @@ let channelId = ref(null);
 const centrifuge = ref(null);
 const channel = ref(null);
 
-const chatList = computed(()=>{
+const chatList = computed(() => {
   return chatMessages.value
 })
 // Загрузка данных
@@ -417,9 +384,9 @@ const selectCargo = (cargo) => {
     method: "POST",
     body: {
       sender: user.id,
-      receiver: user.role=='DRIVER' ? cargo.user.id : cargo.main_driver.id,
-      vehicle_application: user.role=='DRIVER' ?route.query.vehicle_application_id:cargo.id,
-      cargo_application:user.role=='DRIVER'?cargo.id:route.query.cargo_application_id
+      receiver: user.role == 'DRIVER' ? cargo.user.id : cargo.main_driver.id,
+      vehicle_application: user.role == 'DRIVER' ? route.query.vehicle_application_id : cargo.id,
+      cargo_application: user.role == 'DRIVER' ? cargo.id : route.query.cargo_application_id
     },
   }).then((response) => {
     channelId.value = response.id;
@@ -462,7 +429,7 @@ const sendMessage = () => {
 async function SetChannelSelected(id) {
   try {
     // Ensure the Centrifugo instance exists
-    
+
 
     // Unsubscribe from the previous channel if it exists
     if (channel.value) {
@@ -507,16 +474,16 @@ async function SetChannelSelected(id) {
         }),
         isOwner: ctx.data.created_by != user.id,
       });
-      console.log(ctx.data.created_by == user.id,user.id, ctx.data.created_by);
+      console.log(ctx.data.created_by == user.id, user.id, ctx.data.created_by);
       const chatContainer = document.querySelector(".chatContainer");
 
-  // Wait for the DOM to fully render
-  setTimeout(() => {
-    chatContainer.scrollTo({
-      top: chatContainer.scrollHeight,
-      behavior: "smooth", // Optional
-    });
-  }, 100); // Adjust delay if necessary
+      // Wait for the DOM to fully render
+      setTimeout(() => {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: "smooth", // Optional
+        });
+      }, 100); // Adjust delay if necessary
     });
 
     // Ensure the Centrifugo connection is active
