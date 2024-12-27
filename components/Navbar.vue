@@ -483,6 +483,14 @@ function setLocal(lang){
   setLocaleStore(lang);
   _hidLocale();
 }
+
+onMounted(()=>{
+  let currentLang = localStorage.getItem('locale');
+  if(currentLang){
+    setLocale(currentLang);
+    setLocaleStore(currentLang);
+  }
+})
 </script>
 
 <style lang="scss" scoped></style>

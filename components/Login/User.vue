@@ -4,6 +4,7 @@ import { useToast } from "primevue/usetoast";
 import useVuelidate from "@vuelidate/core";
 import { required, sameAs } from "@vuelidate/validators";
 const toast = useToast();
+const { t } = useI18n();
 const auth = useAuth();
 const router = useRouter();
 const { setLogin, set_token, setUser,setRefreshToken } = auth;
@@ -102,19 +103,18 @@ function signIn() {
             router.push("/");
           })
           .catch((e) => {
-            if (e.response.status == 401) {
-              loginPassError.value = true;
-            } else {
-              toast.add({
+              if(e && e.response.status == 401) {
+                loginPassError.value = true;
+                toast.add({
                 severity: "error",
                 summary: "Xatolik",
                 detail: "Login qilishda xatolik",
                 life: 3000,
               });
-            }
             setLogin(false);
             set_token(null);
             setUser(null);
+              }
           });
       }
     }
@@ -204,7 +204,7 @@ watch(
           Login
         </h3>
         <h3 class="text-3xl font-extrabold text-blue-600" v-if="type == 'new'">
-          Ro'yxatdan o'tish
+          {{ t("login.sign_up") }}
         </h3>
       </div>
 
@@ -233,7 +233,7 @@ watch(
             pattern="[0-9]*"
             v-model="formValues.phone"
           />
-          <label for="phone_num">Telefon raqam</label>
+          <label for="phone_num">{{ t("login.phone") }}</label>
         </FloatLabel>
       </div>
       <div class="mt-3" v-if="type == 'sms'">
@@ -250,7 +250,7 @@ watch(
                 name="fa6-solid:comment-sms"
                 class="wh-18 absolute right-2 text-[#bbb]"
               /> -->
-          <div class="text-[#bbb] text-sm">Tasdiqlash kodi</div>
+          <div class="text-[#bbb] text-sm">{{ t("login.otp") }}</div>
           <InputOtp
             v-model="formValues.secret_code"
             integerOnly
@@ -285,13 +285,13 @@ watch(
             v-model="formValues.full_name"
             @blur="$v.full_name.$touch()"
           />
-          <label for="full_name">Ism familiya</label>
+          <label for="full_name">{{ t("login.full_name") }}</label>
         </FloatLabel>
         <div
           v-if="!!$v.full_name.$errors.length"
           class="text-red-500 text-sm mt-1"
         >
-          Ism familiya kiritilmagan
+          {{ t("login_valid.full_name") }}
         </div>
       </div>
       <div class="mt-3" v-if="type == 'new'">
@@ -305,13 +305,13 @@ watch(
               optionLabel="name"
               class="w-full text-sm"
             />
-            <label for="roleId">Foydalanuvchi roli</label>
+            <label for="roleId">{{ t("login.user_role") }}</label>
           </FloatLabel>
           <div
             v-if="!!$v.role.$errors.length"
             class="text-red-500 text-sm mt-1"
           >
-            Foydalanuvchi roli tanlangan
+            {{ t("login_valid.user_role") }}
           </div>
         </div>
       </div>
@@ -327,16 +327,16 @@ watch(
               :invalid="loginPassError || !!$v.password.$errors.length"
               :feedback="false"
             />
-            <label for="passwordId">Parol</label>
+            <label for="passwordId">{{ t("login.password") }}</label>
           </FloatLabel>
           <p v-if="loginPassError" class="text-red-500 text-sm mt-1">
-            Parolni tekshiring
+            {{ t("login_valid.check_password") }}
           </p>
           <div
             v-if="!!$v.password.$errors.length"
             class="text-red-500 text-sm mt-1"
           >
-            Parol kiritilmagan
+            {{ t("login_valid.password") }}
           </div>
         </div>
       </div>
@@ -355,19 +355,19 @@ watch(
               "
               :feedback="false"
             />
-            <label for="rePassword">Takror parol</label>
+            <label for="rePassword">{{ t("login.re_password") }}</label>
           </FloatLabel>
           <div
             v-if="!!$v.password.$errors.length"
             class="text-red-500 text-sm mt-1"
           >
-            Takror parolni kiriting
+            {{ t("login_valid.re_password") }}
           </div>
           <div
             v-if="formValues.password !== formValues.repeat_password"
             class="text-red-500 text-sm mt-1"
           >
-            Takror parolni kiriting
+            {{ t("login_valid.incorrect_password") }}
           </div>
           <!-- <div class="text-red-500 text-xs self-start">Parolda o'xshashlik mavjud emas</div> :invalid="!value" variant="filled" -->
         </div>
@@ -383,7 +383,7 @@ watch(
           @click="signIn"
           class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
         >
-          {{ $t('login.sign') }}
+          {{ t('login.sign') }}
         </button>
         <button
           v-else
@@ -394,14 +394,14 @@ watch(
           @click="loggin"
           class="w-full disabled:cursor-not-allowed disabled:opacity-60 py-2.5 px-4 text-sm font-semibold tracking-wider rounded-md text-white bg-[#4964D8] hover:bg-blue-700 focus:outline-none"
         >
-        {{ $t('login.sign') }}
+        {{ t('login.sign') }}
         </button>
 
         <p class="text-sm text-center mt-3" @click="restart" v-if="!!type">
           <a
             href="javascript:void(0);"
             class="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap"
-            >{{ $t('login.back') }}</a
+            >{{ t('login.back') }}</a
           >
         </p>
       </div>

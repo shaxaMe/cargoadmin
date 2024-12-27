@@ -2,13 +2,40 @@
     "aside": {
         "direction": "Directions",
         "loads": "Loads",
-        "car_park": "Car park"
+        "car_park": "Car Park"
     },
     "notifications": {
-        "empty": "No information found"
+        "empty": "No data found"
     },
-    "login":{
-        "sign":"Kirish",
-        "back":"Orqaga"
+    "login": {
+        "sign": "Sign In",
+        "back": "Back",
+        "sign_up": "Sign Up",
+        "phone": "Phone Number",
+        "otp": "Verification Code",
+        "full_name": "Full Name",
+        "user_role": "User Role",
+        "password": "Password",
+        "re_password": "Repeat Password",
+        "forgot_password": "If you forgot your password, log in again to report it!"
+    },
+    "login_valid": {
+        "full_name": "Full name is not entered",
+        "user_role": "User role is not selected",
+        "password": "Password is not entered",
+        "check_password": "Check the password",
+        "re_password": "Enter the repeat password",
+        "incorrect_password": "Passwords do not match"
+    },
+    "add_car": {
+        "title": "Add Car",
+        "brand": "Transport Type",
+        "vehicle_type": "Body Type",
+        "model": "Model",
+        "color": "Color",
+        "year": "Year",
+        "add": "Add",
+        "weight": "Load Capacity (t)",
+        "volume": "Load Volume (m3)"
     }
 }

@@ -24,7 +24,7 @@ export const useApi = async (path, options = {}) => {
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Handle 401 Unauthorized by attempting to refresh the token
-        return handle401Error();
+        // return handle401Error();
       }
       throw error; // Rethrow if it's not a 401 error
     }
