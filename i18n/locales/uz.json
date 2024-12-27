@@ -9,7 +9,23 @@
     },
     "login":{
         "sign":"Kirish",
-        "back":"Orqaga"
+        "back":"Orqaga",
+        "sign_up":"Ro'yxatdan o'tish",
+        "phone":"Telefon raqam",
+        "otp":"Tasdiqlash kodi",
+        "full_name":"Ism familiya",
+        "user_role":"Foydalanuvchi roli",
+        "password":"Parol",
+        "re_password":"Takror parol",
+        "forgot_password":"Parolni unutganingiz bo’lsangiz, xabar berish uchun qayta kiring!"
+    },
+    "login_valid":{
+       "full_name":"Ism familiya kiritilmagan",
+       "user_role":"Foydalanuvchi roli tanlanmagan",
+       "password":"Parol kiritilmagan",
+       "check_password":"Parolni tekshiring",
+       "re_password":"Takror parolni kiriting",
+       "incorrect_password":"Parol bir xil emas"
     },
     "add_car":{
         "title":"Avtomobil qo'shish",

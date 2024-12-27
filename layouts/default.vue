@@ -15,7 +15,7 @@ import { useFlowbite } from '~/composables/useFlowbite';
 
 import { 
     initDropdowns} from 'flowbite'
-    onMounted(() => {
+    onMounted(() => { 
     useFlowbite(() => {
         initDropdowns();
     });
